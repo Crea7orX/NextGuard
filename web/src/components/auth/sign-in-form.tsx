@@ -1,24 +1,64 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import GoogleIcon from "~/assets/icons/google.svg";
+import { ErrorAlert } from "~/components/auth/error-alert";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { authClient } from "~/lib/auth-client";
 
 export function SignInForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const searchParams = useSearchParams();
+  const redirectUrl = React.useMemo(
+    () => searchParams.get("redirect_url") ?? "/",
+    [searchParams],
+  );
+
+  const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoadingGoogle, setIsLoadingGoogle] = React.useState(false);
+
+  function googleSignIn() {
+    void authClient.signIn.social(
+      {
+        provider: "google",
+        callbackURL: redirectUrl,
+      },
+      {
+        onRequest: () => {
+          setIsLoadingGoogle(true);
+          setError(null);
+        },
+        onError: (ctx) => {
+          setIsLoadingGoogle(false);
+          setError(ctx.error.message);
+        },
+      },
+    );
+  }
 
   return (
     <form className={className} {...props}>
       <div className="grid gap-6">
-        <Button variant="outline" className="w-full">
-          <GoogleIcon />
+        {error && <ErrorAlert error={error} />}
+        <Button
+          variant="outline"
+          className="w-full"
+          type="button"
+          onClick={googleSignIn}
+        >
+          {isLoadingGoogle ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <GoogleIcon />
+          )}
           Login with Google
         </Button>
         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -74,7 +114,10 @@ export function SignInForm({
         </div>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/sign-up" className="underline underline-offset-4">
+          <Link
+            href={`/auth/sign-up?${searchParams.toString()}`}
+            className="underline underline-offset-4"
+          >
             Sign up
           </Link>
         </div>
