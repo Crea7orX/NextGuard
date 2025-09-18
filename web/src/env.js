@@ -11,6 +11,7 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
     GOOGLE_CLIENT_SECRET: z.string(),
+    RESEND_API_KEY: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -39,6 +40,7 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
     NODE_ENV: process.env.NODE_ENV,
