@@ -157,7 +157,7 @@ export function SignInForm({
                   <div className="flex items-center">
                     <FormLabel>Password</FormLabel>
                     <Link
-                      href={`/auth/sign-in/reset-password?${redirectSearchParams}`}
+                      href={`/auth/reset-password?${redirectSearchParams}`}
                       className="text-muted-foreground ml-auto text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?

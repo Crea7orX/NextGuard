@@ -1,7 +1,7 @@
 import { PasswordResetForm } from "~/components/auth/password-reset-form";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordTokenPage() {
   return (
     <Card>
       <CardHeader className="text-center">

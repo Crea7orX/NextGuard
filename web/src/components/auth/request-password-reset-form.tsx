@@ -70,7 +70,7 @@ export function RequestPasswordResetForm({
     void authClient.requestPasswordReset(
       {
         ...data,
-        redirectTo: `${env.NEXT_PUBLIC_BASE_URL}/auth/sign-in/reset-password/token?${redirectSearchParams}`,
+        redirectTo: `${env.NEXT_PUBLIC_BASE_URL}/auth/reset-password/token?${redirectSearchParams}`,
       },
       {
         onRequest: () => {
