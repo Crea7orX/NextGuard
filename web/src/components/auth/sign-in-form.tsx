@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import GoogleIcon from "~/assets/icons/google.svg";
@@ -28,6 +28,7 @@ export function SignInForm({
   ...props
 }: React.ComponentProps<"div">) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const redirectUrl = React.useMemo(
     () => searchParams.get("redirect_url") ?? "/dashboard",
     [searchParams],
@@ -73,6 +74,11 @@ export function SignInForm({
           setError(null);
         },
         onError: (ctx) => {
+          if (ctx.error.code === "EMAIL_NOT_VERIFIED") {
+            router.push(`/auth/verify-email?${redirectSearchParams}`);
+            return;
+          }
+
           setIsLoading(false);
           setError(ctx.error.message);
         },
