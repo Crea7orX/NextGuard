@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { lastLoginMethod } from "better-auth/plugins";
 import { env } from "~/env";
 import { db } from "~/server/db";
 import { sendResetPasswordEmail } from "~/server/email/utils/send-password-reset-email";
@@ -26,4 +27,5 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
+  plugins: [lastLoginMethod()],
 });
