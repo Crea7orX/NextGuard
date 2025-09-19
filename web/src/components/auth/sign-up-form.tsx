@@ -41,7 +41,7 @@ export function SignUpForm({
   const form = useForm<SignUp>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      email: "",
+      email: searchParams.get("email") ?? "",
       password: "",
       passwordConfirmation: "",
       firstName: "",
@@ -49,6 +49,18 @@ export function SignUpForm({
     },
     disabled: isLoading || isLoadingGoogle,
   });
+
+  const redirectSearchParams = React.useMemo(() => {
+    const email = form.watch("email");
+    const params = new URLSearchParams(searchParams.toString());
+    if (email) {
+      params.set("email", email);
+    } else {
+      params.delete("email");
+    }
+    return params.toString();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, form.getValues("email")]);
 
   function onSubmit(data: SignUp) {
     void authClient.signUp.email(
@@ -262,7 +274,7 @@ export function SignUpForm({
         <div className="text-center text-sm">
           Have an account?{" "}
           <Link
-            href={`/auth/sign-in?${searchParams.toString()}`}
+            href={`/auth/sign-in?${redirectSearchParams}`}
             className="underline underline-offset-4"
           >
             Sign in

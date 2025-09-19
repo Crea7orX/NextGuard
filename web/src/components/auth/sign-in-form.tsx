@@ -40,12 +40,24 @@ export function SignInForm({
   const form = useForm<SignIn>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
+      email: searchParams.get("email") ?? "",
       password: "",
       rememberMe: true,
     },
     disabled: isLoading || isLoadingGoogle,
   });
+
+  const redirectSearchParams = React.useMemo(() => {
+    const email = form.watch("email");
+    const params = new URLSearchParams(searchParams.toString());
+    if (email) {
+      params.set("email", email);
+    } else {
+      params.delete("email");
+    }
+    return params.toString();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, form.getValues("email")]);
 
   function onSubmit(data: SignIn) {
     void authClient.signIn.email(
@@ -100,7 +112,7 @@ export function SignInForm({
           ) : (
             <GoogleIcon />
           )}
-          Login with Google
+          Sign in with Google
         </Button>
         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-card text-muted-foreground relative z-10 px-2">
@@ -135,12 +147,12 @@ export function SignInForm({
                 <FormItem>
                   <div className="flex items-center">
                     <FormLabel>Password</FormLabel>
-                    <a
-                      href="#"
+                    <Link
+                      href={`/auth/sign-in/reset-password?${redirectSearchParams}`}
                       className="text-muted-foreground ml-auto text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?
-                    </a>
+                    </Link>
                   </div>
                   <FormControl>
                     <div className="group relative">
@@ -186,7 +198,7 @@ export function SignInForm({
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link
-            href={`/auth/sign-up?${searchParams.toString()}`}
+            href={`/auth/sign-up?${redirectSearchParams}`}
             className="underline underline-offset-4"
           >
             Sign up
