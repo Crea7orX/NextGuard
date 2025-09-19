@@ -8,6 +8,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import GoogleIcon from "~/assets/icons/google.svg";
 import { ErrorAlert } from "~/components/auth/error-alert";
+import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -31,6 +32,7 @@ export function SignInForm({
     () => searchParams.get("redirect_url") ?? "/dashboard",
     [searchParams],
   );
+  const lastMethod = authClient.getLastUsedLoginMethod();
 
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -103,10 +105,11 @@ export function SignInForm({
         {error && <ErrorAlert error={error} />}
         <Button
           variant="outline"
-          className="w-full"
+          className="relative w-full"
           disabled={form.formState.disabled}
           onClick={googleSignIn}
         >
+          {lastMethod === "google" && <LastLoginBadge />}
           {isLoadingGoogle ? (
             <LoaderCircle className="animate-spin" />
           ) : (

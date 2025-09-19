@@ -8,6 +8,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import GoogleIcon from "~/assets/icons/google.svg";
 import { ErrorAlert } from "~/components/auth/error-alert";
+import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { SuccessAlert } from "~/components/auth/success-alert";
 import { Button } from "~/components/ui/button";
 import {
@@ -36,6 +37,7 @@ export function RequestPasswordResetForm({
     () => searchParams.get("redirect_url") ?? "/dashboard",
     [searchParams],
   );
+  const lastMethod = authClient.getLastUsedLoginMethod();
 
   const [success, setSuccess] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -155,10 +157,11 @@ export function RequestPasswordResetForm({
         <div className="flex flex-col gap-3">
           <Button
             variant="outline"
-            className="w-full"
+            className="relative w-full"
             disabled={form.formState.disabled}
             onClick={googleSignIn}
           >
+            {lastMethod === "google" && <LastLoginBadge />}
             {isLoadingGoogle ? (
               <LoaderCircle className="animate-spin" />
             ) : (
@@ -168,11 +171,12 @@ export function RequestPasswordResetForm({
           </Button>
           <Button
             variant="outline"
-            className="w-full"
+            className="relative w-full"
             disabled={form.formState.disabled}
             asChild
           >
             <Link href={`/auth/sign-in?${redirectSearchParams}`}>
+              {lastMethod === "email" && <LastLoginBadge />}
               <Lock />
               Sign in with your password
             </Link>
