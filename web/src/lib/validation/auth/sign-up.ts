@@ -22,7 +22,7 @@ export const signUpSchema = z
 
 export type SignUp = z.infer<typeof signUpSchema>;
 
-function validatePassword(val: string, ctx: RefinementCtx) {
+export function validatePassword(val: string, ctx: RefinementCtx) {
   const smallLetter = /[a-z]/.test(val);
   if (!smallLetter)
     ctx.addIssue({
