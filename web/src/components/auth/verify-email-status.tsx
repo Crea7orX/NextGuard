@@ -1,0 +1,119 @@
+"use client";
+
+import { LoaderCircle, Lock } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import React from "react";
+import GoogleIcon from "~/assets/icons/google.svg";
+import { ErrorAlert } from "~/components/auth/error-alert";
+import { LastLoginBadge } from "~/components/auth/last-login-badge";
+import { SuccessAlert } from "~/components/auth/success-alert";
+import { Button } from "~/components/ui/button";
+import { authClient } from "~/lib/auth-client";
+import { cn } from "~/lib/utils";
+
+export function VerifyEmailStatus({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const redirectUrl = React.useMemo(
+    () => searchParams.get("redirect_url") ?? "/dashboard",
+    [searchParams],
+  );
+  const lastMethod = authClient.getLastUsedLoginMethod();
+
+  const redirectSearchParams = React.useMemo(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("error");
+    return params.toString();
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    setIsInitialLoading(false);
+    if (searchParams.get("error") === "token_expired") {
+      setError(
+        "Verification token expired. Please try again signing in to your account.",
+      );
+      return;
+    }
+
+    setSuccess(
+      "Email verified successfully. You will be redirected after 5 seconds.",
+    );
+    setTimeout(() => {
+      void router.push(`/auth/sign-in?${redirectSearchParams}`);
+    }, 5000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [success, setSuccess] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = React.useState(true);
+  const [isLoadingGoogle, setIsLoadingGoogle] = React.useState(false);
+  const disabled =
+    isInitialLoading || isLoadingGoogle || typeof success === "string";
+
+  function googleSignIn() {
+    void authClient.signIn.social(
+      {
+        provider: "google",
+        callbackURL: redirectUrl,
+      },
+      {
+        onRequest: () => {
+          setIsLoadingGoogle(true);
+          setError(null);
+        },
+        onError: (ctx) => {
+          setIsLoadingGoogle(false);
+          setError(ctx.error.message);
+        },
+      },
+    );
+  }
+
+  return (
+    <div className={cn("grid gap-6", className)} {...props}>
+      {success && <SuccessAlert success={success} />}
+      {error && <ErrorAlert error={error} />}
+      {isInitialLoading && (
+        <LoaderCircle className="size-12 animate-spin justify-self-center" />
+      )}
+      <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+        <span className="bg-card text-muted-foreground relative z-10 px-2">
+          Or use another method
+        </span>
+      </div>
+      <div className="flex flex-col gap-3">
+        <Button
+          variant="outline"
+          className="relative w-full"
+          disabled={disabled}
+          onClick={googleSignIn}
+        >
+          {lastMethod === "google" && <LastLoginBadge />}
+          {isLoadingGoogle ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <GoogleIcon />
+          )}
+          Sign in with Google
+        </Button>
+        <Button
+          variant="outline"
+          className="relative w-full"
+          disabled={disabled}
+          asChild
+        >
+          <Link href={`/auth/sign-in?${redirectSearchParams}`}>
+            {lastMethod === "email" && <LastLoginBadge />}
+            <Lock />
+            Sign in with your password
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
