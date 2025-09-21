@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
+import { LoadingButton } from "~/components/common/loading-button";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -158,17 +159,14 @@ export function SignInForm({
               </FormItem>
             )}
           />
-          <Button
+          <LoadingButton
             type="submit"
             className="w-full"
+            isLoading={isLoading}
             disabled={form.formState.disabled}
           >
-            {isLoading ? (
-              <LoaderCircle size={16} className="animate-spin" />
-            ) : (
-              <span>Sign In</span>
-            )}
-          </Button>
+            Sign In
+          </LoadingButton>
         </form>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}

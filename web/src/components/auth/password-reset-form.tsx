@@ -10,6 +10,7 @@ import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google
 import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
 import { SuccessAlert } from "~/components/auth/success-alert";
+import { LoadingButton } from "~/components/common/loading-button";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -178,17 +179,14 @@ export function PasswordResetForm({
                 </FormItem>
               )}
             />
-            <Button
+            <LoadingButton
               type="submit"
               className="w-full"
+              isLoading={isLoading}
               disabled={form.formState.disabled}
             >
-              {isLoading ? (
-                <LoaderCircle size={16} className="animate-spin" />
-              ) : (
-                <span>Reset password</span>
-              )}
-            </Button>
+              Reset password
+            </LoadingButton>
           </form>
         )}
         <AnotherMethodSeparator />

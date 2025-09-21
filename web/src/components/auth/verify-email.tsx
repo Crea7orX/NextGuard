@@ -7,7 +7,7 @@ import { AnotherMethodSeparator } from "~/components/auth/another-method-separat
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
 import { SuccessAlert } from "~/components/auth/success-alert";
-import { Button } from "~/components/ui/button";
+import { LoadingButton } from "~/components/common/loading-button";
 import { env } from "~/env";
 import { useCountdown } from "~/hooks/use-countdown";
 import { authClient } from "~/lib/auth-client";
@@ -86,19 +86,18 @@ export function VerifyEmail({
       {isInitialLoading ? (
         <LoaderCircle className="size-12 animate-spin justify-self-center" />
       ) : (
-        <Button
+        <LoadingButton
           className="w-full"
+          isLoading={isLoading}
           disabled={disabled || isCountdownRunning}
           onClick={requestVerifyEmail}
         >
           {isCountdownRunning ? (
             <span>Resend after {count}s</span>
-          ) : isLoading ? (
-            <LoaderCircle size={16} className="animate-spin" />
           ) : (
             <span>Send verification email</span>
           )}
-        </Button>
+        </LoadingButton>
       )}
       <AnotherMethodSeparator />
       <ContinueWithGoogleButton

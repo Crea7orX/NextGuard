@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -10,7 +9,7 @@ import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google
 import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
 import { SuccessAlert } from "~/components/auth/success-alert";
-import { Button } from "~/components/ui/button";
+import { LoadingButton } from "~/components/common/loading-button";
 import {
   Form,
   FormControl,
@@ -116,17 +115,14 @@ export function RequestPasswordResetForm({
               </FormItem>
             )}
           />
-          <Button
+          <LoadingButton
             type="submit"
             className="w-full"
+            isLoading={isLoading}
             disabled={form.formState.disabled}
           >
-            {isLoading ? (
-              <LoaderCircle size={16} className="animate-spin" />
-            ) : (
-              <span>Request password reset</span>
-            )}
-          </Button>
+            Request password reset
+          </LoadingButton>
         </form>
         <AnotherMethodSeparator />
         <div className="flex flex-col gap-3">
