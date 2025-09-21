@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
 import { Button } from "~/components/ui/button";
@@ -96,75 +97,67 @@ export function SignInForm({
           setIsLoadingProvider={setIsLoadingProvider}
           setError={setError}
         />
-        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-          <span className="bg-card text-muted-foreground relative z-10 px-2">
-            Or continue with
-          </span>
-        </div>
+        <AnotherMethodSeparator label="Or continue with" />
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-          <div className="grid gap-3">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your email address"
+                    autoComplete="email webauthn"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center">
+                  <FormLabel>Password</FormLabel>
+                  <Link
+                    href={`/auth/reset-password?${redirectSearchParams}`}
+                    className="text-muted-foreground ml-auto text-sm underline-offset-4 hover:underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <FormControl>
+                  <div className="group relative">
                     <Input
-                      placeholder="Enter your email address"
-                      autoComplete="email webauthn"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      autoComplete="password"
+                      className="pr-10"
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="grid gap-3">
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center">
-                    <FormLabel>Password</FormLabel>
-                    <Link
-                      href={`/auth/reset-password?${redirectSearchParams}`}
-                      className="text-muted-foreground ml-auto text-sm underline-offset-4 hover:underline"
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
                     >
-                      Forgot your password?
-                    </Link>
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
                   </div>
-                  <FormControl>
-                    <div className="group relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
-                        autoComplete="password"
-                        className="pr-10"
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <Button
             type="submit"
             className="w-full"

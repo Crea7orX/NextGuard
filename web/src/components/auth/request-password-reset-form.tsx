@@ -5,6 +5,7 @@ import { LoaderCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
@@ -98,25 +99,23 @@ export function RequestPasswordResetForm({
         {success && <SuccessAlert success={success} />}
         {error && <ErrorAlert error={error} />}
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-          <div className="grid gap-3">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your email address"
-                      autoComplete="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your email address"
+                    autoComplete="email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <Button
             type="submit"
             className="w-full"
@@ -129,11 +128,7 @@ export function RequestPasswordResetForm({
             )}
           </Button>
         </form>
-        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-          <span className="bg-card text-muted-foreground relative z-10 px-2">
-            Or use another method
-          </span>
-        </div>
+        <AnotherMethodSeparator />
         <div className="flex flex-col gap-3">
           <ContinueWithGoogleButton
             redirectUrl={redirectUrl}
