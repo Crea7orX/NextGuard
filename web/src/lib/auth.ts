@@ -20,6 +20,7 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: sendVerificationEmail,
+    expiresIn: env.BETTER_AUTH_EMAIL_VERIFICATION_EXPIRES_IN,
   },
   socialProviders: {
     google: {
