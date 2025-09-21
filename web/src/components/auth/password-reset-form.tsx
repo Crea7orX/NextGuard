@@ -51,20 +51,18 @@ export function PasswordResetForm({
       void router.push(`/auth/sign-in?${redirectSearchParams}`);
       return;
     }
-    if (searchParams.get("error") === "INVALID_TOKEN") {
+    if (searchParams.get("error") === "INVALID_TOKEN")
       setError("Invalid or expired token");
-      return;
-    }
-    setDisabled(false);
+    setIsInitialLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [success, setSuccess] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [disabled, setDisabled] = React.useState(true);
+  const [isInitialLoading, setIsInitialLoading] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm<ResetPassword>({
     resolver: zodResolver(resetPasswordSchema),
@@ -72,7 +70,7 @@ export function PasswordResetForm({
       password: "",
       passwordConfirmation: "",
     },
-    disabled: disabled || isLoading || isLoadingProvider,
+    disabled: isInitialLoading || isLoading || isLoadingProvider,
   });
 
   function onSubmit(data: ResetPassword) {
@@ -108,87 +106,91 @@ export function PasswordResetForm({
       <div className={cn("grid gap-6", className)} {...props}>
         {success && <SuccessAlert success={success} />}
         {error && <ErrorAlert error={error} />}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>New password</FormLabel>
-                <FormControl>
-                  <div className="group relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your new password"
-                      autoComplete="new-password"
-                      className="pr-10"
-                      {...field}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="passwordConfirmation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm new password</FormLabel>
-                <FormControl>
-                  <div className="group relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Confirm your new password"
-                      autoComplete="new-password"
-                      className="pr-10"
-                      {...field}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={form.formState.disabled}
-          >
-            {isLoading ? (
-              <LoaderCircle size={16} className="animate-spin" />
-            ) : (
-              <span>Reset password</span>
-            )}
-          </Button>
-        </form>
+        {isInitialLoading ? (
+          <LoaderCircle className="size-12 animate-spin justify-self-center" />
+        ) : (
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New password</FormLabel>
+                  <FormControl>
+                    <div className="group relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your new password"
+                        autoComplete="new-password"
+                        className="pr-10"
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="passwordConfirmation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm new password</FormLabel>
+                  <FormControl>
+                    <div className="group relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Confirm your new password"
+                        autoComplete="new-password"
+                        className="pr-10"
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.disabled}
+            >
+              {isLoading ? (
+                <LoaderCircle size={16} className="animate-spin" />
+              ) : (
+                <span>Reset password</span>
+              )}
+            </Button>
+          </form>
+        )}
         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-card text-muted-foreground relative z-10 px-2">
             Or use another method
@@ -198,14 +200,14 @@ export function PasswordResetForm({
           <ContinueWithGoogleButton
             redirectUrl={redirectUrl}
             lastMethod={lastMethod}
-            disabled={form.formState.disabled && !disabled}
+            disabled={form.formState.disabled}
             setIsLoadingProvider={setIsLoadingProvider}
             setError={setError}
           />
           <Button
             variant="outline"
             className="relative w-full"
-            disabled={form.formState.disabled && !disabled}
+            disabled={form.formState.disabled}
             asChild
           >
             <Link href={`/auth/sign-in?${redirectSearchParams}`}>
