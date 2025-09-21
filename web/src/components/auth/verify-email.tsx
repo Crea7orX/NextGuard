@@ -3,9 +3,8 @@
 import { LoaderCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
-import GoogleIcon from "~/assets/icons/google.svg";
+import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
-import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { SuccessAlert } from "~/components/auth/success-alert";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env";
@@ -38,8 +37,8 @@ export function VerifyEmail({
   const [error, setError] = React.useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isLoadingGoogle, setIsLoadingGoogle] = React.useState(false);
-  const disabled = isInitialLoading || isLoading || isLoadingGoogle;
+  const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const disabled = isInitialLoading || isLoading || isLoadingProvider;
 
   const [count, { startCountdown, resetCountdown }, isCountdownRunning] =
     useCountdown({
@@ -79,25 +78,6 @@ export function VerifyEmail({
     );
   }
 
-  function googleSignIn() {
-    void authClient.signIn.social(
-      {
-        provider: "google",
-        callbackURL: redirectUrl,
-      },
-      {
-        onRequest: () => {
-          setIsLoadingGoogle(true);
-          setError(null);
-        },
-        onError: (ctx) => {
-          setIsLoadingGoogle(false);
-          setError(ctx.error.message);
-        },
-      },
-    );
-  }
-
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       {success && <SuccessAlert success={success} />}
@@ -124,22 +104,13 @@ export function VerifyEmail({
           Or use another method
         </span>
       </div>
-      <div className="flex flex-col gap-3">
-        <Button
-          variant="outline"
-          className="relative w-full"
-          disabled={disabled}
-          onClick={googleSignIn}
-        >
-          {lastMethod === "google" && <LastLoginBadge />}
-          {isLoadingGoogle ? (
-            <LoaderCircle className="animate-spin" />
-          ) : (
-            <GoogleIcon />
-          )}
-          Sign in with Google
-        </Button>
-      </div>
+      <ContinueWithGoogleButton
+        redirectUrl={redirectUrl}
+        lastMethod={lastMethod}
+        disabled={disabled}
+        setIsLoadingProvider={setIsLoadingProvider}
+        setError={setError}
+      />
     </div>
   );
 }

@@ -6,9 +6,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
-import GoogleIcon from "~/assets/icons/google.svg";
+import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
-import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -38,7 +37,7 @@ export function SignInForm({
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
-  const [isLoadingGoogle, setIsLoadingGoogle] = React.useState(false);
+  const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
 
   const form = useForm<SignIn>({
     resolver: zodResolver(signInSchema),
@@ -47,7 +46,7 @@ export function SignInForm({
       password: "",
       rememberMe: true,
     },
-    disabled: isLoading || isLoadingGoogle,
+    disabled: isLoading || isLoadingProvider,
   });
 
   const redirectSearchParams = React.useMemo(() => {
@@ -86,43 +85,17 @@ export function SignInForm({
     );
   }
 
-  function googleSignIn() {
-    void authClient.signIn.social(
-      {
-        provider: "google",
-        callbackURL: redirectUrl,
-      },
-      {
-        onRequest: () => {
-          setIsLoadingGoogle(true);
-          setError(null);
-        },
-        onError: (ctx) => {
-          setIsLoadingGoogle(false);
-          setError(ctx.error.message);
-        },
-      },
-    );
-  }
-
   return (
     <Form {...form}>
       <div className={cn("grid gap-6", className)} {...props}>
         {error && <ErrorAlert error={error} />}
-        <Button
-          variant="outline"
-          className="relative w-full"
+        <ContinueWithGoogleButton
+          redirectUrl={redirectUrl}
+          lastMethod={lastMethod}
           disabled={form.formState.disabled}
-          onClick={googleSignIn}
-        >
-          {lastMethod === "google" && <LastLoginBadge />}
-          {isLoadingGoogle ? (
-            <LoaderCircle className="animate-spin" />
-          ) : (
-            <GoogleIcon />
-          )}
-          Sign in with Google
-        </Button>
+          setIsLoadingProvider={setIsLoadingProvider}
+          setError={setError}
+        />
         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-card text-muted-foreground relative z-10 px-2">
             Or continue with

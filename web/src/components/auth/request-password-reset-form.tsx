@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
-import GoogleIcon from "~/assets/icons/google.svg";
+import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
 import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { SuccessAlert } from "~/components/auth/success-alert";
@@ -42,14 +42,14 @@ export function RequestPasswordResetForm({
   const [success, setSuccess] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isLoadingGoogle, setIsLoadingGoogle] = React.useState(false);
+  const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
 
   const form = useForm<ResetPasswordRequest>({
     resolver: zodResolver(resetPasswordRequestSchema),
     defaultValues: {
       email: searchParams.get("email") ?? "",
     },
-    disabled: isLoading,
+    disabled: isLoading || isLoadingProvider,
   });
 
   const redirectSearchParams = React.useMemo(() => {
@@ -87,25 +87,6 @@ export function RequestPasswordResetForm({
         },
         onError: (ctx) => {
           setIsLoading(false);
-          setError(ctx.error.message);
-        },
-      },
-    );
-  }
-
-  function googleSignIn() {
-    void authClient.signIn.social(
-      {
-        provider: "google",
-        callbackURL: redirectUrl,
-      },
-      {
-        onRequest: () => {
-          setIsLoadingGoogle(true);
-          setError(null);
-        },
-        onError: (ctx) => {
-          setIsLoadingGoogle(false);
           setError(ctx.error.message);
         },
       },
@@ -155,20 +136,13 @@ export function RequestPasswordResetForm({
           </span>
         </div>
         <div className="flex flex-col gap-3">
-          <Button
-            variant="outline"
-            className="relative w-full"
+          <ContinueWithGoogleButton
+            redirectUrl={redirectUrl}
+            lastMethod={lastMethod}
             disabled={form.formState.disabled}
-            onClick={googleSignIn}
-          >
-            {lastMethod === "google" && <LastLoginBadge />}
-            {isLoadingGoogle ? (
-              <LoaderCircle className="animate-spin" />
-            ) : (
-              <GoogleIcon />
-            )}
-            Sign in with Google
-          </Button>
+            setIsLoadingProvider={setIsLoadingProvider}
+            setError={setError}
+          />
           <Button
             variant="outline"
             className="relative w-full"
