@@ -1,14 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LoaderCircle, Lock } from "lucide-react";
-import Link from "next/link";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
+import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
-import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { SuccessAlert } from "~/components/auth/success-alert";
 import { Button } from "~/components/ui/button";
 import {
@@ -204,18 +203,11 @@ export function PasswordResetForm({
             setIsLoadingProvider={setIsLoadingProvider}
             setError={setError}
           />
-          <Button
-            variant="outline"
-            className="relative w-full"
+          <ContinueWithPasswordButton
+            redirectSearchParams={redirectSearchParams}
+            lastMethod={lastMethod}
             disabled={form.formState.disabled}
-            asChild
-          >
-            <Link href={`/auth/sign-in?${redirectSearchParams}`}>
-              {lastMethod === "email" && <LastLoginBadge />}
-              <Lock />
-              Sign in with your password
-            </Link>
-          </Button>
+          />
         </div>
       </div>
     </Form>

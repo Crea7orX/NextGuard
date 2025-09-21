@@ -1,14 +1,12 @@
 "use client";
 
-import { LoaderCircle, Lock } from "lucide-react";
-import Link from "next/link";
+import { LoaderCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
+import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
-import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { SuccessAlert } from "~/components/auth/success-alert";
-import { Button } from "~/components/ui/button";
 import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
 
@@ -75,18 +73,11 @@ export function VerifyEmailStatus({
           setIsLoadingProvider={setIsLoadingProvider}
           setError={setError}
         />
-        <Button
-          variant="outline"
-          className="relative w-full"
+        <ContinueWithPasswordButton
+          redirectSearchParams={redirectSearchParams}
+          lastMethod={lastMethod}
           disabled={disabled}
-          asChild
-        >
-          <Link href={`/auth/sign-in?${redirectSearchParams}`}>
-            {lastMethod === "email" && <LastLoginBadge />}
-            <Lock />
-            Sign in with your password
-          </Link>
-        </Button>
+        />
       </div>
     </div>
   );
