@@ -26,9 +26,14 @@ export function VerifyEmail({
 
   const redirectSearchParams = searchParams.toString();
 
+  const initialRequest = React.useRef(true);
   React.useEffect(() => {
-    if (!searchParams.get("email"))
+    if (!searchParams.get("email")) {
       void router.push(`/auth/sign-in?${redirectSearchParams}`);
+      return;
+    }
+    if (!initialRequest.current) return;
+    initialRequest.current = false;
     requestVerifyEmail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
