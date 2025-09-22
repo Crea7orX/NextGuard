@@ -93,9 +93,9 @@ export function VerifyEmail({
           onClick={requestVerifyEmail}
         >
           {isCountdownRunning ? (
-            <span>Resend after {count}s</span>
+            <span key="resend">Resend after {count}s</span>
           ) : (
-            <span>Send verification email</span>
+            <span key="send">Send verification email</span>
           )}
         </LoadingButton>
       )}
