@@ -157,7 +157,7 @@ export function SignUpForm({
           <FormField
             control={form.control}
             name="password"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
@@ -167,6 +167,7 @@ export function SignUpForm({
                       placeholder="Enter your password"
                       autoComplete="new-password"
                       className="pr-10"
+                      aria-invalid={!!fieldState.error}
                       {...field}
                     />
                     <Button
@@ -192,7 +193,7 @@ export function SignUpForm({
           <FormField
             control={form.control}
             name="passwordConfirmation"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
@@ -202,6 +203,7 @@ export function SignUpForm({
                       placeholder="Confirm your password"
                       autoComplete="new-password"
                       className="pr-10"
+                      aria-invalid={!!fieldState.error}
                       {...field}
                     />
                     <Button

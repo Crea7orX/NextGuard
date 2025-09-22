@@ -113,7 +113,7 @@ export function PasswordResetForm({
             <FormField
               control={form.control}
               name="password"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>New password</FormLabel>
                   <FormControl>
@@ -123,6 +123,7 @@ export function PasswordResetForm({
                         placeholder="Enter your new password"
                         autoComplete="new-password"
                         className="pr-10"
+                        aria-invalid={!!fieldState.error}
                         {...field}
                       />
                       <Button
@@ -148,7 +149,7 @@ export function PasswordResetForm({
             <FormField
               control={form.control}
               name="passwordConfirmation"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>Confirm new password</FormLabel>
                   <FormControl>
@@ -158,6 +159,7 @@ export function PasswordResetForm({
                         placeholder="Confirm your new password"
                         autoComplete="new-password"
                         className="pr-10"
+                        aria-invalid={!!fieldState.error}
                         {...field}
                       />
                       <Button

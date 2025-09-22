@@ -118,7 +118,7 @@ export function SignInForm({
           <FormField
             control={form.control}
             name="password"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <div className="flex items-center">
                   <FormLabel>Password</FormLabel>
@@ -137,6 +137,7 @@ export function SignInForm({
                       placeholder="Enter your password"
                       autoComplete="password"
                       className="pr-10"
+                      aria-invalid={!!fieldState.error}
                       {...field}
                     />
                     <Button
