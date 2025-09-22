@@ -3,6 +3,9 @@ import postgres from "postgres";
 import { env } from "~/env";
 
 import * as account from "~/server/db/schemas/account";
+import * as invitation from "~/server/db/schemas/invitation";
+import * as member from "~/server/db/schemas/member";
+import * as organization from "~/server/db/schemas/organization";
 import * as session from "~/server/db/schemas/session";
 import * as user from "~/server/db/schemas/user";
 import * as verification from "~/server/db/schemas/verification";
@@ -15,5 +18,13 @@ const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 export const db = drizzle(conn, {
-  schema: { ...account, ...session, ...user, ...verification },
+  schema: {
+    ...account,
+    ...invitation,
+    ...member,
+    ...organization,
+    ...session,
+    ...user,
+    ...verification,
+  },
 });
