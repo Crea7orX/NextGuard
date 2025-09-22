@@ -69,7 +69,6 @@ export function VerifyEmailStatus({
         />
         <ContinueWithPasswordButton
           redirectSearchParams={redirectSearchParams}
-          lastMethod={lastMethod}
           disabled={disabled}
         />
       </div>
