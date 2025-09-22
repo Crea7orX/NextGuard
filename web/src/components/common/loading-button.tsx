@@ -13,13 +13,6 @@ export function LoadingButton({
   children,
   ...props
 }: Props) {
-  const initialLoading = React.useRef(true); // Use a ref to disable animation on initial render
-  React.useEffect(() => {
-    if (initialLoading.current) {
-      initialLoading.current = false;
-    }
-  }, []);
-
   function getKey(children: React.ReactNode) {
     if (React.isValidElement(children)) {
       return children.key ?? "content";
@@ -29,10 +22,10 @@ export function LoadingButton({
 
   return (
     <Button className={className} {...props}>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={isLoading ? "loading" : getKey(children)}
-          initial={{ scale: initialLoading.current ? 1 : 0 }}
+          initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
