@@ -125,6 +125,7 @@ export function SignInForm({
                   <Link
                     href={`/auth/reset-password?${redirectSearchParams}`}
                     className="text-muted-foreground ml-auto text-sm underline-offset-4 hover:underline"
+                    tabIndex={-1}
                   >
                     Forgot your password?
                   </Link>
@@ -144,6 +145,7 @@ export function SignInForm({
                       size="sm"
                       className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
