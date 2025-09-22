@@ -23,7 +23,6 @@ export function VerifyEmail({
     () => searchParams.get("redirect_url") ?? "/dashboard",
     [searchParams],
   );
-  const lastMethod = authClient.getLastUsedLoginMethod();
 
   const redirectSearchParams = searchParams.toString();
 
@@ -102,7 +101,6 @@ export function VerifyEmail({
       <AnotherMethodSeparator />
       <ContinueWithGoogleButton
         redirectUrl={redirectUrl}
-        lastMethod={lastMethod}
         disabled={disabled}
         setIsLoadingProvider={setIsLoadingProvider}
         setError={setError}

@@ -8,7 +8,6 @@ import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google
 import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
 import { ErrorAlert } from "~/components/auth/error-alert";
 import { SuccessAlert } from "~/components/auth/success-alert";
-import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
 
 export function VerifyEmailStatus({
@@ -21,7 +20,6 @@ export function VerifyEmailStatus({
     () => searchParams.get("redirect_url") ?? "/dashboard",
     [searchParams],
   );
-  const lastMethod = authClient.getLastUsedLoginMethod();
 
   const redirectSearchParams = React.useMemo(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -65,7 +63,6 @@ export function VerifyEmailStatus({
       <div className="flex flex-col gap-3">
         <ContinueWithGoogleButton
           redirectUrl={redirectUrl}
-          lastMethod={lastMethod}
           disabled={disabled}
           setIsLoadingProvider={setIsLoadingProvider}
           setError={setError}

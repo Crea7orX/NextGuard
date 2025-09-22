@@ -34,7 +34,6 @@ export function SignInForm({
     () => searchParams.get("redirect_url") ?? "/dashboard",
     [searchParams],
   );
-  const lastMethod = authClient.getLastUsedLoginMethod();
 
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -93,7 +92,6 @@ export function SignInForm({
         {error && <ErrorAlert error={error} />}
         <ContinueWithGoogleButton
           redirectUrl={redirectUrl}
-          lastMethod={lastMethod}
           disabled={form.formState.disabled}
           setIsLoadingProvider={setIsLoadingProvider}
           setError={setError}

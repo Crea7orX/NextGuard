@@ -36,7 +36,6 @@ export function RequestPasswordResetForm({
     () => searchParams.get("redirect_url") ?? "/dashboard",
     [searchParams],
   );
-  const lastMethod = authClient.getLastUsedLoginMethod();
 
   const [success, setSuccess] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -128,14 +127,12 @@ export function RequestPasswordResetForm({
         <div className="flex flex-col gap-3">
           <ContinueWithGoogleButton
             redirectUrl={redirectUrl}
-            lastMethod={lastMethod}
             disabled={form.formState.disabled}
             setIsLoadingProvider={setIsLoadingProvider}
             setError={setError}
           />
           <ContinueWithPasswordButton
             redirectSearchParams={redirectSearchParams}
-            lastMethod={lastMethod}
             disabled={form.formState.disabled}
           />
         </div>

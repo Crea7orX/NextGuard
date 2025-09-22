@@ -94,6 +94,7 @@ export function SignUpForm({
         {error && <ErrorAlert error={error} />}
         <ContinueWithGoogleButton
           redirectUrl={redirectUrl}
+          hideLastMethod={true}
           disabled={form.formState.disabled}
           setIsLoadingProvider={setIsLoadingProvider}
           setError={setError}

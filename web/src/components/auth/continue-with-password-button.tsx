@@ -3,21 +3,24 @@ import Link from "next/link";
 import React from "react";
 import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { Button } from "~/components/ui/button";
+import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
 
 interface Props extends React.ComponentProps<typeof Button> {
   redirectSearchParams?: string;
-  lastMethod?: string | null;
+  hideLastMethod?: boolean;
   disabled: boolean;
 }
 
 export function ContinueWithPasswordButton({
   className,
   redirectSearchParams,
-  lastMethod,
+  hideLastMethod,
   disabled,
   ...props
 }: Props) {
+  const isLastMethod = authClient.isLastUsedLoginMethod("email");
+
   return (
     <Button
       variant="outline"
@@ -27,10 +30,16 @@ export function ContinueWithPasswordButton({
       {...props}
     >
       {disabled ? (
-        <ButtonContent lastMethod={lastMethod} />
+        <ButtonContent
+          isLastMethod={isLastMethod}
+          hideLastMethod={hideLastMethod}
+        />
       ) : (
         <Link href={`/auth/sign-in?${redirectSearchParams ?? ""}`}>
-          <ButtonContent lastMethod={lastMethod} />
+          <ButtonContent
+            isLastMethod={isLastMethod}
+            hideLastMethod={hideLastMethod}
+          />
         </Link>
       )}
     </Button>
@@ -38,13 +47,17 @@ export function ContinueWithPasswordButton({
 }
 
 interface ButtonContentProps {
-  lastMethod?: string | null;
+  isLastMethod: boolean;
+  hideLastMethod?: boolean;
 }
 
-export function ButtonContent({ lastMethod }: ButtonContentProps) {
+export function ButtonContent({
+  isLastMethod,
+  hideLastMethod,
+}: ButtonContentProps) {
   return (
     <>
-      {lastMethod === "email" && <LastLoginBadge />}
+      {isLastMethod && !hideLastMethod && <LastLoginBadge />}
       <Lock />
       Continue with your password
     </>

@@ -8,7 +8,7 @@ import { cn } from "~/lib/utils";
 
 interface Props extends React.ComponentProps<typeof Button> {
   redirectUrl: string;
-  lastMethod?: string | null;
+  hideLastMethod?: boolean;
   disabled: boolean;
   setIsLoadingProvider?: React.Dispatch<React.SetStateAction<boolean>>;
   setError?: React.Dispatch<React.SetStateAction<string | null>>;
@@ -17,13 +17,14 @@ interface Props extends React.ComponentProps<typeof Button> {
 export function ContinueWithGoogleButton({
   className,
   redirectUrl,
-  lastMethod,
+  hideLastMethod,
   disabled,
   setIsLoadingProvider,
   setError,
   ...props
 }: Props) {
   const [isLoading, setIsLoading] = React.useState(false);
+  const isLastMethod = authClient.isLastUsedLoginMethod("google");
 
   function googleSignIn() {
     void authClient.signIn.social(
@@ -54,7 +55,7 @@ export function ContinueWithGoogleButton({
       onClick={googleSignIn}
       {...props}
     >
-      {lastMethod === "google" && <LastLoginBadge />}
+      {isLastMethod && !hideLastMethod && <LastLoginBadge />}
       {isLoading ? <LoaderCircle className="animate-spin" /> : <GoogleIcon />}
       Continue with Google
     </Button>
