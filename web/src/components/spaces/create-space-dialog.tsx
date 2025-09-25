@@ -1,3 +1,5 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -35,8 +37,7 @@ import {
 export function CreateSpaceDialog({
   children,
   ...props
-}: React.ComponentProps<typeof Dialog>) {
-  const [isOpen, setIsOpen] = React.useState(false);
+}: React.ComponentPropsWithoutRef<typeof Dialog>) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [message, setMessage] = React.useState<FormResponseMessageProps>();
 
@@ -68,7 +69,7 @@ export function CreateSpaceDialog({
     if (!response) return;
 
     form.reset();
-    setIsOpen(false);
+    props.onOpenChange?.(false);
   }
 
   const onFileReject = React.useCallback(
@@ -80,12 +81,13 @@ export function CreateSpaceDialog({
     },
     [form],
   );
+
   const onFileClear = React.useCallback(() => {
     form.clearErrors("logo");
   }, [form]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen} {...props}>
+    <Dialog {...props}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <Form {...form}>
