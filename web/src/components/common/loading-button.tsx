@@ -19,7 +19,9 @@ export function LoadingButton({
   React.useEffect(() => {
     if (!buttonRef.current) return;
     setCurrentWidth(undefined);
-    setTimeout(() => {setCurrentWidth(buttonRef.current?.offsetWidth);}, 0);
+    setTimeout(() => {
+      setCurrentWidth(buttonRef.current?.offsetWidth);
+    }, 0);
   }, [children]);
 
   function getKey(children: React.ReactNode) {
@@ -37,19 +39,28 @@ export function LoadingButton({
       {...props}
     >
       <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={isLoading ? "loading" : getKey(children)}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          exit={{ scale: 0 }}
-          transition={{ duration: 0.15, ease: "easeOut" }}
-        >
-          {isLoading ? (
+        {!isLoading && (
+          <motion.span
+            key={getKey(children)}
+            initial={{ y: "-100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.05, ease: "easeOut" }}
+          >
+            {children}
+          </motion.span>
+        )}
+        {isLoading && (
+          <motion.span
+            key={"loading"}
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.05, ease: "easeOut" }}
+          >
             <LoaderCircle className="size-6 animate-spin" />
-          ) : (
-            children
-          )}
-        </motion.span>
+          </motion.span>
+        )}
       </AnimatePresence>
     </Button>
   );
