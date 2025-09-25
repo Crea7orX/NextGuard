@@ -8,8 +8,6 @@ import { useForm } from "react-hook-form";
 import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
-import { ErrorAlert } from "~/components/auth/error-alert";
-import { SuccessAlert } from "~/components/auth/success-alert";
 import { LoadingButton } from "~/components/common/loading-button";
 import { Button } from "~/components/ui/button";
 import {
@@ -19,6 +17,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormResponseMessage,
+  type FormResponseMessageProps,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
@@ -52,16 +52,15 @@ export function PasswordResetForm({
       return;
     }
     if (searchParams.get("error") === "INVALID_TOKEN")
-      setError("Invalid or expired token");
+      setMessage({ message: "Invalid or expired token" });
     setIsInitialLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [success, setSuccess] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const [message, setMessage] = React.useState<FormResponseMessageProps>();
   const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm<ResetPassword>({
@@ -82,20 +81,21 @@ export function PasswordResetForm({
       {
         onRequest: () => {
           setIsLoading(true);
-          setSuccess(null);
-          setError(null);
+          setMessage(undefined);
         },
         onSuccess: () => {
-          setSuccess(
-            "Password reset successfully. Now you can sign in with your new password. You will be redirected to the sign in page after 5 seconds.",
-          );
+          setMessage({
+            message:
+              "Password reset successfully. Now you can sign in with your new password. You will be redirected to the sign in page after 5 seconds.",
+            variant: "success",
+          });
           setTimeout(() => {
             void router.push(`/auth/sign-in?${redirectSearchParams}`);
           }, 5000);
         },
         onError: (ctx) => {
           setIsLoading(false);
-          setError(ctx.error.message);
+          setMessage({ message: ctx.error.message });
         },
       },
     );
@@ -103,9 +103,8 @@ export function PasswordResetForm({
 
   return (
     <Form {...form}>
+      <FormResponseMessage className="mb-4" {...message} />
       <div className={cn("grid gap-6", className)} {...props}>
-        {success && <SuccessAlert success={success} />}
-        {error && <ErrorAlert error={error} />}
         {isInitialLoading ? (
           <LoaderCircle className="size-12 animate-spin justify-self-center" />
         ) : (
@@ -198,7 +197,7 @@ export function PasswordResetForm({
             redirectUrl={redirectUrl}
             disabled={form.formState.disabled}
             setIsLoadingProvider={setIsLoadingProvider}
-            setError={setError}
+            setMessage={setMessage}
           />
           <ContinueWithPasswordButton
             redirectSearchParams={redirectSearchParams}

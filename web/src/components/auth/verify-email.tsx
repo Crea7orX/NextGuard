@@ -5,9 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
-import { ErrorAlert } from "~/components/auth/error-alert";
-import { SuccessAlert } from "~/components/auth/success-alert";
 import { LoadingButton } from "~/components/common/loading-button";
+import {
+  FormResponseMessage,
+  type FormResponseMessageProps,
+} from "~/components/ui/form";
 import { env } from "~/env";
 import { useCountdown } from "~/hooks/use-countdown";
 import { authClient } from "~/lib/auth-client";
@@ -38,11 +40,10 @@ export function VerifyEmail({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [success, setSuccess] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const [message, setMessage] = React.useState<FormResponseMessageProps>();
   const disabled = isInitialLoading || isLoading || isLoadingProvider;
 
   const [count, { startCountdown, resetCountdown }, isCountdownRunning] =
@@ -62,8 +63,7 @@ export function VerifyEmail({
       {
         onRequest: () => {
           setIsLoading(true);
-          setSuccess(null);
-          setError(null);
+          setMessage(undefined);
         },
         onResponse: () => {
           setIsInitialLoading(false);
@@ -72,44 +72,46 @@ export function VerifyEmail({
           startCountdown();
         },
         onSuccess: () => {
-          setSuccess(
-            `We've sent an email to ${email}. Follow the link to verify your email address.`,
-          );
+          setMessage({
+            message: `We've sent an email to ${email}. Follow the link to verify your email address.`,
+            variant: "success",
+          });
         },
         onError: (ctx) => {
-          setError(ctx.error.message);
+          setMessage({ message: ctx.error.message });
         },
       },
     );
   }
 
   return (
-    <div className={cn("grid gap-6", className)} {...props}>
-      {success && <SuccessAlert success={success} />}
-      {error && <ErrorAlert error={error} />}
-      {isInitialLoading ? (
-        <LoaderCircle className="size-12 animate-spin justify-self-center" />
-      ) : (
-        <LoadingButton
-          className="w-full"
-          isLoading={isLoading}
-          disabled={disabled || isCountdownRunning}
-          onClick={requestVerifyEmail}
-        >
-          {isCountdownRunning ? (
-            <span key="resend">Resend after {count}s</span>
-          ) : (
-            <span key="send">Send verification email</span>
-          )}
-        </LoadingButton>
-      )}
-      <AnotherMethodSeparator />
-      <ContinueWithGoogleButton
-        redirectUrl={redirectUrl}
-        disabled={disabled}
-        setIsLoadingProvider={setIsLoadingProvider}
-        setError={setError}
-      />
-    </div>
+    <>
+      <FormResponseMessage className="mb-4" {...message} />
+      <div className={cn("grid gap-6", className)} {...props}>
+        {isInitialLoading ? (
+          <LoaderCircle className="size-12 animate-spin justify-self-center" />
+        ) : (
+          <LoadingButton
+            className="w-full"
+            isLoading={isLoading}
+            disabled={disabled || isCountdownRunning}
+            onClick={requestVerifyEmail}
+          >
+            {isCountdownRunning ? (
+              <span key="resend">Resend after {count}s</span>
+            ) : (
+              <span key="send">Send verification email</span>
+            )}
+          </LoadingButton>
+        )}
+        <AnotherMethodSeparator />
+        <ContinueWithGoogleButton
+          redirectUrl={redirectUrl}
+          disabled={disabled}
+          setIsLoadingProvider={setIsLoadingProvider}
+          setMessage={setMessage}
+        />
+      </div>
+    </>
   );
 }

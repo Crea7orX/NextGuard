@@ -3,6 +3,7 @@ import React from "react";
 import GoogleIcon from "~/assets/icons/google.svg";
 import { LastLoginBadge } from "~/components/auth/last-login-badge";
 import { Button } from "~/components/ui/button";
+import type { FormResponseMessageProps } from "~/components/ui/form";
 import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
 
@@ -11,7 +12,9 @@ interface Props extends React.ComponentProps<typeof Button> {
   hideLastMethod?: boolean;
   disabled: boolean;
   setIsLoadingProvider?: React.Dispatch<React.SetStateAction<boolean>>;
-  setError?: React.Dispatch<React.SetStateAction<string | null>>;
+  setMessage?: React.Dispatch<
+    React.SetStateAction<FormResponseMessageProps | undefined>
+  >;
 }
 
 export function ContinueWithGoogleButton({
@@ -20,7 +23,7 @@ export function ContinueWithGoogleButton({
   hideLastMethod,
   disabled,
   setIsLoadingProvider,
-  setError,
+  setMessage,
   ...props
 }: Props) {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -36,12 +39,12 @@ export function ContinueWithGoogleButton({
         onRequest: () => {
           setIsLoading(true);
           setIsLoadingProvider?.(true);
-          setError?.(null);
+          setMessage?.(undefined);
         },
         onError: (ctx) => {
           setIsLoading(false);
           setIsLoadingProvider?.(false);
-          setError?.(ctx.error.message);
+          setMessage?.({ message: ctx.error.message });
         },
       },
     );

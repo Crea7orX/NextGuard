@@ -8,7 +8,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
-import { ErrorAlert } from "~/components/auth/error-alert";
 import { LoadingButton } from "~/components/common/loading-button";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,6 +17,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormResponseMessage,
+  type FormResponseMessageProps,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
@@ -35,10 +36,10 @@ export function SignUpForm({
     [searchParams],
   );
 
-  const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const [message, setMessage] = React.useState<FormResponseMessageProps>();
 
   const form = useForm<SignUp>({
     resolver: zodResolver(signUpSchema),
@@ -75,14 +76,14 @@ export function SignUpForm({
       {
         onRequest: () => {
           setIsLoading(true);
-          setError(null);
+          setMessage(undefined);
         },
         onSuccess: () => {
           router.push(redirectUrl);
         },
         onError: (ctx) => {
           setIsLoading(false);
-          setError(ctx.error.message);
+          setMessage({ message: ctx.error.message });
         },
       },
     );
@@ -90,14 +91,14 @@ export function SignUpForm({
 
   return (
     <Form {...form}>
+      <FormResponseMessage className="mb-4" {...message} />
       <div className={cn("grid gap-6", className)} {...props}>
-        {error && <ErrorAlert error={error} />}
         <ContinueWithGoogleButton
           redirectUrl={redirectUrl}
           hideLastMethod={true}
           disabled={form.formState.disabled}
           setIsLoadingProvider={setIsLoadingProvider}
-          setError={setError}
+          setMessage={setMessage}
         />
         <AnotherMethodSeparator label="Or continue with" />
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">

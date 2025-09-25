@@ -7,8 +7,6 @@ import { useForm } from "react-hook-form";
 import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
-import { ErrorAlert } from "~/components/auth/error-alert";
-import { SuccessAlert } from "~/components/auth/success-alert";
 import { LoadingButton } from "~/components/common/loading-button";
 import {
   Form,
@@ -17,6 +15,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormResponseMessage,
+  type FormResponseMessageProps,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { env } from "~/env";
@@ -37,10 +37,9 @@ export function RequestPasswordResetForm({
     [searchParams],
   );
 
-  const [success, setSuccess] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const [message, setMessage] = React.useState<FormResponseMessageProps>();
 
   const form = useForm<ResetPasswordRequest>({
     resolver: zodResolver(resetPasswordRequestSchema),
@@ -73,19 +72,20 @@ export function RequestPasswordResetForm({
       {
         onRequest: () => {
           setIsLoading(true);
-          setSuccess(null);
-          setError(null);
+          setMessage(undefined);
         },
         onSuccess: () => {
           setIsLoading(false);
-          setSuccess(
-            "If the email address you entered is valid, you will receive an email with a link to reset your password.",
-          );
+          setMessage({
+            message:
+              "If the email address you entered is valid, you will receive an email with a link to reset your password.",
+            variant: "success",
+          });
           form.reset({ email: "" });
         },
         onError: (ctx) => {
           setIsLoading(false);
-          setError(ctx.error.message);
+          setMessage({ message: ctx.error.message });
         },
       },
     );
@@ -93,9 +93,8 @@ export function RequestPasswordResetForm({
 
   return (
     <Form {...form}>
+      <FormResponseMessage className="mb-4" {...message} />
       <div className={cn("grid gap-6", className)} {...props}>
-        {success && <SuccessAlert success={success} />}
-        {error && <ErrorAlert error={error} />}
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
           <FormField
             control={form.control}
@@ -129,7 +128,7 @@ export function RequestPasswordResetForm({
             redirectUrl={redirectUrl}
             disabled={form.formState.disabled}
             setIsLoadingProvider={setIsLoadingProvider}
-            setError={setError}
+            setMessage={setMessage}
           />
           <ContinueWithPasswordButton
             redirectSearchParams={redirectSearchParams}
