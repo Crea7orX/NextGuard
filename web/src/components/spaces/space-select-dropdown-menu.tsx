@@ -3,7 +3,7 @@
 import { ArrowRight, Plus, Settings } from "lucide-react";
 import React from "react";
 import { CreateSpaceDialog } from "~/components/spaces/create-space-dialog";
-import { SpaceInfo } from "~/components/spaces/space-info";
+import { SpaceInfo, SpaceInfoSkeleton } from "~/components/spaces/space-info";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -21,8 +21,11 @@ interface Props extends React.ComponentProps<typeof DropdownMenuContent> {
 export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const { data: spaces, refetch: refetchSpaces } =
-    authClient.useListOrganizations();
+  const {
+    data: spaces,
+    refetch: refetchSpaces,
+    isPending: isSpacesPending,
+  } = authClient.useListOrganizations();
   const { data: activeSpace } = authClient.useActiveOrganization();
   const { data: member, refetch: refetchMember } = authClient.useActiveMember();
 
@@ -45,31 +48,42 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
           {...props}
         >
           {activeSpace && (
-            <div className="flex items-center justify-between gap-2 p-2">
-              <SpaceInfo
-                image={activeSpace.logo}
-                name={activeSpace.name}
-                role={member?.role}
-              />
-              <DropdownMenuItem asChild disabled={isLoading}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-auto cursor-pointer gap-1 py-1 text-xs"
-                >
-                  <Settings />
-                  Manage
-                </Button>
-              </DropdownMenuItem>
-            </div>
+            <>
+              <div className="flex items-center justify-between gap-2 p-2">
+                <SpaceInfo
+                  image={activeSpace.logo}
+                  name={activeSpace.name}
+                  role={member?.role}
+                />
+                <DropdownMenuItem asChild disabled={isLoading}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-auto cursor-pointer gap-1 py-1 text-xs"
+                  >
+                    <Settings />
+                    Manage
+                  </Button>
+                </DropdownMenuItem>
+              </div>
+              <DropdownMenuSeparator className="m-0" />
+            </>
           )}
-          <DropdownMenuSeparator className="m-0" />
+          {isSpacesPending &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <React.Fragment key={i}>
+                <DropdownMenuItem disabled={true}>
+                  <SpaceInfoSkeleton hasRole={i === 0 && !activeSpace} />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="m-0" />
+              </React.Fragment>
+            ))}
           {spaces?.map(
             (space) =>
               space.id !== activeSpace?.id && (
                 <div key={space.id}>
                   <DropdownMenuItem
-                    className="group relative cursor-pointer justify-between gap-2 rounded-none p-2"
+                    className="group cursor-pointer justify-between gap-2 rounded-none p-2"
                     onClick={() => switchSpace(space.id)}
                     disabled={isLoading}
                   >
@@ -87,7 +101,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
           <DropdownMenuItem
             className="text-muted-foreground cursor-pointer gap-2 rounded-t-none rounded-b-md p-2 font-bold"
             onClick={() => setCreateDialogOpen(true)}
-            disabled={isLoading}
+            disabled={isLoading || isSpacesPending}
           >
             <Plus className="size-6 rounded-full border-2 border-dashed" />
             Create space
