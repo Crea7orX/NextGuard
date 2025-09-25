@@ -1,4 +1,5 @@
 import { AvatarWithFallback } from "~/components/common/avatar-with-fallback";
+import { Skeleton } from "~/components/ui/skeleton";
 import { cn } from "~/lib/utils";
 
 interface Props extends React.ComponentProps<"div"> {
@@ -19,6 +20,29 @@ export function SpaceInfo({ className, image, name, role, ...props }: Props) {
         {role && (
           <p className="text-muted-foreground truncate text-xs">{role}</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+interface SkeletonProps extends React.ComponentProps<"div"> {
+  hasRole?: boolean;
+}
+
+export function SpaceInfoSkeleton({
+  className,
+  hasRole = false,
+  ...props
+}: SkeletonProps) {
+  return (
+    <div
+      className={cn("flex items-center gap-2 overflow-hidden", className)}
+      {...props}
+    >
+      <Skeleton className="size-6 rounded-sm border" />
+      <div className="grid gap-1 overflow-hidden text-left text-sm">
+        <Skeleton className="h-4 w-40 border" />
+        {hasRole && <Skeleton className="h-4 w-20 border" />}
       </div>
     </div>
   );
