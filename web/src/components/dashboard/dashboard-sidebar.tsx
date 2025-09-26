@@ -1,4 +1,5 @@
 import { SpaceSidebarSelector } from "~/components/dashboard/space-sidebar-selector";
+import { UserSidebarMenu } from "~/components/dashboard/user-sidebar-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -15,7 +16,9 @@ export function DashboardSidebar({
         <SpaceSidebarSelector />
       </SidebarHeader>
       <SidebarContent></SidebarContent>
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter>
+        <UserSidebarMenu />
+      </SidebarFooter>
     </Sidebar>
   );
 }
