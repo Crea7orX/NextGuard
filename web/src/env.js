@@ -12,6 +12,7 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
     BETTER_AUTH_EMAIL_VERIFICATION_EXPIRES_IN: z.coerce.number().default(600),
     BETTER_AUTH_RESET_PASSWORD_EXPIRES_IN: z.coerce.number().default(300),
+    BETTER_AUTH_ORGANIZATION_LIMIT: z.coerce.number().default(5),
     GOOGLE_CLIENT_SECRET: z.string(),
     RESEND_API_KEY: z.string(),
     NODE_ENV: z
@@ -46,6 +47,7 @@ export const env = createEnv({
       process.env.BETTER_AUTH_EMAIL_VERIFICATION_EXPIRES_IN,
     BETTER_AUTH_RESET_PASSWORD_EXPIRES_IN:
       process.env.BETTER_AUTH_RESET_PASSWORD_EXPIRES_IN,
+    BETTER_AUTH_ORGANIZATION_LIMIT: process.env.BETTER_AUTH_ORGANIZATION_LIMIT,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,

@@ -28,5 +28,10 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
-  plugins: [lastLoginMethod(), organization()],
+  plugins: [
+    lastLoginMethod(),
+    organization({
+      organizationLimit: env.BETTER_AUTH_ORGANIZATION_LIMIT,
+    }),
+  ],
 });
