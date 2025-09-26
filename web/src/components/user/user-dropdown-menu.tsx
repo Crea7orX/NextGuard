@@ -18,14 +18,19 @@ import { authClient } from "~/lib/auth-client";
 
 interface Props extends React.ComponentProps<typeof DropdownMenuContent> {
   children?: React.ReactNode;
+  triggerClassName?: string;
 }
 
-export function UserDropdownMenu({ children, ...props }: Props) {
+export function UserDropdownMenu({
+  children,
+  triggerClassName,
+  ...props
+}: Props) {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const { data: session, isPending, error, refetch } = authClient.useSession();
+  const { data: session, isPending, error } = authClient.useSession();
   const isSessionLoading = !session || isPending || !!error;
 
   const [isLoading, setIsLoading] = React.useState(false);
@@ -41,7 +46,9 @@ export function UserDropdownMenu({ children, ...props }: Props) {
   return (
     <>
       <DropdownMenu open={isOpen || isLoading} onOpenChange={setIsOpen}>
-        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild className={triggerClassName}>
+          {children}
+        </DropdownMenuTrigger>
         <DropdownMenuContent
           className="w-(--radix-dropdown-menu-trigger-width) min-w-64 rounded-lg"
           align="end"
