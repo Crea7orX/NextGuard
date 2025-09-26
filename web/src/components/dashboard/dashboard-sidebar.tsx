@@ -1,4 +1,4 @@
-import { SpaceSidebarSelector } from "~/components/spaces/space-sidebar-selector";
+import { SpaceSidebarSelector } from "~/components/dashboard/space-sidebar-selector";
 import {
   Sidebar,
   SidebarContent,

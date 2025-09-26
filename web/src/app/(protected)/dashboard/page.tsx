@@ -1,7 +1,7 @@
 "use client";
 
 import { DashboardSidebar } from "~/components/dashboard/dashboard-sidebar";
-import { Header } from "~/components/header";
+import { Header } from "~/components/dashboard/header";
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
 
 export default function DashboardPage() {
