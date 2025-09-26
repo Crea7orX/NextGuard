@@ -38,6 +38,9 @@ export function CreateSpaceDialog({
   children,
   ...props
 }: React.ComponentPropsWithoutRef<typeof Dialog>) {
+  const { refetch: refetchSpace } = authClient.useActiveOrganization();
+  const { refetch: refetchMember } = authClient.useActiveMember();
+
   const [isLoading, setIsLoading] = React.useState(false);
   const [message, setMessage] = React.useState<FormResponseMessageProps>();
 
@@ -60,6 +63,7 @@ export function CreateSpaceDialog({
       logo: data.logo ? await convertToBase64(data.logo) : undefined,
       keepCurrentActiveOrganization: false,
     });
+    await Promise.all([refetchSpace(), refetchMember()]);
     setIsLoading(false);
 
     if (error) {
