@@ -2,7 +2,11 @@ import { z } from "zod";
 
 export const spaceCreateSchema = z.object({
   name: z.string().min(2).max(255),
-  logo: z.file().max(10_000_000).mime(["image/png", "image/jpeg"]).optional(),
+  logo: z
+    .file()
+    .max(10_000_000)
+    .mime(["image/png", "image/jpeg", "image/webp"])
+    .optional(),
 });
 
 export type SpaceCreate = z.infer<typeof spaceCreateSchema>;
