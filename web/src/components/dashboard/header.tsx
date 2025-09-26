@@ -1,4 +1,5 @@
 import { SidebarTrigger } from "~/components/ui/sidebar";
+import { UserNav } from "~/components/user/user-nav";
 import { cn } from "~/lib/utils";
 
 export function Header({
@@ -15,7 +16,7 @@ export function Header({
     >
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
-        <div className="ml-auto flex items-center gap-2">Profile</div>
+        <UserNav triggerClassName="ml-auto" />
       </div>
     </header>
   );
