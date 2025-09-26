@@ -15,7 +15,7 @@ import {
 import { authClient } from "~/lib/auth-client";
 
 interface Props extends React.ComponentProps<typeof DropdownMenuContent> {
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
