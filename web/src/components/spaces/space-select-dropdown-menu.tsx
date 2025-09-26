@@ -44,7 +44,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
       <DropdownMenu open={isOpen || isLoading} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent
-          className="max-w-[calc(100vw-1rem)] p-0 sm:max-w-80 sm:min-w-64"
+          className="max-w-(--radix-dropdown-menu-trigger-width) min-w-64 p-0"
           {...props}
         >
           {activeSpace && (
