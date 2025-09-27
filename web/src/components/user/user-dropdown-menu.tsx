@@ -1,10 +1,11 @@
 "use client";
 
-import { Bell, LogOut, UserCircle } from "lucide-react";
+import { Bell, LogOut, Palette, UserCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { AccountDialog } from "~/components/account/account-dialog";
 import { AvatarWithFallback } from "~/components/common/avatar-with-fallback";
+import { ThemeSwitcher } from "~/components/common/theme-switcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,6 +100,12 @@ export function UserDropdownMenu({
               Notifications
             </DropdownMenuItem>
           </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <div className="[&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+            <Palette />
+            Theme
+            <ThemeSwitcher className="ml-auto" />
+          </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout} disabled={disabled}>
             <LogOut />
