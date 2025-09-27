@@ -4,6 +4,7 @@ import { Bell, LogOut, UserCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { AvatarWithFallback } from "~/components/common/avatar-with-fallback";
+import { ProfileDialog } from "~/components/profile/profile-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,7 @@ export function UserDropdownMenu({
   const router = useRouter();
 
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
 
   const { data: session, isPending, error } = authClient.useSession();
   const isSessionLoading = !session || isPending || !!error;
@@ -84,7 +86,10 @@ export function UserDropdownMenu({
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem disabled={disabled}>
+            <DropdownMenuItem
+              onClick={() => setIsProfileOpen(true)}
+              disabled={disabled}
+            >
               <UserCircle />
               Account
             </DropdownMenuItem>
@@ -100,6 +105,7 @@ export function UserDropdownMenu({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <ProfileDialog open={isProfileOpen} onOpenChange={setIsProfileOpen} />
     </>
   );
 }
