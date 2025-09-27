@@ -1,8 +1,8 @@
 "use client";
 
+import { AccountEmailSection } from "~/components/account/account-email-section";
+import { AccountPasswordSection } from "~/components/account/account-password-section";
 import { AvatarWithFallback } from "~/components/common/avatar-with-fallback";
-import { ProfileEmailSection } from "~/components/profile/profile-email-section";
-import { ProfilePasswordSection } from "~/components/profile/profile-password-section";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { authClient } from "~/lib/auth-client";
 
-export function ProfileDialog({
+export function AccountDialog({
   ...props
 }: React.ComponentProps<typeof Dialog>) {
   const { data: session, isPending, error } = authClient.useSession();
@@ -27,7 +27,7 @@ export function ProfileDialog({
     <Dialog {...props}>
       <DialogContent className="lg:min-w-3xl">
         <DialogHeader>
-          <DialogTitle>Profile details</DialogTitle>
+          <DialogTitle>Account details</DialogTitle>
         </DialogHeader>
         <Separator />
         <div className="flex items-center gap-2">
@@ -47,9 +47,9 @@ export function ProfileDialog({
           </div>
         </div>
         <Separator />
-        <ProfileEmailSection />
+        <AccountEmailSection />
         <Separator />
-        <ProfilePasswordSection />
+        <AccountPasswordSection />
       </DialogContent>
     </Dialog>
   );

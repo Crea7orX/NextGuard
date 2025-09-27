@@ -7,7 +7,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
 
-export function ProfileEmailSection({
+export function AccountEmailSection({
   className,
   ...props
 }: React.ComponentProps<"div">) {

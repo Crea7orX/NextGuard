@@ -3,8 +3,8 @@
 import { Bell, LogOut, UserCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { AccountDialog } from "~/components/account/account-dialog";
 import { AvatarWithFallback } from "~/components/common/avatar-with-fallback";
-import { ProfileDialog } from "~/components/profile/profile-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,7 +105,7 @@ export function UserDropdownMenu({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <ProfileDialog open={isProfileOpen} onOpenChange={setIsProfileOpen} />
+      <AccountDialog open={isProfileOpen} onOpenChange={setIsProfileOpen} />
     </>
   );
 }

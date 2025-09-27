@@ -3,11 +3,11 @@
 import { AnimatePresence, motion } from "motion/react";
 import React from "react";
 import useMeasure from "react-use-measure";
-import { ProfileUpdatePasswordCard } from "~/components/profile/profile-update-password-card";
+import { AccountUpdatePasswordCard } from "~/components/account/account-update-password-card";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 
-export function ProfilePasswordSection({
+export function AccountPasswordSection({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -47,7 +47,7 @@ export function ProfilePasswordSection({
                 </Button>
               </>
             ) : (
-              <ProfileUpdatePasswordCard
+              <AccountUpdatePasswordCard
                 className="w-full"
                 onClose={() => setIsUpdating(false)}
               />

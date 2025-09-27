@@ -32,7 +32,7 @@ interface Props extends React.ComponentProps<typeof Card> {
   onClose?: () => void;
 }
 
-export function ProfileUpdatePasswordCard({
+export function AccountUpdatePasswordCard({
   className,
   onClose,
   ...props
