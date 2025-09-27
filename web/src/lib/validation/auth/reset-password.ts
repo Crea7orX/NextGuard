@@ -25,3 +25,29 @@ export const resetPasswordSchema = z
   );
 
 export type ResetPassword = z.infer<typeof resetPasswordSchema>;
+
+export const updatePasswordSchema = z
+  .object({
+    password: z.string().min(8),
+    newPassword: z.string().min(8).max(128).superRefine(validatePassword),
+    newPasswordConfirmation: z
+      .string()
+      .min(8)
+      .max(128)
+      .superRefine(validatePassword),
+    revokeOtherSessions: z.boolean().optional(),
+  })
+  .refine(({ password, newPassword }) => password !== newPassword, {
+    message: "Use a different password from the current one",
+    path: ["newPassword"],
+  })
+  .refine(
+    ({ newPassword, newPasswordConfirmation }) =>
+      newPassword === newPasswordConfirmation,
+    {
+      message: "Passwords don't match",
+      path: ["newPasswordConfirmation"],
+    },
+  );
+
+export type UpdatePassword = z.infer<typeof updatePasswordSchema>;
