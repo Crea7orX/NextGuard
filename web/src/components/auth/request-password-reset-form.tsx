@@ -25,7 +25,7 @@ import { cn } from "~/lib/utils";
 import {
   resetPasswordRequestSchema,
   type ResetPasswordRequest,
-} from "~/lib/validation/auth/reset-password";
+} from "~/lib/validation/auth/password";
 
 export function RequestPasswordResetForm({
   className,

@@ -25,7 +25,7 @@ import { authClient } from "~/lib/auth-client";
 import {
   updatePasswordSchema,
   type UpdatePassword,
-} from "~/lib/validation/auth/reset-password";
+} from "~/lib/validation/auth/password";
 import { PasswordInput } from "../common/password-input";
 
 interface Props extends React.ComponentProps<typeof Card> {
