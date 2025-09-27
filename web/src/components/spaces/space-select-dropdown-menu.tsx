@@ -90,7 +90,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
                     <SpaceInfo
                       image={space.logo}
                       name={space.name}
-                      className="text-muted-foreground"
+                      className="text-accent-foreground"
                     />
                     <ArrowRight className="not-group-hover:hidden" />
                   </DropdownMenuItem>
@@ -99,7 +99,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
               ),
           )}
           <DropdownMenuItem
-            className="text-muted-foreground cursor-pointer gap-2 rounded-t-none rounded-b-md p-2 font-bold"
+            className="text-accent-foreground cursor-pointer gap-2 rounded-t-none rounded-b-md p-2 font-bold"
             onClick={() => setCreateDialogOpen(true)}
             disabled={isLoading || isSpacesPending}
           >
