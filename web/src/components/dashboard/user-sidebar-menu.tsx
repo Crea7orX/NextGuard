@@ -27,8 +27,8 @@ export function UserSidebarMenu() {
           >
             {isLoading ? (
               <>
-                <Skeleton className="size-6 rounded-full border" />
-                <Skeleton className="h-4 w-40 border" />
+                <Skeleton className="size-6 rounded-full" />
+                <Skeleton className="h-4 w-40" />
               </>
             ) : (
               <>

@@ -15,7 +15,7 @@ export function UserNav({
   return (
     <UserDropdownMenu className={className} {...props}>
       {isLoading ? (
-        <Skeleton className="size-6 rounded-full border" />
+        <Skeleton className="size-6 rounded-full" />
       ) : (
         <AvatarWithFallback
           image={session.user.image}

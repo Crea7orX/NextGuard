@@ -39,10 +39,10 @@ export function SpaceInfoSkeleton({
       className={cn("flex items-center gap-2 overflow-hidden", className)}
       {...props}
     >
-      <Skeleton className="size-6 rounded-sm border" />
+      <Skeleton className="size-6 rounded-sm" />
       <div className="grid gap-1 overflow-hidden text-left text-sm">
-        <Skeleton className="h-4 w-40 border" />
-        {hasRole && <Skeleton className="h-4 w-20 border" />}
+        <Skeleton className="h-4 w-40" />
+        {hasRole && <Skeleton className="h-4 w-20" />}
       </div>
     </div>
   );

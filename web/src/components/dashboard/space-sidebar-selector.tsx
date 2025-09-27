@@ -29,7 +29,7 @@ export function SpaceSidebarSelector() {
     </>
   ) : (
     <>
-      <Skeleton className="size-6 rounded-sm border" />
+      <Skeleton className="size-6 rounded-sm" />
       <span className="text-muted-foreground text-xs">Select a space</span>
     </>
   );
@@ -37,7 +37,7 @@ export function SpaceSidebarSelector() {
   if (isPending) {
     body = (
       <>
-        <Skeleton className="size-6 rounded-sm border" />
+        <Skeleton className="size-6 rounded-sm" />
         <Skeleton className="h-4 w-32" />
       </>
     );

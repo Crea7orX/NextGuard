@@ -60,10 +60,10 @@ export function UserDropdownMenu({
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               {isSessionLoading ? (
                 <>
-                  <Skeleton className="size-6 rounded-full border" />
+                  <Skeleton className="size-6 rounded-full" />
                   <div className="grid flex-1 gap-1">
-                    <Skeleton className="h-4 w-40 border" />
-                    <Skeleton className="h-4 w-46 border" />
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-46" />
                   </div>
                 </>
               ) : (
