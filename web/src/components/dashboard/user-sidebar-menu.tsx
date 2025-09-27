@@ -35,6 +35,7 @@ export function UserSidebarMenu() {
                 <AvatarWithFallback
                   image={session.user.image}
                   name={session.user.name}
+                  twoLetter
                 />
                 <span className="truncate text-left text-sm leading-tight font-medium">
                   {session.user.name}

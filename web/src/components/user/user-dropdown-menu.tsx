@@ -71,6 +71,7 @@ export function UserDropdownMenu({
                   <AvatarWithFallback
                     image={session.user.image}
                     name={session.user.name}
+                    twoLetter
                   />
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">

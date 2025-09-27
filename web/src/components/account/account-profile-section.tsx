@@ -51,6 +51,7 @@ export function AccountProfileSection({
                 <AvatarWithFallback
                   image={session.user.image}
                   name={session.user.name}
+                  twoLetter
                   className="size-12"
                 />
                 <p className="font-semibold">{session.user.name}</p>

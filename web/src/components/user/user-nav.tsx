@@ -20,6 +20,7 @@ export function UserNav({
         <AvatarWithFallback
           image={session.user.image}
           name={session.user.name}
+          twoLetter
         />
       )}
     </UserDropdownMenu>
