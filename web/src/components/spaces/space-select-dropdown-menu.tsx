@@ -44,12 +44,12 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
       <DropdownMenu open={isOpen || isLoading} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent
-          className="max-w-(--radix-dropdown-menu-trigger-width) min-w-64 p-0"
+          className="max-w-(--radix-dropdown-menu-trigger-width) min-w-64"
           {...props}
         >
           {activeSpace && (
             <>
-              <div className="flex items-center justify-between gap-2 p-2">
+              <div className="flex items-center justify-between gap-2 px-2 py-1.5">
                 <SpaceInfo
                   image={activeSpace.logo}
                   name={activeSpace.name}
@@ -66,7 +66,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
                   </Button>
                 </DropdownMenuItem>
               </div>
-              <DropdownMenuSeparator className="m-0" />
+              <DropdownMenuSeparator />
             </>
           )}
           {isSpacesPending &&
@@ -75,7 +75,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
                 <DropdownMenuItem disabled={true}>
                   <SpaceInfoSkeleton hasRole={i === 0 && !activeSpace} />
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="m-0" />
+                <DropdownMenuSeparator />
               </React.Fragment>
             ))}
           {spaces?.map(
@@ -83,7 +83,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
               space.id !== activeSpace?.id && (
                 <div key={space.id}>
                   <DropdownMenuItem
-                    className="group cursor-pointer justify-between gap-2 rounded-none p-2"
+                    className="group cursor-pointer justify-between"
                     onClick={() => switchSpace(space.id)}
                     disabled={isLoading}
                   >
@@ -92,14 +92,14 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
                       name={space.name}
                       className="text-accent-foreground"
                     />
-                    <ArrowRight className="not-group-hover:hidden" />
+                    <ArrowRight className="not-group-focus-visible:hidden" />
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="m-0" />
+                  <DropdownMenuSeparator />
                 </div>
               ),
           )}
           <DropdownMenuItem
-            className="text-accent-foreground cursor-pointer gap-2 rounded-t-none rounded-b-md p-2 font-bold"
+            className="text-accent-foreground cursor-pointer font-bold"
             onClick={() => setCreateDialogOpen(true)}
             disabled={isLoading || isSpacesPending}
           >
