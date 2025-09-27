@@ -15,10 +15,16 @@ interface Props {
   onChange?: (file: File | undefined) => void;
   onFileReject?: (file: File, message: string) => void;
   onFileClear?: () => void;
+  value?: File;
 }
 
-export function AvatarUpload({ onChange, onFileClear, ...props }: Props) {
-  const [files, setFiles] = React.useState<File[]>([]);
+export function AvatarUpload({
+  onChange,
+  onFileClear,
+  value,
+  ...props
+}: Props) {
+  const [files, setFiles] = React.useState<File[]>(value ? [value] : []);
 
   return (
     <FileUpload
@@ -30,6 +36,7 @@ export function AvatarUpload({ onChange, onFileClear, ...props }: Props) {
         setFiles(files);
         onChange?.(files[0]);
       }}
+      accept="image/*"
       {...props}
       value={files}
     >
