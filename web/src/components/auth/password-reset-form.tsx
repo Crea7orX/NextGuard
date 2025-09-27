@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +9,7 @@ import { AnotherMethodSeparator } from "~/components/auth/another-method-separat
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { ContinueWithPasswordButton } from "~/components/auth/continue-with-password-button";
 import { LoadingButton } from "~/components/common/loading-button";
-import { Button } from "~/components/ui/button";
+import { PasswordInput } from "~/components/common/password-input";
 import {
   Form,
   FormControl,
@@ -20,7 +20,6 @@ import {
   FormResponseMessage,
   type FormResponseMessageProps,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
 import {
@@ -61,7 +60,6 @@ export function PasswordResetForm({
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
   const [message, setMessage] = React.useState<FormResponseMessageProps>();
-  const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm<ResetPassword>({
     resolver: zodResolver(resetPasswordSchema),
@@ -116,30 +114,12 @@ export function PasswordResetForm({
                 <FormItem>
                   <FormLabel>New password</FormLabel>
                   <FormControl>
-                    <div className="group relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your new password"
-                        autoComplete="new-password"
-                        className="pr-10"
-                        aria-invalid={!!fieldState.error}
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                        tabIndex={-1}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
+                    <PasswordInput
+                      placeholder="Enter your new password"
+                      autoComplete="new-password"
+                      invalid={!!fieldState.invalid}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,30 +132,12 @@ export function PasswordResetForm({
                 <FormItem>
                   <FormLabel>Confirm new password</FormLabel>
                   <FormControl>
-                    <div className="group relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Confirm your new password"
-                        autoComplete="new-password"
-                        className="pr-10"
-                        aria-invalid={!!fieldState.error}
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                        tabIndex={-1}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
+                    <PasswordInput
+                      placeholder="Confirm your new password"
+                      autoComplete="new-password"
+                      invalid={!!fieldState.invalid}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

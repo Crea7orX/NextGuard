@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
@@ -9,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { AnotherMethodSeparator } from "~/components/auth/another-method-separator";
 import { ContinueWithGoogleButton } from "~/components/auth/continue-with-google-button";
 import { LoadingButton } from "~/components/common/loading-button";
-import { Button } from "~/components/ui/button";
+import { PasswordInput } from "~/components/common/password-input";
 import {
   Form,
   FormControl,
@@ -36,7 +35,6 @@ export function SignUpForm({
     [searchParams],
   );
 
-  const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
   const [message, setMessage] = React.useState<FormResponseMessageProps>();
@@ -162,30 +160,12 @@ export function SignUpForm({
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <div className="group relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      autoComplete="new-password"
-                      className="pr-10"
-                      aria-invalid={!!fieldState.error}
-                      {...field}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <PasswordInput
+                    placeholder="Enter your password"
+                    autoComplete="new-password"
+                    invalid={!!fieldState.invalid}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -198,30 +178,12 @@ export function SignUpForm({
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
-                  <div className="group relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
-                      autoComplete="new-password"
-                      className="pr-10"
-                      aria-invalid={!!fieldState.error}
-                      {...field}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute top-0.5 right-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <PasswordInput
+                    placeholder="Confirm your password"
+                    autoComplete="new-password"
+                    invalid={!!fieldState.invalid}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
