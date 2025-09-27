@@ -1,8 +1,8 @@
 "use client";
 
 import { AvatarWithFallback } from "~/components/common/avatar-with-fallback";
+import { ProfileEmailSection } from "~/components/profile/profile-email-section";
 import { ProfilePasswordSection } from "~/components/profile/profile-password-section";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -18,7 +18,7 @@ export function ProfileDialog({
 }: React.ComponentProps<typeof Dialog>) {
   const { data: session, isPending, error } = authClient.useSession();
   const isSessionLoading = !session || isPending || !!error;
-  
+
   if (isSessionLoading) {
     return null;
   }
@@ -47,17 +47,7 @@ export function ProfileDialog({
           </div>
         </div>
         <Separator />
-        <div className="flex items-center gap-2">
-          <div className="w-52">
-            <p>Email address</p>
-          </div>
-          <div className="flex flex-1 items-center gap-2">
-            <p className="text-sm">{session.user.email}</p>
-            {session.user.emailVerified && (
-              <Badge variant="outline">Verified</Badge>
-            )}
-          </div>
-        </div>
+        <ProfileEmailSection />
         <Separator />
         <ProfilePasswordSection />
       </DialogContent>
