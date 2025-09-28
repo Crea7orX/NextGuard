@@ -14,7 +14,7 @@ export function AccountDialog({
 }: React.ComponentProps<typeof Dialog>) {
   return (
     <Dialog {...props}>
-      <DialogContent className="flex h-full max-h-[40rem] flex-col overflow-auto lg:min-w-3xl">
+      <DialogContent className="flex h-full max-h-[40rem] flex-col overflow-auto sm:max-w-[calc(100%-2rem)] md:max-w-2xl lg:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Account details</DialogTitle>
         </DialogHeader>
