@@ -16,18 +16,20 @@ export function AccountPasswordSection({
   const [isUpdating, setIsUpdating] = React.useState(false);
 
   return (
-    <div className={cn("flex items-start gap-2", className)} {...props}>
-      <div className="w-52">
+    <div
+      className={cn("flex flex-col items-start gap-2 lg:flex-row", className)}
+      {...props}
+    >
+      <div className="lg:w-52 lg:translate-y-1">
         <p>Password</p>
       </div>
       <motion.div
-        className="flex-1 -translate-y-1"
+        className="w-full lg:flex-1"
         animate={{ height: height || "auto" }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            className="flex flex-1 items-center gap-4"
             initial={{ opacity: [0, 1], scale: [0.95, 1] }}
             animate={{ opacity: [0, 1], scale: [0.95, 1] }}
             exit={{ opacity: [1, 0], scale: [1, 0.95] }}
@@ -36,8 +38,8 @@ export function AccountPasswordSection({
             ref={ref}
           >
             {!isUpdating ? (
-              <>
-                <p className="text-lg font-bold">••••••••••</p>
+              <div className="flex flex-1 items-center gap-2 max-lg:pl-2 lg:gap-4">
+                <p className="truncate text-lg font-bold">••••••••••</p>
                 <Button
                   variant="outline"
                   className="ml-auto"
@@ -45,7 +47,7 @@ export function AccountPasswordSection({
                 >
                   Update password
                 </Button>
-              </>
+              </div>
             ) : (
               <AccountUpdatePasswordCard
                 className="w-full"
