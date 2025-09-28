@@ -23,6 +23,7 @@ interface Props extends HTMLMotionProps<"div"> {
   uniqueKey?: string;
   heightDuration?: number;
   variant?: keyof typeof variants;
+  alwaysAvailable?: boolean;
 }
 
 export function AnimatedContainer({
@@ -30,6 +31,7 @@ export function AnimatedContainer({
   uniqueKey = "content",
   variant = "scale",
   heightDuration = 0.2,
+  alwaysAvailable = false,
   children,
   ...props
 }: Props) {
@@ -38,7 +40,9 @@ export function AnimatedContainer({
   return (
     <motion.div
       className={cn(variant === "up" && "overflow-hidden", className)}
-      animate={{ height: height ?? "auto" }}
+      animate={{
+        height: alwaysAvailable ? height || "auto" : (height ?? "auto"),
+      }}
       transition={{ duration: heightDuration, ease: "easeOut" }}
       {...props}
     >
