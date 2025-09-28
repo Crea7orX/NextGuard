@@ -100,7 +100,7 @@ export function SignUpForm({
         />
         <AnotherMethodSeparator label="Or continue with" />
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-          <div className="grid grid-cols-2 items-start gap-3">
+          <div className="grid items-start gap-6 sm:grid-cols-2 sm:gap-3">
             <FormField
               control={form.control}
               name="firstName"
