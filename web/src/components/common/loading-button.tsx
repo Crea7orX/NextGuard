@@ -1,6 +1,7 @@
 import { LoaderCircle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React from "react";
+import useMeasure from "react-use-measure";
 import { Button } from "~/components/ui/button";
 
 interface Props extends React.ComponentProps<typeof Button> {
@@ -13,16 +14,19 @@ export function LoadingButton({
   children,
   ...props
 }: Props) {
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const [currentWidth, setCurrentWidth] = React.useState<number>();
+  const [ref, { width }] = useMeasure({ offsetSize: true });
+  const [currentWidth, setCurrentWidth] = React.useState<number | undefined>(
+    width,
+  );
 
   React.useEffect(() => {
-    if (!buttonRef.current) return;
-    setCurrentWidth(undefined);
-    setTimeout(() => {
-      setCurrentWidth(buttonRef.current?.offsetWidth);
-    }, 0);
-  }, [children]);
+    if (!isLoading) {
+      setCurrentWidth(undefined);
+      return;
+    }
+    setCurrentWidth(width);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
 
   function getKey(children: React.ReactNode) {
     if (React.isValidElement(children)) {
@@ -33,9 +37,9 @@ export function LoadingButton({
 
   return (
     <Button
-      ref={buttonRef}
+      ref={ref}
       className={className}
-      style={{ width: currentWidth ?? "auto" }}
+      style={{ minWidth: isLoading ? (currentWidth ?? "auto") : "auto" }}
       {...props}
     >
       <AnimatePresence mode="wait" initial={false}>
