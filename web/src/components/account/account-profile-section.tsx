@@ -52,6 +52,7 @@ export function AccountProfileSection({
                   image={session.user.image}
                   name={session.user.name}
                   twoLetter
+                  largeSize
                   className="size-12"
                 />
                 <p className="font-semibold">{session.user.name}</p>

@@ -6,6 +6,7 @@ interface Props extends React.ComponentProps<typeof Avatar> {
   image?: string | null;
   name: string;
   twoLetter?: boolean;
+  largeSize?: boolean;
 }
 
 export function AvatarWithFallback({
@@ -13,6 +14,7 @@ export function AvatarWithFallback({
   image,
   name,
   twoLetter = false,
+  largeSize = false,
   ...props
 }: Props) {
   const getInitials = () => {
@@ -29,7 +31,9 @@ export function AvatarWithFallback({
   return (
     <Avatar className={cn("size-6", className)} {...props}>
       <AvatarImage src={image ?? undefined} alt={name} />
-      <AvatarFallback>{getInitials()}</AvatarFallback>
+      <AvatarFallback className={cn(!largeSize && "text-xs")}>
+        {getInitials()}
+      </AvatarFallback>
     </Avatar>
   );
 }
