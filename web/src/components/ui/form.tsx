@@ -14,7 +14,7 @@ import {
   type FieldPath,
   type FieldValues,
 } from "react-hook-form";
-import { AnimatedMessage } from "~/components/common/animated-message";
+import { AnimatedContainer } from "~/components/common/animated-container";
 import { Label } from "~/components/ui/label";
 import { cn } from "~/lib/utils";
 
@@ -163,13 +163,15 @@ function FormMessage({
   }, [error?.message]);
 
   return (
-    <AnimatedMessage
+    <AnimatedContainer
       data-slot="form-message"
       uniqueKey={error?.message}
       id={formMessageId}
+      variant="up"
+      heightDuration={0.125}
     >
       {body}
-    </AnimatedMessage>
+    </AnimatedContainer>
   );
 }
 
@@ -233,7 +235,7 @@ function FormResponseMessage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message, variant, IconComponent]);
 
-  return <AnimatedMessage uniqueKey={message}>{body}</AnimatedMessage>;
+  return <AnimatedContainer uniqueKey={message}>{body}</AnimatedContainer>;
 }
 
 export {
