@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { lastLoginMethod, organization } from "better-auth/plugins";
 import { env } from "~/env";
+import { ac, owner } from "~/lib/permissions";
 import { db } from "~/server/db";
 import { sendResetPasswordEmail } from "~/server/email/utils/send-password-reset-email";
 import { sendVerificationEmail } from "~/server/email/utils/send-verification-email";
@@ -32,6 +33,10 @@ export const auth = betterAuth({
     lastLoginMethod(),
     organization({
       organizationLimit: env.BETTER_AUTH_ORGANIZATION_LIMIT,
+      ac,
+      roles: {
+        owner,
+      },
     }),
   ],
 });
