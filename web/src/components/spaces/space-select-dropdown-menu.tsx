@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Plus, Settings } from "lucide-react";
 import React from "react";
 import { CreateSpaceDialog } from "~/components/spaces/create-space-dialog";
@@ -19,6 +20,8 @@ interface Props extends React.ComponentProps<typeof DropdownMenuContent> {
 }
 
 export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
+  const queryClient = useQueryClient();
+
   const [isOpen, setIsOpen] = React.useState(false);
 
   const {
@@ -36,6 +39,7 @@ export function SpaceSelectDropdownMenu({ children, ...props }: Props) {
     setIsLoading(true);
     await authClient.organization.setActive({ organizationId: spaceId });
     await Promise.all([refetchSpaces(), refetchMember()]);
+    void queryClient.resetQueries();
     setIsLoading(false);
   }
 
