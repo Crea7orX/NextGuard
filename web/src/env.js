@@ -7,9 +7,12 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z.string().url(),
+    DATABASE_URL: z.url(),
+    SERVER_SECRET_KEY: z.string(),
+    WEBSOCKET_SERVER: z.url().default("http://localhost:3000"),
+    WEBSOCKET_SECRET_KEY: z.string(),
     BETTER_AUTH_SECRET: z.string(),
-    BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
+    BETTER_AUTH_URL: z.url().default("http://localhost:3000"),
     BETTER_AUTH_EMAIL_VERIFICATION_EXPIRES_IN: z.coerce.number().default(600),
     BETTER_AUTH_RESET_PASSWORD_EXPIRES_IN: z.coerce.number().default(300),
     BETTER_AUTH_ORGANIZATION_LIMIT: z.coerce.number().default(5),
@@ -27,11 +30,9 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
-    NEXT_PUBLIC_BASE_URL: z.string().url().default("http://localhost:3000"),
-    NEXT_PUBLIC_BETTER_AUTH_URL: z
-      .string()
-      .url()
-      .default("http://localhost:3000"),
+    NEXT_PUBLIC_BASE_URL: z.url().default("http://localhost:3000"),
+    NEXT_PUBLIC_API_BASE_URL: z.url().default("http://localhost:3000/api"),
+    NEXT_PUBLIC_BETTER_AUTH_URL: z.url().default("http://localhost:3000"),
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string(),
   },
 
@@ -41,6 +42,9 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
+    SERVER_SECRET_KEY: process.env.SERVER_SECRET_KEY,
+    WEBSOCKET_SERVER: process.env.WEBSOCKET_SERVER,
+    WEBSOCKET_SECRET_KEY: process.env.WEBSOCKET_SECRET_KEY,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     BETTER_AUTH_EMAIL_VERIFICATION_EXPIRES_IN:
@@ -51,6 +55,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
     NODE_ENV: process.env.NODE_ENV,
