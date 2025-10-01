@@ -2,6 +2,7 @@ import "~/styles/globals.css";
 
 import { type Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ApiProvider } from "~/components/providers/api-provider";
 import { ThemeProvider } from "~/components/providers/theme-provider";
 import { TailwindIndicator } from "~/components/ui/tailwind-indicator";
 
@@ -28,8 +29,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <TailwindIndicator />
+          <ApiProvider>
+            {children}
+            <TailwindIndicator />
+          </ApiProvider>
         </ThemeProvider>
       </body>
     </html>
