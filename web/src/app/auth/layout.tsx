@@ -7,7 +7,7 @@ interface Props {
 
 export default function AuthLayout({ children }: Props) {
   return (
-    <div className="bg-muted flex flex-1 flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="flex flex-1 flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-md flex-col gap-6">
         <Link
           href="/"
