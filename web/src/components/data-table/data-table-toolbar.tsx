@@ -37,7 +37,7 @@ export function DataTableToolbar<TData>({
       role="toolbar"
       aria-orientation="horizontal"
       className={cn(
-        "flex w-full items-start justify-between gap-2 p-1",
+        "flex w-full items-center justify-between gap-2 p-1",
         className,
       )}
       {...props}
@@ -48,7 +48,6 @@ export function DataTableToolbar<TData>({
         ))}
         {isFiltered && (
           <Button
-            aria-label="Reset filters"
             variant="outline"
             size="sm"
             className="border-dashed"
@@ -61,7 +60,12 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         {children}
-        <DataTableViewOptions table={table} />
+        {table
+          .getAllColumns()
+          .filter(
+            (column) =>
+              typeof column.accessorFn !== "undefined" && column.getCanHide(),
+          ).length > 0 && <DataTableViewOptions table={table} />}
       </div>
     </div>
   );
