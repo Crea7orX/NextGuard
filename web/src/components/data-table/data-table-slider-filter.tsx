@@ -5,7 +5,6 @@ import { PlusCircle, XCircle } from "lucide-react";
 import * as React from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -134,9 +133,8 @@ export function DataTableSliderFilter<TData>({
           {columnFilterValue ? (
             <div
               role="button"
-              aria-label={`Clear ${title} filter`}
               tabIndex={0}
-              className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="focus-visible:ring-ring rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:outline-none"
               onClick={onReset}
             >
               <XCircle />
@@ -160,16 +158,12 @@ export function DataTableSliderFilter<TData>({
       </PopoverTrigger>
       <PopoverContent align="start" className="flex w-auto flex-col gap-4">
         <div className="flex flex-col gap-3">
-          <p className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          <p className="leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {title}
           </p>
           <div className="flex items-center gap-4">
-            <Label htmlFor={`${id}-from`} className="sr-only">
-              From
-            </Label>
             <div className="relative">
               <Input
-                id={`${id}-from`}
                 type="number"
                 aria-valuemin={min}
                 aria-valuemax={max}
@@ -183,17 +177,13 @@ export function DataTableSliderFilter<TData>({
                 className={cn("h-8 w-24", unit && "pr-8")}
               />
               {unit && (
-                <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-muted-foreground text-sm">
+                <span className="bg-accent text-muted-foreground absolute top-0 right-0 bottom-0 flex items-center rounded-r-md px-2 text-sm">
                   {unit}
                 </span>
               )}
             </div>
-            <Label htmlFor={`${id}-to`} className="sr-only">
-              to
-            </Label>
             <div className="relative">
               <Input
-                id={`${id}-to`}
                 type="number"
                 aria-valuemin={min}
                 aria-valuemax={max}
@@ -207,17 +197,13 @@ export function DataTableSliderFilter<TData>({
                 className={cn("h-8 w-24", unit && "pr-8")}
               />
               {unit && (
-                <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-muted-foreground text-sm">
+                <span className="bg-accent text-muted-foreground absolute top-0 right-0 bottom-0 flex items-center rounded-r-md px-2 text-sm">
                   {unit}
                 </span>
               )}
             </div>
           </div>
-          <Label htmlFor={`${id}-slider`} className="sr-only">
-            {title} slider
-          </Label>
           <Slider
-            id={`${id}-slider`}
             min={min}
             max={max}
             step={step}
