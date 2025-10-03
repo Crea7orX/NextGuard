@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export function createErrorResponse(error: unknown, status = 500) {
+export function createErrorResponse<T>(error: T, status = 400) {
   return NextResponse.json(
     {
       success: false,
@@ -12,7 +12,9 @@ export function createErrorResponse(error: unknown, status = 500) {
   );
 }
 
-export function createSuccessResponse(data: unknown, status = 200) {
+export type ErrorResponse = Awaited<ReturnType<typeof createErrorResponse>>;
+
+export function createSuccessResponse<T>(data: T, status = 200) {
   return NextResponse.json(
     {
       success: true,
@@ -23,3 +25,8 @@ export function createSuccessResponse(data: unknown, status = 200) {
     },
   );
 }
+
+export type SuccessResponse<T> = {
+  success: true;
+  data: T;
+};
