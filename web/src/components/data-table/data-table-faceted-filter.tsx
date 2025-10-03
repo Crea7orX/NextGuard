@@ -1,7 +1,7 @@
 "use client";
 
 import type { Column } from "@tanstack/react-table";
-import { Check, PlusCircle, XCircle } from "lucide-react";
+import { Check, PlusCircle } from "lucide-react";
 import * as React from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -39,8 +39,9 @@ export function DataTableFacetedFilter<TData, TValue>({
   const [open, setOpen] = React.useState(false);
 
   const columnFilterValue = column?.getFilterValue();
-  const selectedValues = new Set(
-    Array.isArray(columnFilterValue) ? columnFilterValue : [],
+  const selectedValues = React.useMemo(
+    () => new Set(Array.isArray(columnFilterValue) ? columnFilterValue : []),
+    [columnFilterValue],
   );
 
   const onItemSelect = React.useCallback(
@@ -76,19 +77,24 @@ export function DataTableFacetedFilter<TData, TValue>({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="border-dashed">
-          {selectedValues?.size > 0 ? (
-            <div
-              role="button"
-              aria-label={`Clear ${title} filter`}
-              tabIndex={0}
-              onClick={onReset}
-              className="focus-visible:ring-ring rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:outline-none"
-            >
-              <XCircle />
-            </div>
-          ) : (
-            <PlusCircle />
-          )}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              if (selectedValues?.size > 0) onReset();
+            }}
+            className={cn(
+              "focus-visible:ring-ring rounded-sm opacity-70 transition-opacity focus-visible:ring-1 focus-visible:outline-none",
+              selectedValues?.size > 0 && "hover:opacity-100",
+            )}
+          >
+            <PlusCircle
+              className={cn(
+                "transition",
+                selectedValues?.size > 0 && "-rotate-45",
+              )}
+            />
+          </div>
           {title}
           {selectedValues?.size > 0 && (
             <>
