@@ -2,6 +2,7 @@
 
 import type { Column, Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
 import { DataTableDateFilter } from "~/components/data-table/data-table-date-filter";
 import { DataTableFacetedFilter } from "~/components/data-table/data-table-faceted-filter";
@@ -46,17 +47,31 @@ export function DataTableToolbar<TData>({
         {columns.map((column) => (
           <DataTableToolbarFilter key={column.id} column={column} />
         ))}
-        {isFiltered && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-dashed"
-            onClick={onReset}
-          >
-            <X />
-            Reset
-          </Button>
-        )}
+        <AnimatePresence>
+          {isFiltered && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-dashed"
+              onClick={onReset}
+              asChild
+            >
+              <motion.div
+                initial={{ opacity: [0, 1], scale: [0.95, 1] }}
+                animate={{ opacity: [0, 1], scale: [0.95, 1] }}
+                exit={{ opacity: [1, 0], scale: [1, 0.95] }}
+                transition={{
+                  duration: 0.15,
+                  ease: "easeOut",
+                  times: [0.5, 1],
+                }}
+              >
+                <X />
+                Reset
+              </motion.div>
+            </Button>
+          )}
+        </AnimatePresence>
       </div>
       <div className="flex items-center gap-2">
         {children}
