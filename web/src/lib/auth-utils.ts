@@ -9,16 +9,11 @@ export async function authenticateUser(request: NextRequest) {
     const session = await auth.api.getSession({
       headers: request.headers,
     });
-
-    const member = await auth.api.getActiveMember({
-      headers: request.headers,
-    });
-
     if (!session) throw new UnauthorizedError();
 
     return {
       ...session,
-      ownerId: member?.organizationId ?? session.user.id,
+      ownerId: session.session.activeOrganizationId ?? session.user.id,
     };
   } catch (error) {
     if (error instanceof APIError) {
