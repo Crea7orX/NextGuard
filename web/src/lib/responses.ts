@@ -12,7 +12,10 @@ export function createErrorResponse<T>(error: T, status = 400) {
   );
 }
 
-export type ErrorResponse = Awaited<ReturnType<typeof createErrorResponse>>;
+export type ErrorResponse<T> = {
+  success: false;
+  error: T;
+};
 
 export function createSuccessResponse<T>(data: T, status = 200) {
   return NextResponse.json(
