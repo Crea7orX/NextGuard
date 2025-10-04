@@ -1,3 +1,4 @@
+import { DashboardSidebarNav } from "~/components/dashboard/dashboard-sidebar-nav";
 import { SpaceSidebarSelector } from "~/components/dashboard/space-sidebar-selector";
 import { UserSidebarMenu } from "~/components/dashboard/user-sidebar-menu";
 import {
@@ -15,7 +16,9 @@ export function DashboardSidebar({
       <SidebarHeader>
         <SpaceSidebarSelector />
       </SidebarHeader>
-      <SidebarContent></SidebarContent>
+      <SidebarContent>
+        <DashboardSidebarNav />
+      </SidebarContent>
       <SidebarFooter>
         <UserSidebarMenu />
       </SidebarFooter>
