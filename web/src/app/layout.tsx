@@ -2,6 +2,7 @@ import "~/styles/globals.css";
 
 import { type Metadata } from "next";
 import { Inter } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ApiProvider } from "~/components/providers/api-provider";
 import { ThemeProvider } from "~/components/providers/theme-provider";
 import { TailwindIndicator } from "~/components/ui/tailwind-indicator";
@@ -22,7 +23,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
-      <body className="flex h-dvh flex-col">
+      <body className="flex min-h-dvh flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -30,8 +31,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ApiProvider>
-            {children}
-            <TailwindIndicator />
+            <NuqsAdapter>
+              {children}
+              <TailwindIndicator />
+            </NuqsAdapter>
           </ApiProvider>
         </ThemeProvider>
       </body>
