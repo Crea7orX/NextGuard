@@ -10,7 +10,7 @@ import { axiosInstance } from "~/lib/axios";
 import type { SuccessResponse } from "~/lib/responses";
 import type { PendingDevicesPaginatedResponse } from "~/lib/validation/pending-device";
 
-interface UseGetAllPendingDevicesQueryProps
+interface Props
   extends Partial<
     UseQueryOptions<PendingDevicesPaginatedResponse, AxiosError>
   > {
@@ -20,7 +20,7 @@ interface UseGetAllPendingDevicesQueryProps
 export function useGetAllPendingDevicesQuery({
   searchParams,
   ...options
-}: UseGetAllPendingDevicesQueryProps) {
+}: Props) {
   const search = useParseSearchParams(searchParams);
 
   return useQuery<PendingDevicesPaginatedResponse, AxiosError>({
