@@ -140,6 +140,7 @@ export function TypeToConfirmAlertDialog() {
           </Button>
           <LoadingButton
             className="flex-1"
+            variant={state.confirmButtonVariant ?? "destructive"}
             onClick={handleConfirm}
             isLoading={isLoading}
             disabled={isLoading}

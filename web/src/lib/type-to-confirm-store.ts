@@ -1,7 +1,9 @@
 "use client";
 
+import type { VariantProps } from "class-variance-authority";
 import type React from "react";
 import { create } from "zustand";
+import type { buttonVariants } from "~/components/ui/button";
 import type { FormResponseMessageProps } from "~/components/ui/form";
 
 export interface TypeToConfirmOptions {
@@ -13,6 +15,7 @@ export interface TypeToConfirmOptions {
   warning?: string;
   isLoading?: boolean;
   confirmButtonText?: string;
+  confirmButtonVariant?: VariantProps<typeof buttonVariants>["variant"];
   cancelButtonText?: string;
   onConfirm?: () => void | Promise<void>;
   onCancel?: () => void;
