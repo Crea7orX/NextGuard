@@ -54,7 +54,6 @@ export async function getPendingDevices({
   try {
     const offset = (searchParams.page - 1) * searchParams.perPage;
 
-    console.log(searchParams.type, searchParams.type.length);
     const where = and(
       searchParams.serialId
         ? ilike(
@@ -109,27 +108,79 @@ export async function getPendingDevices({
   }
 }
 
+interface getPendingDeviceByIdProps {
+  id: string;
+  ownerId: string;
+}
+
+export async function getPendingDeviceById({
+  id,
+  ownerId,
+}: getPendingDeviceByIdProps) {
+  const [device] = await db
+    .select()
+    .from(pendingDevices)
+    .where(
+      and(
+        eq(pendingDevices.id, id),
+        eq(pendingDevices.ownerId, ownerId), // ownership
+      ),
+    )
+    .limit(1);
+
+  return device;
+}
+
 interface deletePendingDeviceProps {
-  deviceId: string;
+  id: string;
   ownerId: string;
   userId: string;
 }
 
 export async function deletePendingDevice({
-  deviceId,
+  id,
   ownerId,
 }: deletePendingDeviceProps) {
   const [deletedDevice] = await db
     .delete(pendingDevices)
     .where(
       and(
-        eq(pendingDevices.id, deviceId),
+        eq(pendingDevices.id, id),
         eq(pendingDevices.ownerId, ownerId), // ownership
       ),
     )
-    .returning({ id: pendingDevices.id });
+    .returning();
 
-  return !!deletedDevice;
+  return deletedDevice;
+}
+
+interface adoptPendingDeviceProps {
+  id: string;
+  ownerId: string;
+  userId: string;
+}
+
+export async function adoptPendingDevice({
+  id,
+  ownerId,
+}: adoptPendingDeviceProps) {
+  const pendingDevice = await getPendingDeviceById({ id, ownerId })
+  if (pendingDevice?.state !== "auto_discovered") throw new ConflictError();
+
+  const [device] = await db
+    .update(pendingDevices)
+    .set({
+      state: "pending_introduce",
+    })
+    .where(
+      and(
+        eq(pendingDevices.id, id),
+        eq(pendingDevices.ownerId, ownerId), // ownership
+      ),
+    )
+    .returning();
+
+  return device;
 }
 
 interface getPendingDeviceBySerialId__unprotectedProps {
