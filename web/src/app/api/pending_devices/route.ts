@@ -5,6 +5,8 @@ import { createSuccessResponse } from "~/lib/responses";
 import {
   pendingDeviceCreateSchema,
   pendingDeviceResponseSchema,
+  pendingDevicesPaginatedResponseSchema,
+  pendingDevicesSearchParamsCache,
   type PendingDeviceCreate,
 } from "~/lib/validation/pending-device";
 import {
@@ -20,11 +22,17 @@ export async function GET(request: NextRequest) {
       "pending_devices:read",
     );
 
+    const url = new URL(request.url);
+    const searchParams = await pendingDevicesSearchParamsCache.parse(
+      Promise.resolve(url.searchParams),
+    );
+
     const pendingDevices = await getPendingDevices({
+      searchParams,
       ownerId: authResult.ownerId,
     });
     return createSuccessResponse(
-      pendingDeviceResponseSchema.array().parse(pendingDevices),
+      pendingDevicesPaginatedResponseSchema.parse(pendingDevices),
     );
   } catch (error) {
     return handleError(error);

@@ -1,7 +1,10 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { getDeviceTypeFromSerialId } from "~/lib/device-utils";
 import { BadRequestError, ConflictError } from "~/lib/errors";
-import type { PendingDeviceCreate } from "~/lib/validation/pending-device";
+import type {
+  PendingDeviceCreate,
+  PendingDeviceSearchParams,
+} from "~/lib/validation/pending-device";
 import { db } from "~/server/db";
 import { pendingDevices } from "~/server/db/schemas/pending-devices";
 
@@ -40,17 +43,70 @@ export async function createPendingDevice({
 }
 
 interface getPendingDevicesProps {
+  searchParams: PendingDeviceSearchParams;
   ownerId: string;
 }
 
-export function getPendingDevices({ ownerId }: getPendingDevicesProps) {
-  return db
-    .select()
-    .from(pendingDevices)
-    .where(
+export async function getPendingDevices({
+  searchParams,
+  ownerId,
+}: getPendingDevicesProps) {
+  try {
+    const offset = (searchParams.page - 1) * searchParams.perPage;
+
+    console.log(searchParams.type, searchParams.type.length);
+    const where = and(
+      searchParams.serialId
+        ? ilike(
+            sql`${pendingDevices.serialId}::text`,
+            `%${searchParams.serialId}%`,
+          )
+        : undefined,
+      searchParams.type && searchParams.type.length > 0
+        ? inArray(pendingDevices.type, searchParams.type)
+        : undefined,
       eq(pendingDevices.ownerId, ownerId), // ownership
-    )
-    .orderBy(pendingDevices.createdAt);
+    );
+
+    const orderBy =
+      searchParams.sort.length > 0
+        ? searchParams.sort.map((item) =>
+            item.desc
+              ? desc(pendingDevices[item.id])
+              : asc(pendingDevices[item.id]),
+          )
+        : [asc(pendingDevices.createdAt)];
+
+    const { data, total } = await db.transaction(async (tx) => {
+      const data = await tx
+        .select()
+        .from(pendingDevices)
+        .limit(searchParams.perPage)
+        .offset(offset)
+        .where(where)
+        .orderBy(...orderBy);
+
+      const total = await tx
+        .select({
+          count: count(),
+        })
+        .from(pendingDevices)
+        .where(where)
+        .execute()
+        .then((res) => res[0]?.count ?? 0);
+
+      return {
+        data,
+        total,
+      };
+    });
+
+    const pageCount = Math.ceil(total / searchParams.perPage);
+    return { data, pageCount };
+  } catch (error) {
+    console.error(error);
+    return { data: [], pageCount: 0 };
+  }
 }
 
 interface deletePendingDeviceProps {
