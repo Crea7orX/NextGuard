@@ -1,12 +1,14 @@
 import { createAccessControl } from "better-auth/plugins/access";
 
 const statement = {
-  pending_devices: ["create", "read"],
+  pending_devices: ["create", "read", "delete"],
 };
 
 export const ac = createAccessControl(statement);
 
-export const owner = ac.newRole({ pending_devices: ["create", "read"] });
+export const owner = ac.newRole({
+  pending_devices: ["create", "read", "delete"],
+});
 
 export function convertPermissionsToObject(permissionStrings: string[]) {
   const result: Record<string, string[]> = {};
