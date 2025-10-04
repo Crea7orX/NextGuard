@@ -15,13 +15,23 @@ import { cn } from "~/lib/utils";
 interface DataTableProps<TData> extends React.ComponentProps<"div"> {
   table: TanstackTable<TData>;
   actionBar?: React.ReactNode;
+  contentClassName?: string;
+  notFoundChildren?: React.ReactNode;
+  notFoundClassName?: string;
+  withPagination?: boolean;
+  paginationClassName?: string;
 }
 
 export function DataTable<TData>({
+  className,
   table,
   actionBar,
+  contentClassName,
+  notFoundChildren,
+  notFoundClassName,
+  withPagination = true,
+  paginationClassName,
   children,
-  className,
   ...props
 }: DataTableProps<TData>) {
   return (
@@ -30,7 +40,9 @@ export function DataTable<TData>({
       {...props}
     >
       {children}
-      <div className="overflow-hidden rounded-md border">
+      <div
+        className={cn("overflow-hidden rounded-md border", contentClassName)}
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -76,6 +88,15 @@ export function DataTable<TData>({
                   ))}
                 </TableRow>
               ))
+            ) : notFoundChildren ? (
+              <TableRow>
+                <TableCell
+                  colSpan={table.getAllColumns().length}
+                  className={cn(notFoundClassName)}
+                >
+                  {notFoundChildren}
+                </TableCell>
+              </TableRow>
             ) : (
               <TableRow>
                 <TableCell
@@ -89,12 +110,19 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col gap-2.5">
-        <DataTablePagination table={table} />
-        {actionBar &&
-          table.getFilteredSelectedRowModel().rows.length > 0 &&
-          actionBar}
-      </div>
+      {(withPagination || actionBar) && (
+        <div className="flex flex-col gap-2.5">
+          {withPagination && (
+            <DataTablePagination
+              table={table}
+              className={paginationClassName}
+            />
+          )}
+          {actionBar &&
+            table.getFilteredSelectedRowModel().rows.length > 0 &&
+            actionBar}
+        </div>
+      )}
     </div>
   );
 }
