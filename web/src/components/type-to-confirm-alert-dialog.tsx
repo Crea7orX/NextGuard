@@ -31,7 +31,10 @@ export function TypeToConfirmAlertDialog() {
 
   const isLoading = state.isLoading ?? false;
   const confirmText = state.confirmText ?? "Confirm";
-  const warning = state.warning ?? "This action is permanent and irreversible.";
+  const warning =
+    state.warning !== undefined
+      ? state.warning
+      : "This action is permanent and irreversible.";
 
   React.useEffect(() => {
     if (state.open) return;
@@ -123,11 +126,15 @@ export function TypeToConfirmAlertDialog() {
               </AnimatedContainer>
             </div>
           </div>
-          <Separator />
-          <p className="text-destructive inline-flex w-full gap-1 px-6 text-sm">
-            <TriangleAlert className="size-3.5 shrink-0 translate-y-[0.1875rem]" />
-            <span>{warning}</span>
-          </p>
+          {warning && (
+            <>
+              <Separator />
+              <p className="text-destructive inline-flex w-full gap-1 px-6 text-sm">
+                <TriangleAlert className="size-3.5 shrink-0 translate-y-[0.1875rem]" />
+                <span>{warning}</span>
+              </p>
+            </>
+          )}
         </div>
         <AlertDialogFooter className="bg-muted rounded-b-lg px-6 py-4">
           <Button

@@ -12,7 +12,7 @@ export interface TypeToConfirmOptions {
   confirmText?: string;
   caseInensitive?: boolean;
   message?: FormResponseMessageProps;
-  warning?: string;
+  warning?: string | null;
   isLoading?: boolean;
   confirmButtonText?: string;
   confirmButtonVariant?: VariantProps<typeof buttonVariants>["variant"];
