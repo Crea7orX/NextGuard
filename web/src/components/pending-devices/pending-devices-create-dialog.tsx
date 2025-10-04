@@ -33,7 +33,7 @@ import {
   type PendingDeviceCreate,
 } from "~/lib/validation/pending-device";
 
-export function CreatePendingDeviceDialog({
+export function PendingDevicesCreateDialog({
   children,
   ...props
 }: React.ComponentPropsWithoutRef<typeof Dialog>) {
