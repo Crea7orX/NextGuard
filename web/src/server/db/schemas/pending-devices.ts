@@ -11,6 +11,7 @@ import IdPrefix, { generateId } from "~/lib/ids";
 
 export const deviceTypeEnum = pgEnum("device_types", ["hub"]);
 export const pendingDeviceState = pgEnum("pending_device_states", [
+  "auto_discovered",
   "pending_introduce",
   "pending_acknowledgement",
 ]);
@@ -21,6 +22,7 @@ export const pendingDevices = pgTable("pending_devices", {
     .$default(() => generateId(IdPrefix.PENDING_DEVICE)),
   serialId: uuid("serial_id").notNull(),
   type: deviceTypeEnum("type").notNull(),
+  state: pendingDeviceState("state").notNull().default("pending_introduce"),
   publicKeyPem: text("public_key_pem"),
   ownerId: text("owner_id").notNull(),
   createdAt: integer("created_at")
