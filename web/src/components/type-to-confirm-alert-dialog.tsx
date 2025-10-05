@@ -19,6 +19,8 @@ import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { typeToConfirm, useAlertStore } from "~/lib/type-to-confirm-store";
 
+const isDev = process.env.NODE_ENV === "development";
+
 export function TypeToConfirmAlertDialog() {
   const state = useAlertStore((s) => s.state);
   const close = useAlertStore((s) => s.close);
@@ -55,7 +57,7 @@ export function TypeToConfirmAlertDialog() {
     const normalizedConfirmText = state.caseInensitive
       ? confirmText.toLowerCase()
       : confirmText;
-    if (normalizedInput !== normalizedConfirmText) {
+    if (!isDev && normalizedInput !== normalizedConfirmText) {
       inputRef.current?.focus();
       setShowIsWrong(true);
       return;
