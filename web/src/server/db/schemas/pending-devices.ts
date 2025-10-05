@@ -14,6 +14,7 @@ export const pendingDeviceState = pgEnum("pending_device_states", [
   "auto_discovered",
   "pending_introduce",
   "pending_acknowledgement",
+  "waiting_user_confirmation",
 ]);
 
 export const pendingDevices = pgTable("pending_devices", {
