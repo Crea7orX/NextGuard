@@ -1,11 +1,12 @@
 import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { getDeviceTypeFromSerialId } from "~/lib/device-utils";
-import { BadRequestError, ConflictError } from "~/lib/errors";
+import { BadRequestError, ConflictError, NotFoundError } from "~/lib/errors";
 import type {
   PendingDeviceCreate,
   PendingDeviceSearchParams,
 } from "~/lib/validation/pending-device";
 import { db } from "~/server/db";
+import { hubs } from "~/server/db/schemas/hubs";
 import { pendingDevices } from "~/server/db/schemas/pending-devices";
 
 interface createPendingDeviceProps {
@@ -185,6 +186,45 @@ export async function adoptPendingDevice({
 
 interface getPendingDeviceBySerialId__unprotectedProps {
   serialId: string;
+}
+
+interface confirmPendingDeviceProps {
+  id: string;
+  ownerId: string;
+  userId: string;
+  name: string;
+  description?: string;
+}
+
+export async function confirmPendingDevice({
+  id,
+  ownerId,
+  userId,
+  ...props
+}: confirmPendingDeviceProps) {
+  const pendingDevice = await getPendingDeviceById({ id, ownerId });
+  if (pendingDevice?.state !== "waiting_user_confirmation")
+    throw new ConflictError();
+
+  const deletedDevice = await deletePendingDevice({
+    id,
+    ownerId,
+    userId,
+  });
+  if (!deletedDevice) throw new NotFoundError();
+
+  // TODO: check device type and insert in appropriate table
+  const [device] = await db
+    .insert(hubs)
+    .values({
+      serialId: deletedDevice.serialId,
+      publicKeyPem: deletedDevice.publicKeyPem,
+      ownerId,
+      ...props,
+    })
+    .returning();
+
+  return device;
 }
 
 export async function getPendingDeviceBySerialId__unprotected({
