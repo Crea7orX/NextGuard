@@ -5,10 +5,7 @@ import { PendingDevicesActions } from "~/components/pending-devices/data-table/p
 import { Badge } from "~/components/ui/badge";
 import { RelativeTimeCard } from "~/components/ui/relative-time-card";
 import type { PendingDeviceResponse } from "~/lib/validation/pending-device";
-import {
-  deviceTypeEnum,
-  pendingDeviceState,
-} from "~/server/db/schemas/pending-devices";
+import { deviceTypeEnum } from "~/server/db/schemas/pending-devices";
 
 interface Props {
   setAdoptDevice: React.Dispatch<
@@ -31,8 +28,10 @@ export function getPendingDevicesColumns({
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Badge variant="secondary">{row.getValue("type")}</Badge>
-          {row.original.state === pendingDeviceState.enumValues[0] ? (
+          {row.original.state === "auto_discovered" ? (
             <Badge>Auto discovered</Badge>
+          ) : row.original.state === "waiting_user_confirmation" ? (
+            <Badge variant="destructive">Confirmation required</Badge>
           ) : (
             <Badge>Adopting</Badge>
           )}
