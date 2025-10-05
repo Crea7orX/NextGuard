@@ -82,7 +82,7 @@ export function getPendingDevicesColumns({
       id: "actions",
       cell: ({ row }) => (
         <PendingDevicesActions
-          key={row.original.id}
+          key={row.id}
           pendingDevice={row.original}
           setAdoptDevice={setAdoptDevice}
           setAdoptDialogOpen={setAdoptDialogOpen}

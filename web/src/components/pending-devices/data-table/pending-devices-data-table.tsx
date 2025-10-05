@@ -46,6 +46,7 @@ export function PendingDevicesDataTable({
     data: data?.data ?? [],
     columns,
     pageCount: data?.pageCount ?? 0,
+    getRowId: (row) => row.id,
   });
 
   const rows = table.getRowModel().rows?.length;
