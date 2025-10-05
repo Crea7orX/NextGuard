@@ -6,7 +6,7 @@ import type {
   PendingDeviceSearchParams,
 } from "~/lib/validation/pending-device";
 import { db } from "~/server/db";
-import { hubs } from "~/server/db/schemas/hubs";
+import { devices } from "~/server/db/schemas/devices";
 import { pendingDevices } from "~/server/db/schemas/pending-devices";
 
 interface createPendingDeviceProps {
@@ -213,11 +213,11 @@ export async function confirmPendingDevice({
   });
   if (!deletedDevice) throw new NotFoundError();
 
-  // TODO: check device type and insert in appropriate table
   const [device] = await db
-    .insert(hubs)
+    .insert(devices)
     .values({
       serialId: deletedDevice.serialId,
+      type: deletedDevice.type,
       publicKeyPem: deletedDevice.publicKeyPem,
       ownerId,
       ...props,

@@ -1,7 +1,7 @@
 import { generateId as generate } from "better-auth";
 
 enum IdPrefix {
-  HUB = "hub_",
+  DEVICE = "dvc_",
   PENDING_DEVICE = "pnd_dvc_",
 }
 

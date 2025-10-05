@@ -3,7 +3,7 @@ import postgres from "postgres";
 import { env } from "~/env";
 
 import * as account from "~/server/db/schemas/account";
-import * as hubs from "~/server/db/schemas/hubs";
+import * as devices from "~/server/db/schemas/devices";
 import * as invitation from "~/server/db/schemas/invitation";
 import * as member from "~/server/db/schemas/member";
 import * as organization from "~/server/db/schemas/organization";
@@ -22,7 +22,7 @@ if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 export const db = drizzle(conn, {
   schema: {
     ...account,
-    ...hubs,
+    ...devices,
     ...invitation,
     ...member,
     ...organization,
