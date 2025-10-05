@@ -20,7 +20,7 @@ export function useAdoptPendingDeviceMutation({ id }: Props) {
         )
       ).data.data,
     onSuccess: () =>
-      Promise.all([
+      void Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["PendingDevices", "GetAll"],
         }),

@@ -17,10 +17,8 @@ export function useCreatePendingDeviceMutation() {
     mutationKey: ["PendingDevices", "Create"],
     mutationFn: (create) => axiosInstance.post("/pending_devices", create),
     onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["PendingDevices", "GetAll"],
-        }),
-      ]),
+      void queryClient.invalidateQueries({
+        queryKey: ["PendingDevices", "GetAll"],
+      }),
   });
 }
