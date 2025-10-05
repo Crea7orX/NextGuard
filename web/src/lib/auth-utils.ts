@@ -1,5 +1,6 @@
 import { APIError } from "better-auth";
 import type { NextRequest } from "next/server";
+import { env } from "~/env";
 import { auth } from "~/lib/auth";
 import { ForbiddenError, UnauthorizedError } from "~/lib/errors";
 import { convertCommaSeparatedPermissions } from "~/lib/permissions";
@@ -52,4 +53,16 @@ export async function checkPermission(
       permissions: permissionsObject,
     },
   });
+}
+
+export async function authenticateWSServer(request: NextRequest) {
+  const token = request.headers.get("Authorization")?.split("Bearer ")?.[1];
+
+  console.log(token);
+
+  if (!token || token !== env.WEBSOCKET_SECRET_KEY) {
+    throw new UnauthorizedError();
+  }
+
+  return true;
 }
