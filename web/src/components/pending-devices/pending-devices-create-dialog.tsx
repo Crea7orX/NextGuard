@@ -39,6 +39,7 @@ export function PendingDevicesCreateDialog({
 }: React.ComponentPropsWithoutRef<typeof Dialog>) {
   const { mutateAsync: create } = useCreatePendingDeviceMutation();
 
+  const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [message, setMessage] = React.useState<FormResponseMessageProps>();
 
@@ -57,6 +58,7 @@ export function PendingDevicesCreateDialog({
     await create(data)
       .then(() => {
         form.reset();
+        setOpen(false);
         props.onOpenChange?.(false);
       })
       .catch((error) => {
@@ -82,7 +84,12 @@ export function PendingDevicesCreateDialog({
   }
 
   return (
-    <Dialog {...props}>
+    <Dialog
+      {...props}
+      open={props.open ?? open}
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      onOpenChange={props.onOpenChange ?? setOpen}
+    >
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <Form {...form}>
