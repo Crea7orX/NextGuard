@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { authenticateAndAuthorizeUser } from "~/lib/auth-utils";
 import { handleError } from "~/lib/errors";
 import { createSuccessResponse } from "~/lib/responses";
-import { hubResponseSchema } from "~/lib/validation/hubs";
+import { deviceResponseSchema } from "~/lib/validation/devices";
 import {
   pendingDeviceConfirmSchema,
   type PendingDeviceConfirm,
@@ -34,8 +34,7 @@ export async function POST(request: NextRequest, { params }: Props) {
     });
     if (!device) throw new Error(); // unsuccessful creation of device
 
-    // TODO: return proper type based on device type
-    return createSuccessResponse(hubResponseSchema.parse(device));
+    return createSuccessResponse(deviceResponseSchema.parse(device));
   } catch (error) {
     return handleError(error);
   }
