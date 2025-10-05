@@ -22,6 +22,22 @@ export function PendingDevicesDataTable({
   const [adoptDevice, setAdoptDevice] = React.useState<PendingDeviceResponse>();
   const [adoptDialogOpen, setAdoptDialogOpen] = React.useState(false);
 
+  const [knownIds, setKnownIds] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    if (!data) return;
+
+    // if new id appears, open dialog
+    const newIds = data.data.map((device) => device.id);
+    const newIdsToOpen = newIds.filter((id) => !knownIds.includes(id));
+    if (newIdsToOpen.length > 0 && knownIds.length > 0) {
+      setAdoptDevice(data.data.find((device) => device.id === newIdsToOpen[0]));
+      setAdoptDialogOpen(true);
+    }
+
+    setKnownIds(data.data.map((device) => device.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
   const columns = React.useMemo(
     () => getPendingDevicesColumns({ setAdoptDevice, setAdoptDialogOpen }),
     [],
