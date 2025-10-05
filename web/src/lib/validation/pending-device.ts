@@ -58,3 +58,10 @@ export const pendingDevicesPaginatedResponseSchema = z.object({
 export type PendingDevicesPaginatedResponse = z.infer<
   typeof pendingDevicesPaginatedResponseSchema
 >;
+
+export const pendingDeviceConfirmSchema = z.object({
+  name: z.string().min(2).max(255),
+  description: z.string().optional(),
+});
+
+export type PendingDeviceConfirm = z.infer<typeof pendingDeviceConfirmSchema>;
