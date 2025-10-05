@@ -31,7 +31,11 @@ export function PendingDevicesActions({
         setAdoptDevice={setAdoptDevice}
         setAdoptDialogOpen={setAdoptDialogOpen}
       >
-        <Button variant="outline">Adopt</Button>
+        {pendingDevice.state === "waiting_user_confirmation" ? (
+          <Button>Add</Button>
+        ) : (
+          <Button variant="outline">Adopt</Button>
+        )}
       </PendingDevicesAdopt>
       <ButtonGroupSeparator />
       <PendingDevicesDelete pendingDevice={pendingDevice}>
