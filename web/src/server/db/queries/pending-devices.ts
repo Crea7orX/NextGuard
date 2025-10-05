@@ -164,7 +164,7 @@ export async function adoptPendingDevice({
   id,
   ownerId,
 }: adoptPendingDeviceProps) {
-  const pendingDevice = await getPendingDeviceById({ id, ownerId })
+  const pendingDevice = await getPendingDeviceById({ id, ownerId });
   if (pendingDevice?.state !== "auto_discovered") throw new ConflictError();
 
   const [device] = await db
@@ -195,6 +195,56 @@ export async function getPendingDeviceBySerialId__unprotected({
     .from(pendingDevices)
     .where(eq(pendingDevices.serialId, serialId))
     .limit(1);
+
+  return device;
+}
+
+interface introducePendingDeviceBySerialId__unprotectedProps {
+  serialId: string;
+  publicKey: string;
+}
+
+export async function introducePendingDeviceBySerialId__unprotected({
+  serialId,
+  publicKey,
+}: introducePendingDeviceBySerialId__unprotectedProps) {
+  const pendingDevice = await getPendingDeviceBySerialId__unprotected({
+    serialId,
+  });
+  if (pendingDevice?.publicKeyPem) throw new ConflictError();
+
+  const [device] = await db
+    .update(pendingDevices)
+    .set({
+      publicKeyPem: publicKey,
+      state: "pending_acknowledgement",
+    })
+    .where(eq(pendingDevices.serialId, serialId))
+    .returning();
+
+  return device;
+}
+
+interface acknowledgePendingDeviceBySerialId__unprotectedProps {
+  serialId: string;
+}
+
+export async function acknowledgePendingDeviceBySerialId__unprotected({
+  serialId,
+}: acknowledgePendingDeviceBySerialId__unprotectedProps) {
+  const pendingDevice = await getPendingDeviceBySerialId__unprotected({
+    serialId,
+  });
+  if (pendingDevice?.state !== "pending_acknowledgement")
+    throw new ConflictError();
+
+  const [device] = await db
+    .update(pendingDevices)
+    .set({
+      state: "waiting_user_confirmation",
+    })
+    .where(eq(pendingDevices.serialId, serialId))
+    .returning();
 
   return device;
 }
