@@ -14,11 +14,11 @@ export const deviceResponseSchema = z.object({
   serialId: z.uuid(),
   type: z.enum(deviceTypeEnum.enumValues),
   name: z.string(),
-  description: z.string().optional(),
+  description: z.string().nullish(),
   metadata: z.object(),
   ownerId: z.string(),
   createdAt: z.number(),
-  updatedAt: z.number().optional(),
+  updatedAt: z.number().nullish(),
 });
 
 export type DeviceResponse = z.infer<typeof deviceResponseSchema>;
