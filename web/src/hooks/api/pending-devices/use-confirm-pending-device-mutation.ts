@@ -29,6 +29,9 @@ export function useConfirmPendingDeviceMutation({ id }: Props) {
         queryClient.invalidateQueries({
           queryKey: ["PendingDevices", "Get", id],
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["Devices", "GetAll"],
+        }),
       ]),
   });
 }
