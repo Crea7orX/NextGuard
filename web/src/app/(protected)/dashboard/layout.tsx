@@ -2,6 +2,7 @@ import * as React from "react";
 import { DashboardSidebar } from "~/components/dashboard/dashboard-sidebar";
 import { Header } from "~/components/dashboard/header";
 import { SelectSpacePrompt } from "~/components/dashboard/select-space-prompt";
+import { GlobalSheet } from "~/components/global-sheet";
 import {
   NoSpaceSelected,
   SpaceSelected,
@@ -34,6 +35,7 @@ export default function DashboardLayout({ children }: Props) {
         </SidebarInset>
       </SidebarProvider>
       <TypeToConfirmAlertDialog />
+      <GlobalSheet />
     </>
   );
 }
