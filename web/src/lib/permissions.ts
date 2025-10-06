@@ -1,12 +1,14 @@
 import { createAccessControl } from "better-auth/plugins/access";
 
 const statement = {
+  devices: ["create", "read", "update", "delete"],
   pending_devices: ["create", "read", "delete"],
 };
 
 export const ac = createAccessControl(statement);
 
 export const owner = ac.newRole({
+  devices: ["create", "read", "update", "delete"],
   pending_devices: ["create", "read", "delete"],
 });
 
