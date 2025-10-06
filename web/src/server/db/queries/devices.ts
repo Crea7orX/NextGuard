@@ -62,3 +62,23 @@ export async function getDevices({ searchParams, ownerId }: getDevicesProps) {
     return { data: [], pageCount: 0 };
   }
 }
+
+interface getDeviceByIdProps {
+  id: string;
+  ownerId: string;
+}
+
+export async function getDeviceById({ id, ownerId }: getDeviceByIdProps) {
+  const [device] = await db
+    .select()
+    .from(devices)
+    .where(
+      and(
+        eq(devices.id, id),
+        eq(devices.ownerId, ownerId), // ownership
+      ),
+    )
+    .limit(1);
+
+  return device;
+}
