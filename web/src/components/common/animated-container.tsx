@@ -37,11 +37,31 @@ export function AnimatedContainer({
 }: Props) {
   const [ref, { height }] = useMeasure({ offsetSize: true });
 
+  const [disableHeightAnimation, setDisableHeightAnimation] =
+    React.useState(alwaysAvailable);
+  const [timeoutId, setTimeoutId] = React.useState<NodeJS.Timeout>();
+
+  React.useEffect(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+    setDisableHeightAnimation(false);
+    setTimeoutId(
+      setTimeout(
+        () => setDisableHeightAnimation(true),
+        (heightDuration + 0.35) * 1000,
+      ),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uniqueKey]);
+
   return (
     <motion.div
       className={cn(variant === "up" && "overflow-hidden", className)}
       animate={{
-        height: alwaysAvailable ? height || "auto" : (height ?? "auto"),
+        height: disableHeightAnimation
+          ? "auto"
+          : alwaysAvailable
+            ? height || "auto"
+            : (height ?? "auto"),
       }}
       transition={{ duration: heightDuration, ease: "easeOut" }}
       {...props}
