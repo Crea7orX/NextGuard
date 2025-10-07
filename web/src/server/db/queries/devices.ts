@@ -1,5 +1,8 @@
 import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
-import type { DeviceSearchParams } from "~/lib/validation/devices";
+import type {
+  DeviceSearchParams,
+  DeviceUpdate,
+} from "~/lib/validation/devices";
 import { db } from "~/server/db";
 import { devices } from "~/server/db/schemas/devices";
 
@@ -79,6 +82,42 @@ export async function getDeviceById({ id, ownerId }: getDeviceByIdProps) {
       ),
     )
     .limit(1);
+
+  return device;
+}
+
+interface updateDeviceByIdProps {
+  id: string;
+  ownerId: string;
+  userId: string;
+  update: DeviceUpdate;
+}
+
+export async function updateDeviceById({
+  id,
+  ownerId,
+  update,
+}: updateDeviceByIdProps) {
+  const [device] = await db
+    .update(devices)
+    .set({
+      ...(typeof update.name === "string" && {
+        name: update.name.trim(),
+      }),
+      ...(update.description !== undefined && {
+        description:
+          typeof update.description === "string"
+            ? update.description.trim()
+            : null,
+      }),
+    })
+    .where(
+      and(
+        eq(devices.id, id),
+        eq(devices.ownerId, ownerId), // ownership
+      ),
+    )
+    .returning();
 
   return device;
 }
