@@ -1,6 +1,7 @@
 import type { WebSocket as WSWebSocket } from "ws";
 import { sendRequest } from "~/lib/requests";
 import { nowSec, signB64, verifyP256 } from "~/lib/utils";
+import { deviceResponseSchema } from "~/lib/validation/devices";
 import { sessionMessageSchema } from "~/lib/validation/messages";
 import {
   createSession,
@@ -21,16 +22,20 @@ export async function handleSession(ws: WSWebSocket, data: any) {
     throw new Error("Invalid timestamp!");
   }
 
-  const publicKeyResponse = await sendRequest({
+  const deviceResponse = await sendRequest({
     method: "GET",
-    path: `/devices/${device_id}/public_key`,
+    path: `/devices/${device_id}`,
   });
-
-  if (!publicKeyResponse.success) {
-    console.log("Invalid response!", publicKeyResponse.error);
+  if (!deviceResponse.success) {
+    console.log("Invalid response!", deviceResponse.error);
     throw new Error("Invalid response!");
   }
-  // TODO: validate data response
+
+  const device = deviceResponseSchema.safeParse(deviceResponse.data);
+  if (!device.success) {
+    console.log("Invalid response!", device.error);
+    throw new Error("Invalid response!");
+  }
 
   const signedBytes = Buffer.concat([
     Buffer.from(String(device_id)),
@@ -38,7 +43,7 @@ export async function handleSession(ws: WSWebSocket, data: any) {
     Buffer.from(nonce, "base64"),
   ]);
   const isValid = verifyP256(
-    publicKeyResponse.data.publicKeyPem,
+    device.data.publicKeyPem,
     signedBytes,
     Buffer.from(sig, "base64"),
   );
