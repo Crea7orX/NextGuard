@@ -7,7 +7,12 @@ export const env = createEnv({
     SERVER_SECRET_KEY: z.string(),
     API_SERVER: z.string().default("http://localhost:3000"),
     API_SECRET_KEY: z.string(),
-    SERVER_SIGN_KEY_PEM: z.string(),
+    SERVER_SIGN_KEY_PEM: z
+      .string()
+      .transform((val) => val.replace(/\n/g, "\r\n")),
+    SERVER_PUBLIC_KEY_PEM: z
+      .string()
+      .transform((val) => val.replace(/\n/g, "\r\n")),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
