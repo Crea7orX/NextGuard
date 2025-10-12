@@ -51,6 +51,7 @@ export const useSheetStore = create<SheetStore>((set, get) => ({
     set({
       state: {
         isOpen: true,
+        id: options.id,
         title: options.title,
         description: options.description,
         body: options.body,
@@ -62,7 +63,7 @@ export const useSheetStore = create<SheetStore>((set, get) => ({
   close: () => {
     const { state } = get();
     state.onClose?.();
-    set({ state: { ...state, isOpen: false } });
+    set({ state: { ...state, isOpen: false, id: undefined } });
   },
   setId: (id) => set((store) => ({ state: { ...store.state, id } })),
   setTitle: (title) => set((store) => ({ state: { ...store.state, title } })),
@@ -77,6 +78,7 @@ export const useSheetStore = create<SheetStore>((set, get) => ({
 export const sheet = {
   open: (options: SheetOptions) => useSheetStore.getState().open(options),
   close: () => useSheetStore.getState().close(),
+  getId: () => useSheetStore.getState().state.id,
   setId: (id?: string) => useSheetStore.getState().setId(id),
   setTitle: (title?: React.ReactNode) =>
     useSheetStore.getState().setTitle(title),
