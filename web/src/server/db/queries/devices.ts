@@ -1,8 +1,10 @@
 import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { NotFoundError } from "~/lib/errors";
 import type {
   DeviceSearchParams,
   DeviceUpdate,
 } from "~/lib/validation/devices";
+import type { DeviceTelemetrySchema } from "~/lib/validation/websockets/devices";
 import { db } from "~/server/db";
 import { devices } from "~/server/db/schemas/devices";
 
@@ -136,4 +138,33 @@ export async function getDeviceBySerialId__unprotected({
     .limit(1);
 
   return device;
+}
+
+interface setDeviceTelemetryBySerialId__unprotectedProps {
+  serialId: string;
+  telemetry: DeviceTelemetrySchema;
+}
+
+export async function setDeviceTelemetryBySerialId__unprotected({
+  serialId,
+  telemetry,
+}: setDeviceTelemetryBySerialId__unprotectedProps) {
+  const device = await getDeviceBySerialId__unprotected({
+    serialId,
+  });
+  if (!device) throw new NotFoundError();
+
+  const metadata = device.metadata as Record<string, unknown>;
+  const [updatedDevice] = await db
+    .update(devices)
+    .set({
+      metadata: {
+        ...metadata,
+        telemetry,
+      },
+    })
+    .where(and(eq(devices.id, device.id)))
+    .returning();
+
+  return updatedDevice;
 }
