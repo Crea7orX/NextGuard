@@ -10,6 +10,13 @@ export const baseMessageSchema = z.object({
 
 export type BaseMessage = z.infer<typeof baseMessageSchema>;
 
+export const messageSchema = z.object({
+  ...baseMessageSchema.shape,
+  payload: z.any(),
+});
+
+export type Message = z.infer<typeof messageSchema>;
+
 export const helloMessageSchema = z.object({
   type: z.literal("hello"),
   device_id: z.string(),
