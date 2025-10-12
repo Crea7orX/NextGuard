@@ -1,7 +1,9 @@
 #include "SecureMessage.h"
+#include <storage/StorageManager.h>
 
 SecureMessage::SecureMessage() {
     logger = nullptr;
+    storage = nullptr;
     seqOut = 1;
     srvLastSeq = 0;
     lastServerTime = 0;
@@ -10,8 +12,9 @@ SecureMessage::SecureMessage() {
     memset(sessionKey, 0, sizeof(sessionKey));
 }
 
-void SecureMessage::begin(Logger* loggerInstance) {
+void SecureMessage::begin(Logger* loggerInstance, StorageManager* storageInstance) {
     logger = loggerInstance;
+    storage = storageInstance;
 }
 
 void SecureMessage::setSessionKey(const uint8_t key[32]) {
@@ -153,7 +156,18 @@ String SecureMessage::createSimpleMessage(const char* type) {
     return out;
 }
 
-bool SecureMessage::verifyMessage(JsonDocument& doc, uint32_t maxTimeDrift) {
+bool SecureMessage::checkTimeDrift(JsonDocument& doc, uint32_t maxTimeDrift) {
+    uint32_t ts = doc["ts"].as<uint32_t>();
+    uint32_t nowT = getCurrentTime();
+    int64_t drift = (int64_t)nowT - (int64_t)ts;
+    if (abs((int)drift) > (int)maxTimeDrift) {
+        logger->warning("Message timestamp drift too large");
+        return false;
+    }
+    return true;
+}
+
+bool SecureMessage::verifyMessage(JsonDocument& doc) {
     if (!hasSessionKey) {
         if (logger) logger->error("No session key for verification");
         return false;
@@ -187,11 +201,8 @@ bool SecureMessage::verifyMessage(JsonDocument& doc, uint32_t maxTimeDrift) {
     }
     
     // Check time drift
-    uint32_t nowT = getCurrentTime();
-    int64_t drift = (int64_t)nowT - (int64_t)ts;
-    if (abs((int)drift) > (int)maxTimeDrift) {
-        if (logger) logger->warning("Message timestamp drift too large");
-        // return false;
+    if (!checkTimeDrift(doc)) {
+        return false;
     }
     
     // Check sequence number
@@ -200,4 +211,37 @@ bool SecureMessage::verifyMessage(JsonDocument& doc, uint32_t maxTimeDrift) {
     }
     
     return true;
+}
+
+bool SecureMessage::verifyServerSignature(JsonDocument& doc) {
+    String serverSignPubKey = storage->getServerSigningPublicKey();
+    if (serverSignPubKey.length() == 0) {
+        logger->error("Server signing public key not found");
+        return false;
+    }
+
+    uint32_t ts = doc["ts"].as<uint32_t>();
+    String nonce = doc["nonce"].as<String>();
+    String sigB64 = doc["sig"].as<String>();
+    
+    if (ts == 0 || nonce == "null" || sigB64 == "null") {
+        logger->error("Missing required signature fields");
+        return false;
+    }
+
+    // Create digest: SHA256(ts || nonce)
+    String tsStr = String(ts);
+    String digestInput = tsStr + nonce;
+    
+    uint8_t digest[32];
+    CryptoManager::sha256((const uint8_t*)digestInput.c_str(), digestInput.length(), digest);
+    
+    // Verify the signature
+    bool verified = CryptoManager::verifySha256(serverSignPubKey, digest, sigB64);
+    
+    if (!verified) {
+        logger->error("Server signature verification failed!");
+    }
+    
+    return verified;
 }

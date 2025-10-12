@@ -95,7 +95,7 @@ void setup() {
     }
     
     // Initialize secure messaging
-    secureMsg.begin(&logger);
+    secureMsg.begin(&logger, &storage);
     
     // Initialize WebSocket
     logger.info("Initializing WebSocket...");
