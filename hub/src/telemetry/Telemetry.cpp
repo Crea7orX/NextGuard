@@ -65,12 +65,12 @@ void Telemetry::getSystemInfo(JsonObject& obj) {
 }
 
 void Telemetry::getCPUInfo(JsonObject& obj) {
-    obj["cpu_freq_mhz"] = getCpuFrequencyMhz();
-    obj["cpu_temp_c"] = getCPUTemperature();
+    obj["freq_mhz"] = getCpuFrequencyMhz();
+    obj["temp_c"] = getCPUTemperature();
     
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
-    obj["cpu_cores"] = chip_info.cores;
+    obj["cores"] = chip_info.cores;
 }
 
 void Telemetry::getMemoryInfo(JsonObject& obj) {
