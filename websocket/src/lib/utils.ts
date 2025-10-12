@@ -1,22 +1,11 @@
 import crypto, { type BinaryLike, type KeyObject } from "crypto";
 import { SERVER_SIGN_KEY_PEM } from "~/index";
 
-export function sha256(buffer: Buffer) {
-  const hash = crypto.createHash("sha256");
-  hash.update(buffer);
-  return hash.digest();
-}
-
-export function signB64(data: any) {
-  const toSign = sha256(Buffer.from(JSON.stringify(data)));
-  return signP256(SERVER_SIGN_KEY_PEM, toSign).toString("base64");
-}
-
-export function signP256(privateKeyPem: string, dataBuffer: Buffer) {
+export function signP256(dataBuffer: Buffer) {
   const signature = crypto.createSign("sha256");
   signature.update(dataBuffer);
   signature.end();
-  return signature.sign(privateKeyPem);
+  return signature.sign(SERVER_SIGN_KEY_PEM);
 }
 
 export function verifyP256(
@@ -44,5 +33,5 @@ export function nowSec() {
 }
 
 export function generateNonce() {
-  return crypto.randomBytes(16).toString("base64");
+  return crypto.randomBytes(12).toString("base64");
 }
