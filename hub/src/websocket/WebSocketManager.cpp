@@ -74,6 +74,7 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
         case WStype_CONNECTED:
             if (logger) logger->info("WebSocket connected: " + String((char*)payload));
             isConnected = true;
+            sendTimestamp();
             // Check if device is already adopted
             if (storage && storage->isAdopted()) {
                 sendSession();
@@ -95,8 +96,12 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
             
             const char* type = doc["type"] | "";
             if (logger) logger->debug("Message type: " + String(type));
-            
-            // Handle different message types
+
+            if (strcmp(type, "timestamp_ack") == 0) {
+                handleTimestampAck(doc);
+                return;
+            }
+
             if (strcmp(type, "hello_ack") == 0) {
                 handleHelloAck(doc);
                 return;
@@ -134,6 +139,15 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
         default:
             break;
     }
+}
+
+void WebSocketManager::handleTimestampAck(JsonDocument& doc) {
+    logger->info("Processing TIMESTAMP_ACK...");
+
+    uint32_t ts = doc["ts"].as<uint32_t>();
+    secureMsg->setServerTime(ts);
+
+    logger->info("Server time set to: " + String(ts));
 }
 
 void WebSocketManager::handleHelloAck(JsonDocument& doc) {
@@ -225,6 +239,11 @@ void WebSocketManager::handleAdoptAck(JsonDocument& doc) {
     } else {
         if (logger) logger->error("ADOPT_ACK verification failed");
     }
+}
+
+void WebSocketManager::sendTimestamp() {
+    client->sendTXT("{\"type\":\"timestamp\"}");
+    logger->info("TIMESTAMP sent");
 }
 
 void WebSocketManager::sendHello() {

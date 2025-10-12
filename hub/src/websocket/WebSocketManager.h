@@ -26,9 +26,11 @@ private:
     static WebSocketManager* instance;
     void onWebSocketEvent(WStype_t type, uint8_t* payload, size_t length);
     static void staticWebSocketEvent(WStype_t type, uint8_t* payload, size_t length);
+    void handleTimestampAck(JsonDocument& doc);
     void handleHelloAck(JsonDocument& doc);
     void handleSessionAck(JsonDocument& doc);
     void handleAdoptAck(JsonDocument& doc);
+    void sendTimestamp();
     void sendHello();
     void sendSession();
     void sendHelloAck();
