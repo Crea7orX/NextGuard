@@ -120,10 +120,10 @@ bool BootstrapManager::fetchServerCredentials(const char* bootstrapPath) {
     }
     
     String certChain = doc["cert_chain_pem"].as<String>();
-    String signPubKey = doc["server_pub_sign_key_pem"].as<String>();
-    uint32_t srvTime = doc["srv_ts"].as<uint32_t>();
-    
-    if (certChain.length() == 0 || signPubKey.length() == 0) {
+    String signPubKey = doc["pub_sign_key_pem"].as<String>();
+    uint32_t srvTime = doc["ts"].as<uint32_t>();
+
+    if (certChain == "null" || signPubKey == "null") {
         if (logger) logger->error("Bootstrap: missing credentials");
         return false;
     }
