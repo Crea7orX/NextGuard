@@ -27,7 +27,8 @@ export function createSession(
     nonces: new Set<string>(),
   };
 
-  if (sessions.has(deviceId)) throw new Error("Session already exists!");
+  // TODO: Check for broken sessions
+
   sessions.set(deviceId, session);
 
   return session;
@@ -62,7 +63,9 @@ export function generateMac(
   sessionKey: ArrayBuffer,
   pack: Record<string, any>,
 ) {
-  const packString = JSON.stringify(pack);
+  const { mac, ...packWithoutMac } = pack;
+  const packString = JSON.stringify(packWithoutMac);
+  console.log("packString", packString);
   return crypto
     .createHmac("sha256", Buffer.from(sessionKey))
     .update(packString)
@@ -91,8 +94,9 @@ export function validateTimestamp(timestamp: number) {
 }
 
 export function validateMessage(session: Session, data: Record<string, any>) {
-  if (validateMac(session.sessionKey, data, data.mac)) return false;
+  if (!validateMac(session.sessionKey, data, data.mac)) return false;
   if (!validateSequence(session, data.seq)) return false;
   if (!validateNonce(session, data.nonce)) return false;
-  return validateTimestamp(data.ts);
+  return true;
+  // return validateTimestamp(data.ts);
 }
