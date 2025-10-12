@@ -40,7 +40,11 @@ export default function DevicesPage({ searchParams }: Props) {
   });
 
   function handleRowClick(row: Row<DeviceResponse>) {
-    row.toggleSelected(true);
+    if (sheet.getId() === row.id) {
+      sheet.close();
+      return;
+    }
+
     sheet.open({
       id: row.id,
       title: row.original.name,
