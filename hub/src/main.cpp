@@ -11,6 +11,7 @@
 #include <factory/FactoryReset.h>
 #include <webserver/WebServer.h>
 #include <network/NetworkManager.h>
+#include <telemetry/Telemetry.h>
 
 // Global instances
 Logger logger;
@@ -22,9 +23,7 @@ WebSocketManager wsManager;
 FactoryReset factoryReset;
 WebServerManager webServer;
 NetworkManager networkManager;
-
-// Timing
-unsigned long lastTelemetry = 0;
+Telemetry telemetry;
 
 void setup() {
     Serial.begin(SERIAL_BAUD_RATE);
@@ -112,6 +111,10 @@ void setup() {
     wsManager.setServer(SERVER_HOST, SERVER_PORT, WEBSOCKET_PATH, SERVER_USE_TLS);
     wsManager.connect();
     
+    // Initialize telemetry (after WebSocket)
+    logger.info("Initializing Telemetry...");
+    telemetry.begin(&logger, &networkManager, &wsManager);
+    
     // Initialize Web Server
     logger.info("Initializing Web Server...");
     webServer.begin(&logger, &networkManager);
@@ -131,25 +134,8 @@ void loop() {
     // Handle Web Server requests
     webServer.loop();
     
-    // Send telemetry periodically
-    if (wsManager.isAuth() && millis() - lastTelemetry >= TELEMETRY_INTERVAL) {
-        lastTelemetry = millis();
-        
-        StaticJsonDocument<256> telemetry;
-        telemetry["uptime"] = millis() / 1000;
-        telemetry["free_heap"] = ESP.getFreeHeap();
-        telemetry["ip"] = networkManager.getIPAddress();
-        telemetry["network_mode"] = networkManager.isEthernetConnected() ? "ethernet" : 
-                                    (networkManager.isWiFiConnected() ? "wifi" : "none");
-        
-        // Only include RSSI if using WiFi
-        if (networkManager.isWiFiConnected()) {
-            telemetry["rssi"] = WiFi.RSSI();
-        }
-        
-        wsManager.sendTelemetry(telemetry);
-        logger.debug("Telemetry sent");
-    }
+    // Handle automatic telemetry sending
+    telemetry.loop();
     
     delay(LOOP_DELAY_MS);
 }
