@@ -121,3 +121,19 @@ export async function updateDeviceById({
 
   return device;
 }
+
+interface getDeviceBySerialId__unprotectedProps {
+  serialId: string;
+}
+
+export async function getDeviceBySerialId__unprotected({
+  serialId,
+}: getDeviceBySerialId__unprotectedProps) {
+  const [device] = await db
+    .select()
+    .from(devices)
+    .where(eq(devices.serialId, serialId))
+    .limit(1);
+
+  return device;
+}
