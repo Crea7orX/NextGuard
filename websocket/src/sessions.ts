@@ -96,6 +96,5 @@ export function validateMessage(session: Session, data: Record<string, any>) {
   if (!validateMac(session.sessionKey, data, data.mac)) return false;
   if (!validateSequence(session, data.seq)) return false;
   if (!validateNonce(session, data.nonce)) return false;
-  return true;
-  // return validateTimestamp(data.ts);
+  return validateTimestamp(data.ts);
 }
