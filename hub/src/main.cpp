@@ -79,14 +79,6 @@ void setup() {
         
         storage.setDeviceKeys(devPriv, devPub);
         logger.info("Device keys generated and stored");
-        
-        // Announce public key to server
-        bootstrap.begin(&logger, &storage, SERVER_HOST, SERVER_PORT);
-        if (bootstrap.announcePublicKey(ANNOUNCE_PATH, devPub)) {
-            logger.info("Public key announced to server");
-        } else {
-            logger.warning("Failed to announce public key");
-        }
     }
     
     // Bootstrap server credentials (TOFU)

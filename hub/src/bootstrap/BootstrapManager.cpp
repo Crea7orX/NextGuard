@@ -59,50 +59,6 @@ String BootstrapManager::httpGet(const char* path) {
     return response.substring(idx + 4);
 }
 
-bool BootstrapManager::httpPost(const char* path, const String& jsonBody) {
-    WiFiClientSecure client;
-    client.setInsecure(); // TOFU: Trust on first use
-    
-    if (!client.connect(serverHost.c_str(), serverPort)) {
-        if (logger) logger->error("Connection failed!");
-        return false;
-    }
-    
-    String header = String("POST ") + path + " HTTP/1.1\r\n"
-                    "Host: " + serverHost + "\r\n"
-                    "Content-Type: application/json\r\n"
-                    "Content-Length: " + jsonBody.length() + "\r\n"
-                    "Connection: close\r\n\r\n";
-    
-    client.print(header);
-    client.print(jsonBody);
-    
-    String response;
-    unsigned long timeout = millis();
-    while (client.connected() || client.available()) {
-        if (client.available()) {
-            response += (char)client.read();
-            timeout = millis();
-        }
-        if (millis() - timeout > 5000) break;
-        delay(1);
-    }
-    
-    client.stop();
-    
-    // Check for 200 OK
-    bool success = response.indexOf("200") > 0;
-    if (logger) {
-        if (success) {
-            logger->info("POST successful");
-        } else {
-            logger->error("POST failed: " + response.substring(0, 100));
-        }
-    }
-    
-    return success;
-}
-
 bool BootstrapManager::fetchServerCredentials(const char* bootstrapPath) {
     if (logger) logger->info("Fetching server credentials (TOFU)...");
     
@@ -138,16 +94,4 @@ bool BootstrapManager::fetchServerCredentials(const char* bootstrapPath) {
     }
     
     return true;
-}
-
-bool BootstrapManager::announcePublicKey(const char* announcePath, const String& pubKeyPem) {
-    if (logger) logger->info("Announcing public key to server...");
-    
-    DynamicJsonDocument doc(2048);
-    doc["pubkey_pem"] = pubKeyPem;
-    
-    String jsonBody;
-    serializeJson(doc, jsonBody);
-    
-    return httpPost(announcePath, jsonBody);
 }
