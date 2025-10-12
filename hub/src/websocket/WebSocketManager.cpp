@@ -153,7 +153,7 @@ void WebSocketManager::handleHelloAck(JsonDocument& doc) {
     // Set session key
     if (secureMsg) {
         secureMsg->setSessionKey(sessionKey);
-        secureMsg->setServerTime(doc["srv_ts"].as<uint32_t>());
+        secureMsg->setServerTime(doc["ts"].as<uint32_t>());
         secureMsg->setSeqOut(doc["seq0"].as<uint32_t>());
     }
     
@@ -186,7 +186,7 @@ void WebSocketManager::handleSessionAck(JsonDocument& doc) {
     // Set session key
     if (secureMsg) {
         secureMsg->setSessionKey(sessionKey);
-        secureMsg->setServerTime(doc["srv_ts"].as<uint32_t>());
+        secureMsg->setServerTime(doc["ts"].as<uint32_t>());
         secureMsg->setSeqOut(doc["seq0"].as<uint32_t>());
     }
     
@@ -242,11 +242,11 @@ void WebSocketManager::handleCommand(JsonDocument& doc) {
 }
 
 void WebSocketManager::handleTimeSync(JsonDocument& doc) {
-    uint32_t srvTime = doc["srv_ts"].as<uint32_t>();
+    uint32_t ts = doc["ts"].as<uint32_t>();
     if (secureMsg) {
-        secureMsg->setServerTime(srvTime);
+        secureMsg->setServerTime(ts);
     }
-    if (logger) logger->debug("Time synced: " + String(srvTime));
+    if (logger) logger->debug("Time synced: " + String(ts));
 }
 
 void WebSocketManager::handleAck(JsonDocument& doc) {
