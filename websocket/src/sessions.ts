@@ -65,7 +65,6 @@ export function generateMac(
 ) {
   const { mac, ...packWithoutMac } = pack;
   const packString = JSON.stringify(packWithoutMac);
-  console.log("packString", packString);
   return crypto
     .createHmac("sha256", Buffer.from(sessionKey))
     .update(packString)
