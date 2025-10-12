@@ -50,37 +50,23 @@ void setup() {
         // Device will restart, execution won't continue
     }
     
-    // Initialize Ethernet
-    logger.info("Initializing Ethernet...");
+    // Initialize Ethernet (with automatic WiFi fallback)
+    logger.info("Initializing network...");
     networkManager.setLogger(&logger);
     if (networkManager.begin()) {
-        logger.info("Ethernet connected!");
-        logger.info("IP Address: " + networkManager.getIPAddress());
-        logger.info("MAC Address: " + networkManager.getMACAddress());
+        if (networkManager.isEthernetConnected()) {
+            logger.info("Ethernet connected!");
+            logger.info("IP Address: " + networkManager.getIPAddress());
+            logger.info("MAC Address: " + networkManager.getMACAddress());
+        } else if (networkManager.isWiFiConnected()) {
+            logger.info("WiFi connected!");
+            logger.info("IP Address: " + networkManager.getIPAddress());
+            logger.info("MAC Address: " + networkManager.getMACAddress());
+        }
     } else {
-        logger.error("Ethernet initialization failed!");
-        logger.info("Falling back to WiFi...");
-        
-        // Try WiFi as backup
-        WiFi.mode(WIFI_STA);
-        WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-        logger.info("Connecting to WiFi...");
-        
-        int attempts = 0;
-        while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-            delay(500);
-            Serial.print(".");
-            attempts++;
-        }
-        
-        if (WiFi.status() == WL_CONNECTED) {
-            logger.info("\nWiFi connected!");
-            logger.info("IP Address: " + WiFi.localIP().toString());
-        } else {
-            logger.error("\nWiFi connection failed!");
-            logger.error("No network connection available!");
-            while (true) delay(1000);
-        }
+        logger.error("Network initialization failed!");
+        logger.error("No network connection available!");
+        while (true) delay(1000);
     }
     
     // Ensure device keys exist
@@ -152,9 +138,14 @@ void loop() {
         StaticJsonDocument<256> telemetry;
         telemetry["uptime"] = millis() / 1000;
         telemetry["free_heap"] = ESP.getFreeHeap();
-        telemetry["ip"] = networkManager.isEthernetConnected() ? 
-                         networkManager.getIPAddress() : WiFi.localIP().toString();
-        telemetry["rssi"] = WiFi.RSSI();
+        telemetry["ip"] = networkManager.getIPAddress();
+        telemetry["network_mode"] = networkManager.isEthernetConnected() ? "ethernet" : 
+                                    (networkManager.isWiFiConnected() ? "wifi" : "none");
+        
+        // Only include RSSI if using WiFi
+        if (networkManager.isWiFiConnected()) {
+            telemetry["rssi"] = WiFi.RSSI();
+        }
         
         wsManager.sendTelemetry(telemetry);
         logger.debug("Telemetry sent");
