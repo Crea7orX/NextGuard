@@ -76,8 +76,6 @@ void Telemetry::getCPUInfo(JsonObject& obj) {
 void Telemetry::getMemoryInfo(JsonObject& obj) {
     obj["heap_total"] = ESP.getHeapSize();
     obj["heap_free"] = ESP.getFreeHeap();
-    obj["heap_used"] = ESP.getHeapSize() - ESP.getFreeHeap();
-    obj["heap_used_pct"] = (float)(ESP.getHeapSize() - ESP.getFreeHeap()) / ESP.getHeapSize() * 100.0;
     obj["heap_min_free"] = ESP.getMinFreeHeap();
     obj["heap_max_alloc"] = ESP.getMaxAllocHeap();
 }
