@@ -3,8 +3,8 @@ import { handleHello } from "~/handlers/hello";
 import { handleHelloAck } from "~/handlers/hello-ack";
 import { handleSession } from "~/handlers/session";
 import { handleTelemtry } from "~/handlers/telemetry";
+import { handleTimestamp } from "~/handlers/timestamp";
 import { messageSchema } from "~/lib/validation/messages";
-import { handleTimestamp } from "~/lib/validation/timestamp";
 import { updateSession, validateMessage, type Session } from "~/sessions";
 
 export async function handleMessage(
