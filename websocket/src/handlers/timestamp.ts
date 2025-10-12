@@ -1,16 +1,17 @@
 import { WebSocket } from "ws";
-import { SERVER_SIGN_KEY_PEM } from "~/index";
-import { nowSec, signP256 } from "~/lib/utils";
+import { generateNonce, nowSec, signP256 } from "~/lib/utils";
 
 export async function handleTimestamp(socket: WebSocket): Promise<void> {
+  const ts = nowSec();
+  const nonce = generateNonce();
+
   const payload = {
     type: "timestamp_ack",
-    ts: nowSec(),
+    ts,
+    nonce,
   };
 
-  const sigB64 = signP256(
-    SERVER_SIGN_KEY_PEM,
-    Buffer.from(JSON.stringify(payload)),
-  ).toString("base64");
-  socket.send(JSON.stringify({ ...payload, sig: sigB64 }));
+  const digest = Buffer.concat([Buffer.from(String(ts)), Buffer.from(nonce)]);
+  const sig = signP256(digest).toString("base64");
+  socket.send(JSON.stringify({ ...payload, sig }));
 }
