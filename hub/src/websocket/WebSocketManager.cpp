@@ -144,6 +144,10 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
 void WebSocketManager::handleTimestampAck(JsonDocument& doc) {
     logger->info("Processing TIMESTAMP_ACK...");
 
+    if (!secureMsg->verifyServerSignature(doc)) {
+        return;
+    }
+
     uint32_t ts = doc["ts"].as<uint32_t>();
     secureMsg->setServerTime(ts);
 
@@ -153,6 +157,10 @@ void WebSocketManager::handleTimestampAck(JsonDocument& doc) {
 void WebSocketManager::handleHelloAck(JsonDocument& doc) {
     if (logger) logger->info("Processing HELLO_ACK...");
     
+    if (!secureMsg->verifyServerSignature(doc)) {
+        return;
+    }
+
     // Extract IKM and KDF parameters
     String ikmB64 = doc["ikm"].as<String>();
     String saltB64 = doc["kdf"]["salt"].as<String>();
@@ -186,6 +194,13 @@ void WebSocketManager::handleHelloAck(JsonDocument& doc) {
 void WebSocketManager::handleSessionAck(JsonDocument& doc) {
     if (logger) logger->info("Processing SESSION_ACK...");
     
+    if (!secureMsg->verifyServerSignature(doc)) {
+        return;
+    }
+    if (!secureMsg->checkTimeDrift(doc)) {
+        return;
+    }
+
     // Extract IKM and KDF parameters
     String ikmB64 = doc["ikm"].as<String>();
     String saltB64 = doc["kdf"]["salt"].as<String>();
@@ -226,7 +241,7 @@ void WebSocketManager::handleAdoptAck(JsonDocument& doc) {
     if (logger) logger->info("Processing ADOPT_ACK...");
     
     // Verify the message
-    if (secureMsg && secureMsg->verifyMessage(doc, MAX_TIME_DRIFT)) {
+    if (secureMsg && secureMsg->verifyMessage(doc)) {
         isAuthenticated = true;
         
         // Mark device as adopted
