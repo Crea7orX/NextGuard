@@ -99,16 +99,22 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
             // Handle different message types
             if (strcmp(type, "hello_ack") == 0) {
                 handleHelloAck(doc);
-            } else if (strcmp(type, "session_ack") == 0) {
+                return;
+            }
+            
+            if (strcmp(type, "session_ack") == 0) {
                 handleSessionAck(doc);
-            } else if (strcmp(type, "adopt_ack") == 0) {
+                return;
+            }
+
+            uint32_t ts = doc["ts"].as<uint32_t>();
+            if (ts > 0) {
+                secureMsg->setServerTime(ts);
+            }
+            
+            if (strcmp(type, "adopt_ack") == 0) {
                 handleAdoptAck(doc);
-            } else if (strcmp(type, "cmd") == 0) {
-                handleCommand(doc);
-            } else if (strcmp(type, "time") == 0) {
-                handleTimeSync(doc);
-            } else if (strcmp(type, "ack") == 0) {
-                handleAck(doc);
+                return;
             }
             break;
         }
@@ -219,38 +225,6 @@ void WebSocketManager::handleAdoptAck(JsonDocument& doc) {
     } else {
         if (logger) logger->error("ADOPT_ACK verification failed");
     }
-}
-
-void WebSocketManager::handleCommand(JsonDocument& doc) {
-    if (!isAuthenticated) {
-        if (logger) logger->warning("Received command but not authenticated");
-        return;
-    }
-    
-    // Verify the message
-    if (secureMsg && secureMsg->verifyMessage(doc, MAX_TIME_DRIFT)) {
-        if (logger) {
-            logger->info("--- SERVER COMMAND ---");
-            String pretty;
-            serializeJsonPretty(doc["payload"], pretty);
-            Serial.println(pretty);
-            logger->info("----------------------");
-        }
-    } else {
-        if (logger) logger->error("Command verification failed");
-    }
-}
-
-void WebSocketManager::handleTimeSync(JsonDocument& doc) {
-    uint32_t ts = doc["ts"].as<uint32_t>();
-    if (secureMsg) {
-        secureMsg->setServerTime(ts);
-    }
-    if (logger) logger->debug("Time synced: " + String(ts));
-}
-
-void WebSocketManager::handleAck(JsonDocument& doc) {
-    if (logger) logger->debug("Received ACK");
 }
 
 void WebSocketManager::sendHello() {
