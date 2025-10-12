@@ -37,10 +37,6 @@ public:
     String getServerSigningPublicKey();
     bool setServerCredentials(const String& cert, const String& signPubKey);
     
-    // Time
-    uint32_t getServerTime();
-    bool setServerTime(uint32_t time);
-    
     // Adoption status
     bool isAdopted();
     bool setAdopted(bool adopted);

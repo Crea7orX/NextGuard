@@ -62,14 +62,6 @@ bool StorageManager::setServerCredentials(const String& cert, const String& sign
     return putString("srv_cert", cert) && putString("srv_sign_pub", signPubKey);
 }
 
-uint32_t StorageManager::getServerTime() {
-    return getUInt32("srv_time", 0);
-}
-
-bool StorageManager::setServerTime(uint32_t time) {
-    return putUInt32("srv_time", time);
-}
-
 bool StorageManager::isAdopted() {
     return getUInt32("adopted", 0) == 1;
 }

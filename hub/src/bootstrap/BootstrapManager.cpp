@@ -130,7 +130,6 @@ bool BootstrapManager::fetchServerCredentials(const char* bootstrapPath) {
     
     if (storage) {
         storage->setServerCredentials(certChain, signPubKey);
-        storage->setServerTime(srvTime);
     }
     
     if (logger) {
