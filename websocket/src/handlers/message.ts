@@ -2,8 +2,10 @@ import type { RawData, WebSocket as WSWebSocket } from "ws";
 import { handleHello } from "~/handlers/hello";
 import { handleHelloAck } from "~/handlers/hello-ack";
 import { handleSession } from "~/handlers/session";
+import { handleTelemtry } from "~/handlers/telemetry";
+import { messageSchema } from "~/lib/validation/messages";
 import { handleTimestamp } from "~/lib/validation/timestamp";
-import { validateMessage, type Session } from "~/sessions";
+import { updateSession, validateMessage, type Session } from "~/sessions";
 
 export async function handleMessage(
   socket: WSWebSocket,
@@ -42,6 +44,19 @@ export async function handleMessage(
 
   if (data.type === "hello_ack") {
     await handleHelloAck(socket, data, session);
+    return;
+  }
+
+  const parsedMessage = messageSchema.safeParse(data);
+  if (!parsedMessage.success) {
+    throw new Error("Invalid message!");
+  }
+
+  const { seq, nonce } = parsedMessage.data;
+  updateSession(session, seq, nonce);
+
+  if (data.type === "telemetry") {
+    await handleTelemtry(socket, parsedMessage.data, session);
     return;
   }
 }
