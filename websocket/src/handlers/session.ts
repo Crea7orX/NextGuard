@@ -1,6 +1,6 @@
 import type { WebSocket as WSWebSocket } from "ws";
 import { sendRequest } from "~/lib/requests";
-import { nowSec, signB64, verifyP256 } from "~/lib/utils";
+import { generateNonce, nowSec, signP256, verifyP256 } from "~/lib/utils";
 import { deviceResponseSchema } from "~/lib/validation/devices";
 import { sessionMessageSchema } from "~/lib/validation/messages";
 import {
@@ -55,9 +55,13 @@ export async function handleSession(ws: WSWebSocket, data: any) {
   const { ikm, salt, info, sessionKey } = generateSessionKey();
   const session = createSession(device_id, ws, sessionKey);
 
+  const responseTS = nowSec();
+  const responseNonce = generateNonce();
+
   const response = {
     type: "session_ack",
-    ts: nowSec(),
+    ts: responseTS,
+    nonce: responseNonce,
     seq0: 1,
     kdf: {
       alg: "HKDF-SHA256",
@@ -67,6 +71,11 @@ export async function handleSession(ws: WSWebSocket, data: any) {
     ikm: ikm.toString("base64"),
   };
 
-  ws.send(JSON.stringify({ ...response, sig: signB64(response) }));
+  const digest = Buffer.concat([
+    Buffer.from(String(responseTS)),
+    Buffer.from(responseNonce),
+  ]);
+  const responseSig = signP256(digest).toString("base64");
+  ws.send(JSON.stringify({ ...response, sig: responseSig }));
   return session;
 }
