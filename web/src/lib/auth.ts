@@ -1,3 +1,4 @@
+
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { lastLoginMethod, organization } from "better-auth/plugins";
@@ -29,6 +30,7 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
+  trustedOrigins: ["*"],
   plugins: [
     lastLoginMethod(),
     organization({

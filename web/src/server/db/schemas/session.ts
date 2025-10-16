@@ -15,4 +15,5 @@ export const session = pgTable("session", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   activeOrganizationId: text("active_organization_id"),
+  mobileExpoPushToken: text("mobile_expo_push_token"), //could be null if user logs in from web just added
 });
