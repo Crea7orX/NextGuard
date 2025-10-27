@@ -1,8 +1,8 @@
 {
   "name": "web",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
+  "private": true,
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
@@ -10,7 +10,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "email": "email dev --dir src/emails",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/ui": "workspace:*",
     "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -83,6 +84,8 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@eslint/eslintrc": "^3.3.1",
     "@react-email/preview-server": "4.2.11",
     "@svgr/webpack": "^8.1.0",
