@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "expo start -c",
-    "android": "expo start -c --android",
-    "ios": "expo start -c --ios",
-    "web": "expo start -c --web",
+    "dev": "npx expo start -c",
+    "android": "npx expo start -c --android",
+    "ios": "npx expo start -c --ios",
+    "web": "npx expo start -c --web",
     "clean": "rm -rf .expo node_modules"
   },
   "dependencies": {
@@ -39,6 +39,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "expo": "^54.0.0",
+    "expo-constants": "^18.0.10",
     "expo-linking": "~8.0.8",
     "expo-router": "~6.0.10",
     "expo-splash-screen": "~31.0.10",

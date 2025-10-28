@@ -16,5 +16,20 @@
   "packageManager": "pnpm@10.19.0",
   "engines": {
     "node": ">=18"
+  },
+  "resolutions": {
+    "react": "18.2.0",
+    "react-native": "0.74.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "18.2.0",
+      "react-native": "0.74.5"
+    },
+    "ignoredBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
