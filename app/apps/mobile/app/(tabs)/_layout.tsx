@@ -1,8 +1,39 @@
 import { Tabs } from 'expo-router';
-import { Home, LayoutDashboard, MoreHorizontal } from 'lucide-react-native';
+import { Home, LayoutDashboard, LucideMenu } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
-import { Platform } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function CustomTabBarButton({ children, onPress, style, ...props }: any) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.85, { damping: 15, stiffness: 400 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 100, stiffness: 400 });
+  };
+
+  return (
+    <AnimatedPressable
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={[style, animatedStyle]}
+      {...props}
+    >
+      {children}
+    </AnimatedPressable>
+  );
+}
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -35,9 +66,10 @@ export default function TabLayout() {
             android: 8,
             default: 8,
           }),
-          paddingTop: 8,
+          paddingHorizontal: 12,
         },
         headerShown: false,
+        tabBarButton: (props) => <CustomTabBarButton {...props} />,
       }}
     >
       <Tabs.Screen
@@ -58,7 +90,7 @@ export default function TabLayout() {
         name="more"
         options={{
           title: 'More',
-          tabBarIcon: ({ color, size }) => <MoreHorizontal color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <LucideMenu color={color} size={size} />,
         }}
       />
     </Tabs>
