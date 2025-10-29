@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, LayoutDashboard, LucideMenu } from 'lucide-react-native';
+import { Home, LayoutDashboard, LucideMenu, Code2 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -91,6 +91,13 @@ export default function TabLayout() {
         options={{
           title: 'More',
           tabBarIcon: ({ color, size }) => <LucideMenu color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="developer"
+        options={{
+          title: 'Dev',
+          tabBarIcon: ({ color, size }) => <Code2 color={color} size={size} />,
         }}
       />
     </Tabs>

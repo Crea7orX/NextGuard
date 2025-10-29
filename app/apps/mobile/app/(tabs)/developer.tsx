@@ -19,6 +19,13 @@ const discoverRoutes = (): Route[] => {
     { path: '/(tabs)/more', title: 'More' },
     { path: '/(tabs)/developer', title: 'Developer' },
     
+    // Auth routes
+    { path: '/auth/welcome', title: 'Welcome' },
+    { path: '/auth/sign-in', title: 'Sign In' },
+    { path: '/auth/sign-up', title: 'Sign Up' },
+    { path: '/auth/forgot-password', title: 'Forgot Password' },
+    { path: '/auth/verify-email', title: 'Verify Email' },
+    
     // Other routes
     { path: '/+not-found', title: 'Not Found' },
   ];
@@ -54,7 +61,7 @@ export default function DeveloperScreen() {
       >
         <Card className={isCurrentPage ? 'opacity-50' : ''}>
           <CardContent className="flex-row items-center gap-4 py-4">
-            <View className="bg-primary/10 rounded-lg p-3">
+            <View className="bg-primary rounded-lg p-3">
               <FileText size={20} className="text-primary" color="currentColor" />
             </View>
             <View className="flex-1">
@@ -85,7 +92,7 @@ export default function DeveloperScreen() {
       <View className="mb-6">
         <View className="flex-row items-center gap-3 mb-2">
           <View className="bg-primary rounded-lg p-2">
-            <Code2 size={28} color="#fff" />
+            <Code2 size={28} />
           </View>
           <View>
             <Text className="text-3xl font-bold">Developer</Text>
