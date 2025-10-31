@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "NextGuard",
+    "slug": "nextguard",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "my-app",
+    "scheme": "nextguard",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
