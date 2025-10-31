@@ -8,7 +8,7 @@ import { View, Image, type ImageStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { KeyRound } from 'lucide-react-native';
-import { useThemeColor } from '@/lib/hooks/use-theme-color';
+import { Icon } from '@/components/ui/icon';
 import { useState, useEffect } from 'react';
 import { KeyboardAvoidingScrollView } from '@/components/ui/keyboard-avoiding-scroll-view';
 
@@ -25,7 +25,6 @@ const IMAGE_STYLE: ImageStyle = {
 export default function ForgotPasswordScreen() {
   const { colorScheme } = useColorScheme();
   const insets = useSafeAreaInsets();
-  const colors = useThemeColor();
   const { email: emailParam } = useLocalSearchParams<{ email?: string }>();
   const [email, setEmail] = useState('');
 
@@ -71,7 +70,7 @@ export default function ForgotPasswordScreen() {
         <Card>
           <CardHeader className="text-center">
             <View className="bg-primary/10 rounded-full h-16 w-16 items-center justify-center mx-auto mb-4">
-              <KeyRound size={32} color={colors.foreground} />
+              <Icon as={KeyRound} className='text-primary size-8' />
             </View>
             <CardTitle className="text-xl text-center">Forgot your password?</CardTitle>
             <CardDescription className="text-center">

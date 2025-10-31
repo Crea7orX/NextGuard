@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Home, LayoutDashboard, LucideMenu, Code2 } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
 import { useColorScheme } from 'nativewind';
 import { Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -76,28 +77,28 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Home} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="dashboard"
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ color, size }) => <LayoutDashboard color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon as={LayoutDashboard} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="more"
         options={{
           title: 'More',
-          tabBarIcon: ({ color, size }) => <LucideMenu color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon as={LucideMenu} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="developer"
         options={{
           title: 'Dev',
-          tabBarIcon: ({ color, size }) => <Code2 color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Code2} color={color} size={size} />,
         }}
       />
     </Tabs>

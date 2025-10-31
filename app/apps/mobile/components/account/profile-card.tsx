@@ -1,6 +1,7 @@
 import { Text } from '@/components/ui/text';
 import { View, Pressable, Animated, Platform, UIManager, Easing, useColorScheme } from 'react-native';
 import { UserCircle, ChevronDown } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
 import { useState, useRef, useEffect } from 'react';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -19,8 +20,6 @@ export function ProfileCard({ name, username, email, initials, onAccountDetailsP
   const [isExpanded, setIsExpanded] = useState(false);
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const heightAnim = useRef(new Animated.Value(0)).current;
-  const colorScheme = useColorScheme();
-  const iconColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
 
   useEffect(() => {
     Animated.parallel([
@@ -63,7 +62,7 @@ export function ProfileCard({ name, username, email, initials, onAccountDetailsP
           <Text className="text-sm text-muted-foreground">{email}</Text>
         </View>
         <Animated.View style={{ transform: [{ rotate: rotation }] }}>
-          <ChevronDown size={24} color={iconColor} />
+          <Icon as={ChevronDown} className='text-primary size-6' />
         </Animated.View>
       </Pressable>
       
@@ -74,7 +73,7 @@ export function ProfileCard({ name, username, email, initials, onAccountDetailsP
           className="flex-row items-center justify-center gap-1 rounded-md bg-primary px-4 py-3 active:opacity-80"
           onPress={onAccountDetailsPress}
         >
-          <UserCircle size={16} className='text-primary-foreground' />
+          <Icon as={UserCircle} className='text-primary-foreground size-4' />
           <Text className="text-sm font-semibold text-primary-foreground">
             Account Details
           </Text>

@@ -4,6 +4,8 @@ import { Link } from 'expo-router';
 import { View, ScrollView, Image, type ImageStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
+import { Check } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
 
 const LOGO = {
   light: require('@/assets/images/react-native-reusables-light.png'),
@@ -49,7 +51,7 @@ export default function WelcomeScreen() {
         <View className="gap-4 w-full max-w-md">
           <View className="flex-row items-start gap-3">
             <View className="bg-primary rounded-full h-6 w-6 items-center justify-center">
-              <Text className="text-primary-foreground text-sm font-bold">✓</Text>
+              <Icon as={Check} className='text-primary-foreground size-4' />
             </View>
             <View className="flex-1">
               <Text className="font-semibold">Nqkvi polzi tam</Text>
@@ -61,7 +63,7 @@ export default function WelcomeScreen() {
           
           <View className="flex-row items-start gap-3">
             <View className="bg-primary rounded-full h-6 w-6 items-center justify-center">
-              <Text className="text-primary-foreground text-sm font-bold">✓</Text>
+              <Icon as={Check} className='text-primary-foreground size-4' />
             </View>
             <View className="flex-1">
               <Text className="font-semibold">Enterprise-grade security</Text>
@@ -73,7 +75,7 @@ export default function WelcomeScreen() {
           
           <View className="flex-row items-start gap-3">
             <View className="bg-primary rounded-full h-6 w-6 items-center justify-center">
-              <Text className="text-primary-foreground text-sm font-bold">✓</Text>
+              <Icon as={Check} className='text-primary-foreground size-4' />
             </View>
             <View className="flex-1">
               <Text className="font-semibold">Bezopasnost</Text>

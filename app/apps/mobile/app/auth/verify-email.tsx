@@ -5,13 +5,12 @@ import { Link } from 'expo-router';
 import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mail } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
 import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
 import { ContinueWithGoogle } from '@/components/auth/continue-with-google';
-import { useThemeColor } from '@/lib/hooks/use-theme-color';
 
 export default function VerifyEmailScreen() {
   const insets = useSafeAreaInsets();
-  const colors = useThemeColor();
 
   const handleResendEmail = () => {
     console.log('Resend verification email');
@@ -40,7 +39,7 @@ export default function VerifyEmailScreen() {
         <Card>
           <CardHeader className="text-center">
             <View className="bg-primary/10 rounded-full h-16 w-16 items-center justify-center mx-auto mb-4">
-              <Mail size={32} color={colors.foreground} />
+              <Icon as={Mail} className='text-primary size-8' />
             </View>
             <CardTitle className="text-xl text-center">Check your email</CardTitle>
             <CardDescription className="text-center">
