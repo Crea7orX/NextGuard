@@ -3,12 +3,13 @@ import { Text } from '@/components/ui/text';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from 'expo-router';
-import { View, ScrollView, Image, type ImageStyle } from 'react-native';
+import { View, Image, type ImageStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
 import { ContinueWithGoogle } from '@/components/auth/continue-with-google';
 import { useState } from 'react';
+import { KeyboardAvoidingScrollView } from '@/components/ui/keyboard-avoiding-scroll-view';
 
 const LOGO = {
   light: require('@/assets/images/react-native-reusables-light.png'),
@@ -32,7 +33,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <ScrollView
+    <KeyboardAvoidingScrollView
       className="flex-1 bg-background"
       contentContainerStyle={{ 
         paddingTop: insets.top + 20,
@@ -40,7 +41,6 @@ export default function SignInScreen() {
         paddingHorizontal: 16,
         flexGrow: 1,
       }}
-      keyboardShouldPersistTaps="handled"
     >
       <View className="flex-1 justify-center gap-8 px-6">
         {/* Logo Section */}
@@ -110,6 +110,6 @@ export default function SignInScreen() {
           </Link>
         </View>
       </View>
-    </ScrollView>
+    </KeyboardAvoidingScrollView>
   );
 }

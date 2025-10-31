@@ -4,12 +4,13 @@ import { Text } from '@/components/ui/text';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link, useLocalSearchParams } from 'expo-router';
-import { View, ScrollView, Image, type ImageStyle } from 'react-native';
+import { View, Image, type ImageStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { KeyRound } from 'lucide-react-native';
 import { useThemeColor } from '@/lib/hooks/use-theme-color';
 import { useState, useEffect } from 'react';
+import { KeyboardAvoidingScrollView } from '@/components/ui/keyboard-avoiding-scroll-view';
 
 const LOGO = {
   light: require('@/assets/images/react-native-reusables-light.png'),
@@ -40,7 +41,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <ScrollView
+    <KeyboardAvoidingScrollView
       className="flex-1 bg-background"
       contentContainerStyle={{ 
         paddingTop: insets.top + 20,
@@ -49,7 +50,6 @@ export default function ForgotPasswordScreen() {
         flexGrow: 1,
         justifyContent: 'center'
       }}
-      keyboardShouldPersistTaps="handled"
     >
       <View className="w-full max-w-md mx-auto gap-8">
         {/* Logo Section */}
@@ -113,6 +113,6 @@ export default function ForgotPasswordScreen() {
           </CardContent>
         </Card>
       </View>
-    </ScrollView>
+    </KeyboardAvoidingScrollView>
   );
 }
