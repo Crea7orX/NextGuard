@@ -5,9 +5,18 @@ import { Link } from 'expo-router';
 import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mail } from 'lucide-react-native';
+import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
+import { ContinueWithGoogle } from '@/components/auth/continue-with-google';
+import { useThemeColor } from '@/lib/hooks/use-theme-color';
 
 export default function VerifyEmailScreen() {
   const insets = useSafeAreaInsets();
+  const colors = useThemeColor();
+
+  const handleResendEmail = () => {
+    console.log('Resend verification email');
+    // TODO: Implement resend logic
+  };
 
   return (
     <ScrollView
@@ -31,7 +40,7 @@ export default function VerifyEmailScreen() {
         <Card>
           <CardHeader className="text-center">
             <View className="bg-primary/10 rounded-full h-16 w-16 items-center justify-center mx-auto mb-4">
-              <Mail size={32} color="#fff" />
+              <Mail size={32} color={colors.foreground} />
             </View>
             <CardTitle className="text-xl text-center">Check your email</CardTitle>
             <CardDescription className="text-center">
@@ -48,30 +57,20 @@ export default function VerifyEmailScreen() {
               </View>
 
               {/* Resend Button */}
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" onPress={handleResendEmail}>
                 <Text>Resend Verification Email</Text>
               </Button>
 
               {/* Alternative Sign In Methods */}
-              <View className="gap-4">
-                <View className="flex-row items-center gap-4">
-                  <View className="flex-1 h-[1px] bg-border" />
-                  <Text className="text-muted-foreground text-sm">Or continue with</Text>
-                  <View className="flex-1 h-[1px] bg-border" />
-                </View>
-
-                <Button variant="outline" className="w-full">
-                  <Text>Continue with Google</Text>
-                </Button>
+              <View className="gap-6">
+                <AnotherMethodSeparator text='Or use another method' />
+                <ContinueWithGoogle />
               </View>
 
               {/* Help Text */}
               <View className="gap-2">
                 <Text className="text-sm text-muted-foreground text-center">
-                  Didn't receive the email? Check your spam folder or
-                </Text>
-                <Text className="text-sm font-medium text-center underline">
-                  contact support
+                  Didn't receive the email? Check your spam folder.
                 </Text>
               </View>
 
@@ -81,7 +80,7 @@ export default function VerifyEmailScreen() {
                   Wrong email?{' '}
                 </Text>
                 <Link href="/auth/sign-in" asChild>
-                  <Text className="text-sm font-medium underline">Go back</Text>
+                  <Text className="text-sm font-medium">Go back</Text>
                 </Link>
               </View>
             </View>

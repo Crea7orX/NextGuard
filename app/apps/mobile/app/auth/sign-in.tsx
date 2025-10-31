@@ -1,105 +1,115 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Link } from 'expo-router';
-import { View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, ScrollView, Image, type ImageStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColorScheme } from 'nativewind';
+import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
+import { ContinueWithGoogle } from '@/components/auth/continue-with-google';
+import { useState } from 'react';
+
+const LOGO = {
+  light: require('@/assets/images/react-native-reusables-light.png'),
+  dark: require('@/assets/images/react-native-reusables-dark.png'),
+};
+
+const IMAGE_STYLE: ImageStyle = {
+  height: 80,
+  width: 80,
+};
 
 export default function SignInScreen() {
+  const { colorScheme } = useColorScheme();
   const insets = useSafeAreaInsets();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignIn = () => {
+    console.log('Sign in with:', { email, password });
+    // TODO: Implement sign-in logic
+  };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{ 
+        paddingTop: insets.top + 20,
+        paddingBottom: insets.bottom + 20,
+        paddingHorizontal: 16,
+        flexGrow: 1,
+      }}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView
-        className="flex-1 bg-background"
-        contentContainerStyle={{ 
-          paddingTop: insets.top + 20,
-          paddingBottom: insets.bottom + 20,
-          paddingHorizontal: 16,
-          flexGrow: 1,
-          justifyContent: 'center'
-        }}
-      >
-        <View className="w-full max-w-md mx-auto">
-          {/* Logo/Brand Section */}
-          <View className="mb-8 items-center">
-            <Text className="text-base text-center">Welcome back to</Text>
-            <Text className="text-3xl font-bold">NextGuard</Text>
-            <Text className="text-muted-foreground mt-2">Secure your devices</Text>
+      <View className="flex-1 justify-center gap-8 px-6">
+        {/* Logo Section */}
+        <View className="items-center gap-4">
+          <Image 
+            source={LOGO[colorScheme ?? 'light']} 
+            style={IMAGE_STYLE} 
+            resizeMode="contain" 
+          />
+          <View className="items-center gap-2">
+            <Text className="text-3xl font-bold">Welcome back</Text>
+            <Text className="text-muted-foreground text-center">
+              Sign in to your NextGuard account
+            </Text>
+          </View>
+        </View>
+
+        {/* Sign In Form */}
+        <View className="gap-6 w-full max-w-md">
+          <ContinueWithGoogle />
+
+          <AnotherMethodSeparator />
+
+          <View className="gap-1">
+            <Label nativeID="email">Email</Label>
+            <Input
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+            />
           </View>
 
-          {/* Sign In Card */}
-          <Card>
-            <CardContent>
-              <View className="gap-6">
-                {/* Google Sign In Button */}
-                <Button variant="outline" className="w-full">
-                  <Text>Continue with Google</Text>
-                </Button>
-
-                {/* Separator */}
-                <View className="flex-row items-center gap-4">
-                  <Separator className="flex-1" />
-                  <Text className="text-muted-foreground text-sm">Or continue with</Text>
-                  <Separator className="flex-1" />
-                </View>
-
-                {/* Form Fields */}
-                <View className="gap-4">
-                  {/* Email Field */}
-                  <View className="gap-1">
-                    <Text className="text-sm font-medium">Email</Text>
-                    <Input
-                      placeholder="Enter your email address"
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoComplete="email"
-                    />
-                  </View>
-
-                  {/* Password Field */}
-                  <View className="gap-1">
-                    <View className="flex-row items-center justify-between">
-                      <Text className="text-sm font-medium">Password</Text>
-                      <Link href="/auth/forgot-password" asChild>
-                        <Text className="text-muted-foreground text-sm underline">
-                          Forgot password?
-                        </Text>
-                      </Link>
-                    </View>
-                    <Input
-                      placeholder="Enter your password"
-                      secureTextEntry
-                      autoCapitalize="none"
-                      autoComplete="password"
-                    />
-                  </View>
-                </View>
-
-                {/* Sign In Button */}
-                <Button className="w-full">
-                  <Text>Sign In</Text>
-                </Button>
-
-                {/* Sign Up Link */}
-                <View className="flex-row justify-center gap-1">
-                  <Text className="text-sm text-muted-foreground">
-                    Don't have an account?{' '}
+          <View className="gap-1">
+            <View className="flex-row items-center justify-between">
+              <Label nativeID="password">Password</Label>
+                <Link href={{ pathname: '/auth/forgot-password', params: email ? { email } : undefined }} asChild>
+                  <Text className="text-muted-foreground text-sm">
+                    Forgot password?
                   </Text>
-                  <Link href="/auth/sign-up" asChild>
-                    <Text className="text-sm font-medium underline">Sign up</Text>
-                  </Link>
-                </View>
-              </View>
-            </CardContent>
-          </Card>
+                </Link>
+            </View>
+            <Input
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password"
+            />
+          </View>
+
+          <Button className="w-full" onPress={handleSignIn}>
+            <Text>Sign In</Text>
+          </Button>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+        {/* Sign Up Link */}
+        <View className="flex-row justify-center gap-1">
+          <Text className="text-sm text-muted-foreground">
+            Don't have an account?
+          </Text>
+          <Link href="/auth/sign-up">
+            <Text className="text-sm font-medium text-primary">Sign up</Text>
+          </Link>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
