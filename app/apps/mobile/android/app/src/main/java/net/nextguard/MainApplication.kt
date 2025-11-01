@@ -1,4 +1,4 @@
-package com.anonymous.nextguard
+package net.nextguard
 
 import android.app.Application
 import android.content.res.Configuration

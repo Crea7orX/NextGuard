@@ -1,4 +1,4 @@
-package com.anonymous.nextguard
+package net.nextguard
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

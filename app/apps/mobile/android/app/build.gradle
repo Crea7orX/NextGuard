@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.nextguard'
+    namespace 'net.nextguard'
     defaultConfig {
-        applicationId 'com.anonymous.nextguard'
+        applicationId 'net.nextguard'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
