@@ -1,8 +1,8 @@
+import { pendingDeviceResponseSchema } from "@repo/validations/websockets/pending-devices";
 import type { NextRequest } from "next/server";
 import { authenticateWSServer } from "~/lib/auth-utils";
 import { BadRequestError, handleError, NotFoundError } from "~/lib/errors";
 import { createSuccessResponse } from "~/lib/responses";
-import { pendingDeviceResponseSchema } from "~/lib/validation/websockets/pending-devices";
 import { acknowledgePendingDeviceBySerialId__unprotected } from "~/server/db/queries/pending-devices";
 
 interface Props {

@@ -1,12 +1,12 @@
-import type { NextRequest } from "next/server";
-import { authenticateWSServer } from "~/lib/auth-utils";
-import { BadRequestError, handleError, NotFoundError } from "~/lib/errors";
-import { createSuccessResponse } from "~/lib/responses";
 import {
   deviceResponseSchema,
   deviceTelemetrySchema,
   type DeviceTelemetrySchema,
-} from "~/lib/validation/websockets/devices";
+} from "@repo/validations/websockets/devices";
+import type { NextRequest } from "next/server";
+import { authenticateWSServer } from "~/lib/auth-utils";
+import { BadRequestError, handleError, NotFoundError } from "~/lib/errors";
+import { createSuccessResponse } from "~/lib/responses";
 import { setDeviceTelemetryBySerialId__unprotected } from "~/server/db/queries/devices";
 
 interface Props {

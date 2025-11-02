@@ -1,10 +1,10 @@
+import type { DeviceTelemetrySchema } from "@repo/validations/websockets/devices";
 import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { NotFoundError } from "~/lib/errors";
 import type {
   DeviceSearchParams,
   DeviceUpdate,
 } from "~/lib/validation/devices";
-import type { DeviceTelemetrySchema } from "~/lib/validation/websockets/devices";
 import { db } from "~/server/db";
 import { devices } from "~/server/db/schemas/devices";
 

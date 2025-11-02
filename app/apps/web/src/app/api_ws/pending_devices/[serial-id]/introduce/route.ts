@@ -1,12 +1,12 @@
-import type { NextRequest } from "next/server";
-import { authenticateWSServer } from "~/lib/auth-utils";
-import { BadRequestError, handleError, NotFoundError } from "~/lib/errors";
-import { createSuccessResponse } from "~/lib/responses";
 import {
   pendingDeviceIntroduceSchema,
   pendingDeviceResponseSchema,
   type PendingDeviceIntroduceSchema,
-} from "~/lib/validation/websockets/pending-devices";
+} from "@repo/validations/websockets/pending-devices";
+import type { NextRequest } from "next/server";
+import { authenticateWSServer } from "~/lib/auth-utils";
+import { BadRequestError, handleError, NotFoundError } from "~/lib/errors";
+import { createSuccessResponse } from "~/lib/responses";
 import { introducePendingDeviceBySerialId__unprotected } from "~/server/db/queries/pending-devices";
 
 interface Props {
