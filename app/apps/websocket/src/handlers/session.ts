@@ -1,7 +1,7 @@
+import { deviceResponseSchema } from "@repo/validations/websockets/devices";
 import type { WebSocket as WSWebSocket } from "ws";
 import { sendRequest } from "~/lib/requests";
 import { generateNonce, nowSec, signP256, verifyP256 } from "~/lib/utils";
-import { deviceResponseSchema } from "~/lib/validation/devices";
 import { sessionMessageSchema } from "~/lib/validation/messages";
 import {
   createSession,

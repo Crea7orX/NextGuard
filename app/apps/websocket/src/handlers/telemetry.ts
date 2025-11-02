@@ -1,7 +1,7 @@
+import { deviceTelemetrySchema } from "@repo/validations/websockets/devices";
 import type { WebSocket as WSWebSocket } from "ws";
 import { sendRequest } from "~/lib/requests";
 import { generateNonce, nowSec } from "~/lib/utils";
-import { deviceTelemetrySchema } from "~/lib/validation/devices";
 import type { Message } from "~/lib/validation/messages";
 import { generateMac, type Session } from "~/sessions";
 
