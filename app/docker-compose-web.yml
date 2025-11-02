@@ -1,0 +1,10 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    container_name: nextguard-web
+    env_file: .env
+    ports:
+      - "${DOCKER_PORT:-3000}:3000"
+    restart: unless-stopped
