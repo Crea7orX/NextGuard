@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const deviceTypes = ["hub"];
+export const deviceTypes = ["hub", "entry"] as const;
 
 export const deviceResponseSchema = z.object({
   id: z.string(),
