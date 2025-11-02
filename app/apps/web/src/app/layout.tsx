@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
 import { ApiProvider } from "~/components/providers/api-provider";
 import { ThemeProvider } from "~/components/providers/theme-provider";
 import { TailwindIndicator } from "~/components/ui/tailwind-indicator";
@@ -32,7 +33,8 @@ export default function RootLayout({
         >
           <ApiProvider>
             <NuqsAdapter>
-              {children}
+              {/* TODO: Add Suspense fallback */}
+              <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
               <TailwindIndicator />
             </NuqsAdapter>
           </ApiProvider>
