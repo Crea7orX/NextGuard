@@ -17,10 +17,6 @@
   "engines": {
     "node": ">=18"
   },
-  "resolutions": {
-    "react": "18.2.0",
-    "react-native": "0.74.5"
-  },
   "pnpm": {
     "ignoredBuiltDependencies": [
       "esbuild",
