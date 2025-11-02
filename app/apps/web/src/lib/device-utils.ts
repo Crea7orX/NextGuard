@@ -4,6 +4,7 @@ type DeviceTypeValue = (typeof deviceTypeEnum.enumValues)[number];
 
 enum DeviceTypeMapping {
   "0x54" = "hub",
+  "0x24" = "entry",
 }
 
 export function getDeviceTypeFromSerialId(serialId: string) {
