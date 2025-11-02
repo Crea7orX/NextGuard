@@ -1,3 +1,4 @@
+import { deviceTypes } from "@repo/validations/websockets/devices";
 import { sql } from "drizzle-orm";
 import {
   integer,
@@ -9,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import IdPrefix, { generateId } from "~/lib/ids";
 
-export const deviceTypeEnum = pgEnum("device_types", ["hub"]);
+export const deviceTypeEnum = pgEnum("device_types", deviceTypes);
 export const pendingDeviceState = pgEnum("pending_device_states", [
   "auto_discovered",
   "pending_introduce",
