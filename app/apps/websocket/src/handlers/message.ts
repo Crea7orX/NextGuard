@@ -1,4 +1,5 @@
 import type { RawData, WebSocket as WSWebSocket } from "ws";
+import { handleDiscovery } from "~/handlers/discovery";
 import { handleHello } from "~/handlers/hello";
 import { handleHelloAck } from "~/handlers/hello-ack";
 import { handleSession } from "~/handlers/session";
@@ -57,6 +58,11 @@ export async function handleMessage(
 
   if (data.type === "telemetry") {
     await handleTelemtry(socket, parsedMessage.data, session);
+    return;
+  }
+
+  if (data.type === "discovery") {
+    await handleDiscovery(socket, parsedMessage.data, session);
     return;
   }
 }
