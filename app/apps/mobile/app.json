@@ -38,6 +38,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "82df21f5-86cc-4585-ad01-86249e7a8bca"
+      }
+    },
+    "owner": "nextguard"
   }
 }

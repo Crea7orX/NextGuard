@@ -22,10 +22,6 @@
     "react-native": "0.74.5"
   },
   "pnpm": {
-    "overrides": {
-      "react": "18.2.0",
-      "react-native": "0.74.5"
-    },
     "ignoredBuiltDependencies": [
       "esbuild",
       "sharp",
