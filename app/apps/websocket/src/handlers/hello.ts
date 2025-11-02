@@ -1,3 +1,4 @@
+import { pendingDeviceIntroduceSchema } from "@repo/validations/websockets/pending-devices";
 import type { WebSocket as WSWebSocket } from "ws";
 import { sendRequest } from "~/lib/requests";
 import { generateNonce, nowSec, signP256, verifyP256 } from "~/lib/utils";
@@ -24,9 +25,9 @@ export async function handleHello(ws: WSWebSocket, data: any) {
   const introduceResponse = await sendRequest({
     method: "POST",
     path: `/pending_devices/${device_id}/introduce`,
-    body: {
+    body: pendingDeviceIntroduceSchema.parse({
       publicKeyPem: pubkey_pem,
-    },
+    }),
   });
 
   if (!introduceResponse.success) {
