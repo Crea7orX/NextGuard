@@ -27,3 +27,13 @@ export const pendingDeviceIntroduceSchema = z.object({
 export type PendingDeviceIntroduceSchema = z.infer<
   typeof pendingDeviceIntroduceSchema
 >;
+
+export const pendingDeviceDiscoverySchema = z.object({
+  serialId: z.uuid(),
+  rssi: z.number(),
+  snr: z.number(),
+});
+
+export type PendingDeviceDiscoverySchema = z.infer<
+  typeof pendingDeviceDiscoverySchema
+>;
