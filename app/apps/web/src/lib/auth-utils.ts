@@ -58,8 +58,6 @@ export async function checkPermission(
 export async function authenticateWSServer(request: NextRequest) {
   const token = request.headers.get("Authorization")?.split("Bearer ")?.[1];
 
-  console.log(token);
-
   if (!token || token !== env.WEBSOCKET_SECRET_KEY) {
     throw new UnauthorizedError();
   }

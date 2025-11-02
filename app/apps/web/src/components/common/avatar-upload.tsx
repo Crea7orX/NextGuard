@@ -32,7 +32,6 @@ export function AvatarUpload({
       maxSize={10 * 1024 * 1024}
       className="flex-row gap-4"
       onValueChange={(files) => {
-        console.log(files);
         setFiles(files);
         onChange?.(files[0]);
       }}
@@ -42,7 +41,7 @@ export function AvatarUpload({
     >
       {!files[0] ? (
         <FileUploadDropzone className="group size-20 shrink-0 p-1">
-          <UploadIcon className="size-4 transition-transform group-hover:scale-130" />
+          <UploadIcon className="group-hover:scale-130 size-4 transition-transform" />
         </FileUploadDropzone>
       ) : (
         <FileUploadItem value={files[0]} className="border-0 p-0">

@@ -8,7 +8,6 @@ enum DeviceTypeMapping {
 
 export function getDeviceTypeFromSerialId(serialId: string) {
   const typeId = serialId.substring(16, 18);
-  console.log(serialId, typeId);
   const deviceType =
     DeviceTypeMapping[`0x${typeId}` as keyof typeof DeviceTypeMapping];
 

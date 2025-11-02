@@ -10,7 +10,6 @@ export function convertToBase64(file: File) {
 export function convertFromBase64(base64: string, filename = "image") {
   // Validate base64 format
   if (!base64.includes(",")) {
-    console.log("Invalid base64 format");
     return undefined;
   }
 
@@ -18,7 +17,6 @@ export function convertFromBase64(base64: string, filename = "image") {
   const [mimeTypePart, base64Data] = base64.split(",");
 
   if (!mimeTypePart || !base64Data) {
-    console.log("Invalid mime format");
     return undefined;
   }
 

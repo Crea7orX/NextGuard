@@ -66,7 +66,6 @@ export function DevicesSettingsTab({ className, device, ...props }: Props) {
       return acc;
     }, {});
 
-    console.log(updatedData);
     await update(updatedData)
       .then(() => {
         form.reset(form.getValues());
