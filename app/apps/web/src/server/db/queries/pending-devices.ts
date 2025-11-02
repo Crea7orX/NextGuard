@@ -1,3 +1,4 @@
+import type { PendingDeviceDiscoverySchema } from "@repo/validations/websockets/pending-devices";
 import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { getDeviceTypeFromSerialId } from "~/lib/device-utils";
 import { BadRequestError, ConflictError, NotFoundError } from "~/lib/errors";
@@ -6,6 +7,7 @@ import type {
   PendingDeviceSearchParams,
 } from "~/lib/validation/pending-device";
 import { db } from "~/server/db";
+import { getDeviceBySerialId__unprotected } from "~/server/db/queries/devices";
 import { devices } from "~/server/db/schemas/devices";
 import { pendingDevices } from "~/server/db/schemas/pending-devices";
 
@@ -287,4 +289,41 @@ export async function acknowledgePendingDeviceBySerialId__unprotected({
     .returning();
 
   return device;
+}
+
+interface discoverPendingDeviceBySerialId__unprotectedProps {
+  serialId: string;
+  discovery: PendingDeviceDiscoverySchema;
+}
+
+export async function discoverPendingDeviceBySerialId__unprotected({
+  serialId,
+  discovery,
+}: discoverPendingDeviceBySerialId__unprotectedProps) {
+  const hub = await getDeviceBySerialId__unprotected({ serialId });
+  if (!hub) throw new NotFoundError();
+
+  const existingPendingDevice = await getPendingDeviceBySerialId__unprotected({
+    serialId: discovery.serialId,
+  });
+  if (existingPendingDevice) throw new ConflictError();
+
+  const type = getDeviceTypeFromSerialId(discovery.serialId);
+  if (!type) throw new BadRequestError();
+
+  const [pendingDevice] = await db
+    .insert(pendingDevices)
+    .values({
+      serialId: discovery.serialId,
+      type,
+      state: "auto_discovered",
+      ownerId: hub.ownerId,
+    })
+    .returning();
+
+  if (!pendingDevice) {
+    throw new Error();
+  }
+
+  return pendingDevice;
 }
