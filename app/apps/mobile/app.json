@@ -26,7 +26,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "net.nextguard"
+      "package": "net.nextguard",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
