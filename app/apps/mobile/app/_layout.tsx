@@ -1,6 +1,7 @@
 import '@/global.css';
 
 import { NAV_THEME } from '@/lib/theme';
+import { usePersistedTheme } from '@/hooks/usePersistedTheme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
@@ -13,6 +14,8 @@ export {
 } from 'expo-router';
 
 export default function RootLayout() {
+  usePersistedTheme();
+
   const { colorScheme } = useColorScheme();
 
   return (

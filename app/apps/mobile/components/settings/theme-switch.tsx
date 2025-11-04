@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { Sun, Moon, Monitor } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEY = 'NG_THEME_PREFERENCE';
 
@@ -24,8 +25,6 @@ export default function ThemeSwitch({ label = 'Appearance' }: Props) {
     let mounted = true;
     (async () => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const AsyncStorage = require('@react-native-async-storage/async-storage');
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
         if (!mounted) return;
         if (saved === 'dark' || saved === 'light' || saved === 'system') {
@@ -33,7 +32,7 @@ export default function ThemeSwitch({ label = 'Appearance' }: Props) {
           setColorScheme?.(saved);
         }
       } catch (e) {
-        // If AsyncStorage isn't available, silently skip persistence
+        console.warn('Failed to load theme preference:', e);
       }
     })();
     return () => {
@@ -43,14 +42,12 @@ export default function ThemeSwitch({ label = 'Appearance' }: Props) {
 
   const handleThemeChange = async (theme: ThemeOption) => {
     setSelectedTheme(theme);
+    setColorScheme?.(theme);
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const AsyncStorage = require('@react-native-async-storage/async-storage');
       await AsyncStorage.setItem(STORAGE_KEY, theme);
     } catch (e) {
-      // ignore if AsyncStorage not installed
+      console.warn('Failed to save theme preference:', e);
     }
-    setColorScheme?.(theme);
   };
 
   const iconSize = 20;
