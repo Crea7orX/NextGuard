@@ -33,3 +33,6 @@ yarn-error.*
 *.tsbuildinfo
 
 expo-env.d.ts
+
+# Google services
+google-services.json
