@@ -1,5 +1,6 @@
 import { Text } from '@/components/ui/text';
 import { View, ScrollView } from 'react-native';
+import ThemeSwitch from '@/components/settings/theme-switch';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ProfileCard } from '@/components/account/profile-card';
 
@@ -18,6 +19,10 @@ export default function MoreScreen() {
         initials="DM"
         onAccountDetailsPress={() => console.log('Account details pressed')}
       />
+
+      <View className="w-full px-4">
+        <ThemeSwitch label="Dark mode" />
+      </View>
 
       <View className="flex-1 items-center justify-center p-4">
         <Text className="text-2xl font-bold">More</Text>
