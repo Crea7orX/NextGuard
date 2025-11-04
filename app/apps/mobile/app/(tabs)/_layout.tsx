@@ -1,10 +1,20 @@
-import { Tabs } from 'expo-router';
-import { Home, LayoutDashboard, LucideMenu, Code2 } from 'lucide-react-native';
-import { Icon } from '@/components/ui/icon';
-import { useColorScheme } from 'nativewind';
-import { Platform, Pressable } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { Tabs } from "expo-router";
+import {
+  Home,
+  LayoutDashboard,
+  LucideMenu,
+  Code2,
+  Bell,
+} from "lucide-react-native";
+import { Icon } from "@/components/ui/icon";
+import { useColorScheme } from "nativewind";
+import { Platform, Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -39,11 +49,11 @@ function CustomTabBarButton({ children, onPress, style, ...props }: any) {
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const insets = useSafeAreaInsets();
-  
-  const activeColor = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
-  const inactiveColor = colorScheme === 'dark' ? '#737373' : '#A3A3A3';
-  const backgroundColor = colorScheme === 'dark' ? '#171717' : '#FFFFFF';
-  const borderColor = colorScheme === 'dark' ? '#262626' : '#E5E5E5';
+
+  const activeColor = colorScheme === "dark" ? "#FFFFFF" : "#000000";
+  const inactiveColor = colorScheme === "dark" ? "#737373" : "#A3A3A3";
+  const backgroundColor = colorScheme === "dark" ? "#171717" : "#FFFFFF";
+  const borderColor = colorScheme === "dark" ? "#262626" : "#E5E5E5";
 
   // Calculate tab bar height with safe area
   const tabBarHeight = Platform.select({
@@ -76,29 +86,46 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => <Icon as={Home} color={color} size={size} />,
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={Home} color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color, size }) => <Icon as={LayoutDashboard} color={color} size={size} />,
+          title: "Dashboard",
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={LayoutDashboard} color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Notifications",
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={Bell} color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="more"
         options={{
-          title: 'More',
-          tabBarIcon: ({ color, size }) => <Icon as={LucideMenu} color={color} size={size} />,
+          title: "More",
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={LucideMenu} color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="developer"
         options={{
-          title: 'Dev',
-          tabBarIcon: ({ color, size }) => <Icon as={Code2} color={color} size={size} />,
+          title: "Dev",
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={Code2} color={color} size={size} />
+          ),
         }}
       />
     </Tabs>
