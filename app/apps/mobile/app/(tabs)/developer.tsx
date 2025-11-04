@@ -1,81 +1,80 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { useRouter } from 'expo-router';
-import { Code2, FileText } from 'lucide-react-native';
-import { View, ScrollView, Pressable } from 'react-native';
+import { useState } from 'react';
+import { View, ScrollView, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useEffect, useState } from 'react';
 
-interface Route {
-  path: string;
-  title: string;
+interface StorageItem {
+  key: string;
+  value: string;
 }
-
-const discoverRoutes = (): Route[] => {
-  const routes: Route[] = [
-    // Tab routes
-    { path: '/(tabs)/', title: 'Home' },
-    { path: '/(tabs)/dashboard', title: 'Dashboard' },
-    { path: '/(tabs)/more', title: 'More' },
-    { path: '/(tabs)/developer', title: 'Developer' },
-    
-    // Auth routes
-    { path: '/auth/welcome', title: 'Welcome' },
-    { path: '/auth/sign-in', title: 'Sign In' },
-    { path: '/auth/sign-up', title: 'Sign Up' },
-    { path: '/auth/forgot-password', title: 'Forgot Password' },
-    { path: '/auth/verify-email', title: 'Verify Email' },
-    
-    // Other routes
-    { path: '/+not-found', title: 'Not Found' },
-  ];
-  
-  return routes.sort((a, b) => a.path.localeCompare(b.path));
-};
 
 export default function DeveloperScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [routes, setRoutes] = useState<Route[]>([]);
+  const [storageItems, setStorageItems] = useState<StorageItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    setRoutes(discoverRoutes());
-  }, []);
+  const openSitemap = () => {
+    router.push('/_sitemap' as any);
+  };
 
-  const navigateTo = (path: string) => {
+  const inspectStorage = async () => {
+    setIsLoading(true);
     try {
-      router.push(path as any);
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const AsyncStorageModule = require('@react-native-async-storage/async-storage');
+      // Handle environments that export the module as a default export
+      const AsyncStorage = (AsyncStorageModule && (AsyncStorageModule.default ?? AsyncStorageModule)) as any;
+
+      if (!AsyncStorage || typeof AsyncStorage.getAllKeys !== 'function') {
+        throw new Error('AsyncStorage API not available (getAllKeys is not a function)');
+      }
+
+      const keys = await AsyncStorage.getAllKeys();
+      const items = keys && keys.length > 0 ? await AsyncStorage.multiGet(keys) : [];
+      
+      const storageData: StorageItem[] = items.map(([key, value]: [string, string | null]) => ({
+        key,
+        value: value ?? 'null',
+      }));
+      
+      setStorageItems(storageData);
     } catch (error) {
-      console.error('Navigation error:', error);
+      Alert.alert('Error', 'Failed to load storage items: ' + (error as Error).message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const renderRouteItem = (route: Route) => {
-    const isCurrentPage = route.path === '/(tabs)/developer';
-
-    return (
-      <Pressable
-        key={route.path}
-        onPress={() => !isCurrentPage && navigateTo(route.path)}
-        disabled={isCurrentPage}
-      >
-        <Card className={isCurrentPage ? 'opacity-50' : ''}>
-          <CardContent className="flex-row items-center gap-4 py-4">
-            <View className="bg-primary rounded-lg p-3">
-              <FileText size={20} className="text-primary" color="currentColor" />
-            </View>
-            <View className="flex-1">
-              <Text className="font-semibold text-base">
-                {route.title}
-                {isCurrentPage && ' (Current)'}
-              </Text>
-              <Text className="text-muted-foreground text-xs mt-1 font-mono">
-                {route.path}
-              </Text>
-            </View>
-          </CardContent>
-        </Card>
-      </Pressable>
+  const clearStorage = async () => {
+    Alert.alert(
+      'Clear Storage',
+      'Are you sure you want to clear all storage items? This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const AsyncStorageModule = require('@react-native-async-storage/async-storage');
+              const AsyncStorage = (AsyncStorageModule && (AsyncStorageModule.default ?? AsyncStorageModule)) as any;
+              if (!AsyncStorage || typeof AsyncStorage.clear !== 'function') {
+                throw new Error('AsyncStorage.clear is not available');
+              }
+              await AsyncStorage.clear();
+              setStorageItems([]);
+              Alert.alert('Success', 'Storage cleared successfully');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear storage: ' + (error as Error).message);
+            }
+          },
+        },
+      ]
     );
   };
 
@@ -86,28 +85,54 @@ export default function DeveloperScreen() {
         paddingTop: insets.top + 16,
         paddingBottom: insets.bottom + 16,
         paddingHorizontal: 16,
+        gap: 16,
       }}
     >
-      {/* Header */}
-      <View className="mb-6">
-        <View className="flex-row items-center gap-3 mb-2">
-          <View className="bg-primary rounded-lg p-2">
-            <Code2 size={28} />
-          </View>
-          <View>
-            <Text className="text-3xl font-bold">Developer</Text>
-            <Text className="text-muted-foreground">App Route Navigator</Text>
-          </View>
-        </View>
-        <Text className="text-muted-foreground mt-2">
-          Navigate to any screen in the app. Tap on a route to visit that page.
-        </Text>
+      <View className="gap-3">
+        <Button onPress={openSitemap}>
+          <Text>Open Sitemap</Text>
+        </Button>
+        
+        <Button onPress={inspectStorage} disabled={isLoading}>
+          <Text>{isLoading ? 'Loading...' : 'Inspect Storage'}</Text>
+        </Button>
+
+        {storageItems.length > 0 && (
+          <Button onPress={clearStorage} variant="destructive">
+            <Text>Clear All Storage</Text>
+          </Button>
+        )}
       </View>
 
-      {/* All Routes */}
-      <View className="gap-3">
-        {routes.map(renderRouteItem)}
-      </View>
+      {storageItems.length > 0 && (
+        <Card>
+          <CardHeader>
+            <Text className="text-lg font-semibold">Storage Items ({storageItems.length})</Text>
+          </CardHeader>
+          <CardContent className="gap-3">
+            {storageItems.map((item) => (
+              <View key={item.key} className="border-b border-border pb-3 last:border-b-0 last:pb-0">
+                <Text className="font-mono text-sm font-semibold text-primary mb-1">
+                  {item.key}
+                </Text>
+                <Text className="font-mono text-xs text-muted-foreground">
+                  {item.value}
+                </Text>
+              </View>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {storageItems.length === 0 && !isLoading && (
+        <Card>
+          <CardContent className="py-8">
+            <Text className="text-center text-muted-foreground">
+              No storage items found. Tap "Inspect Storage" to load.
+            </Text>
+          </CardContent>
+        </Card>
+      )}
     </ScrollView>
   );
 }
