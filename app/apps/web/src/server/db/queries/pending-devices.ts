@@ -306,7 +306,14 @@ export async function discoverPendingDeviceBySerialId__unprotected({
   const existingPendingDevice = await getPendingDeviceBySerialId__unprotected({
     serialId: discovery.serialId,
   });
-  if (existingPendingDevice) throw new ConflictError();
+  if (existingPendingDevice) {
+    const [pendindDevice] = await db
+      .update(pendingDevices)
+      .set({}) // TODO: Update pending device when fields are added
+      .where(eq(pendingDevices.serialId, discovery.serialId))
+      .returning();
+    return pendindDevice;
+  }
 
   const type = getDeviceTypeFromSerialId(discovery.serialId);
   if (!type) throw new BadRequestError();
