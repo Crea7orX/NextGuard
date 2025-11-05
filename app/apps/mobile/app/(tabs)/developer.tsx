@@ -4,6 +4,7 @@ import { Text } from '@/components/ui/text';
 import { useRouter } from 'expo-router';
 import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import DeveloperModeToggle from '../../components/settings/developer-mode-toggle';
 
 interface StorageItem {
   key: string;
@@ -29,6 +30,14 @@ export default function DeveloperScreen() {
       }}
     >
       <View className="gap-3">
+        <View>
+          <Text className="text-lg font-medium text-foreground">Developer Options</Text>
+        </View>
+
+        <View className="w-full">
+          <DeveloperModeToggle />
+        </View>
+
         <Button onPress={openSitemap}>
           <Text>Open Sitemap</Text>
         </Button>

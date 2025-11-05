@@ -15,6 +15,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useDeveloperMode } from "@/hooks/useDeveloperMode";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -49,6 +50,7 @@ function CustomTabBarButton({ children, onPress, style, ...props }: any) {
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const insets = useSafeAreaInsets();
+  const { isDeveloperMode, isLoading } = useDeveloperMode();
 
   const activeColor = colorScheme === "dark" ? "#FFFFFF" : "#000000";
   const inactiveColor = colorScheme === "dark" ? "#737373" : "#A3A3A3";
@@ -117,6 +119,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Icon as={Code2} color={color} size={size} />
           ),
+          href: isDeveloperMode ? undefined : null,
         }}
       />
     </Tabs>
