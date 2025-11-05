@@ -3,7 +3,7 @@ import { z } from "zod";
 export const pendingDeviceResponseSchema = z.object({
   id: z.string(),
   serialId: z.string(),
-  publicKeyPem: z.string(),
+  publicKeyPem: z.string().nullish(),
 });
 
 export type PendingDeviceResponseSchema = z.infer<
