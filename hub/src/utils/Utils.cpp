@@ -80,3 +80,53 @@ bool Utils::isValidMAC(String mac) {
     }
     return true;
 }
+
+// UUID formatting utilities
+String Utils::uuidToString(const uint8_t* uuid) {
+    String result = "";
+    for (int i = 0; i < 16; i++) {
+        if (uuid[i] < 0x10) result += "0";
+        result += String(uuid[i], HEX);
+        if (i == 3 || i == 5 || i == 7 || i == 9) result += "-";
+    }
+    return result;
+}
+
+bool Utils::stringToUUID(String uuidStr, uint8_t* uuid) {
+    // Remove dashes and validate length
+    uuidStr.replace("-", "");
+    if (uuidStr.length() != 32) return false;
+    
+    // Convert hex string to bytes
+    for (int i = 0; i < 16; i++) {
+        String byteStr = uuidStr.substring(i * 2, i * 2 + 2);
+        char* endPtr;
+        long value = strtol(byteStr.c_str(), &endPtr, 16);
+        
+        // Check if conversion was successful
+        if (*endPtr != '\0' || value < 0 || value > 255) {
+            return false;
+        }
+        
+        uuid[i] = (uint8_t)value;
+    }
+    
+    return true;
+}
+
+bool Utils::isUUIDEmpty(const uint8_t* uuid) {
+    for (int i = 0; i < 16; i++) {
+        if (uuid[i] != 0) return false;
+    }
+    return true;
+}
+
+// Hex formatting utilities
+String Utils::toHexString(const uint8_t* data, size_t len) {
+    String result = "";
+    for (size_t i = 0; i < len; i++) {
+        if (data[i] < 0x10) result += "0";
+        result += String(data[i], HEX);
+    }
+    return result;
+}

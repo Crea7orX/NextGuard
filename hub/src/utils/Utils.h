@@ -26,6 +26,14 @@ public:
     // Validation utilities
     static bool isValidIP(String ip);
     static bool isValidMAC(String mac);
+
+    // UUID formatting utilities
+    static String uuidToString(const uint8_t* uuid);
+    static bool stringToUUID(String str, uint8_t* uuid);
+    static bool isUUIDEmpty(const uint8_t* uuid);
+
+    // Hex formatting utilities
+    static String toHexString(const uint8_t* data, size_t len);
 };
 
 #endif // UTILS_H
