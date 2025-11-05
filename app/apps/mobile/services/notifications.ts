@@ -2,7 +2,7 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { saveToSecureStore, getFromSecureStore, deleteFromSecureStore  } from '@/lib/utils';
 
 const PUSH_TOKEN_KEY = 'NG_EXPO_PUSH_TOKEN';
 
@@ -47,7 +47,7 @@ export async function registerForPushNotificationsAsync() {
 
     // Save token globally
     if (token) {
-      await AsyncStorage.setItem(PUSH_TOKEN_KEY, token);
+      await saveToSecureStore(PUSH_TOKEN_KEY, token);
     }
   } catch (error) {
     console.error('Error getting push token:', error);
@@ -77,7 +77,7 @@ export async function registerForPushNotificationsAsync() {
 
 export async function getStoredPushToken(): Promise<string | null> {
   try {
-    return await AsyncStorage.getItem(PUSH_TOKEN_KEY);
+    return await getFromSecureStore(PUSH_TOKEN_KEY);
   } catch (error) {
     console.error('Error retrieving stored push token:', error);
     return null;
@@ -86,7 +86,7 @@ export async function getStoredPushToken(): Promise<string | null> {
 
 export async function clearStoredPushToken(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(PUSH_TOKEN_KEY);
+    await deleteFromSecureStore(PUSH_TOKEN_KEY);
   } catch (error) {
     console.error('Error clearing stored push token:', error);
   }
