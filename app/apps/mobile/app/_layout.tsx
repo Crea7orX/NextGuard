@@ -10,6 +10,12 @@ import { useColorScheme } from "nativewind";
 import { useEffect } from "react";
 import { registerForPushNotificationsAsync } from "@/services/notifications";
 import { DeveloperModeProvider } from "@/hooks/useDeveloperMode";
+import { LogBox } from 'react-native';
+
+// Suppress warnings
+LogBox.ignoreLogs([
+  '[Reanimated] Writing to `value` during component render',
+]);
 
 export {
   // Catch any errors thrown by the Layout component.

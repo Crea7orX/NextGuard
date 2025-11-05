@@ -12,8 +12,8 @@ export interface NotificationData {
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
-  const notificationListener = useRef<Notifications.Subscription | null>(null);
-  const responseListener = useRef<Notifications.Subscription | null>(null);
+  const notificationListener = useRef<Notifications.EventSubscription | null>(null);
+  const responseListener = useRef<Notifications.EventSubscription | null>(null);
   const router = useRouter();
 
   useEffect(() => {

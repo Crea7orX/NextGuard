@@ -7,13 +7,26 @@ import { useNotifications } from "@/hooks/useNotifications";
 import {
   scheduleLocalNotification,
   setBadgeCount,
+  getStoredPushToken,
 } from "@/services/notifications";
 import { Bell, BellOff } from "lucide-react-native";
 import { Icon } from "@/components/ui/icon";
+import { CopyButton } from "@/components/ui/copy-button";
+import { useState, useEffect } from "react";
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
   const { notifications, clearNotifications } = useNotifications();
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadPushToken();
+  }, []);
+
+  const loadPushToken = async () => {
+    const token = await getStoredPushToken();
+    setExpoPushToken(token);
+  };
 
   const sendTestNotification = async () => {
     try {
@@ -49,6 +62,22 @@ export default function NotificationsScreen() {
       <View className="gap-4">
         <Text className="text-2xl font-bold">Notifications</Text>
 
+        {expoPushToken && (
+          <Card className="p-6 pt-4 gap-0">
+            <View className="flex-row items-center justify-between">
+              <Text className="font-semibold">Expo Push Token</Text>
+              <CopyButton
+                value={expoPushToken}
+                showText
+                successMessage="Token copied!"
+              />
+            </View>
+            <Text className="text-muted-foreground text-xs font-mono break-all">
+              {expoPushToken}
+            </Text>
+          </Card>
+        )}
+
         <View className="gap-3">
           <Button onPress={sendTestNotification}>
             <Icon as={Bell} className="text-primary-foreground size-4" />
@@ -67,16 +96,12 @@ export default function NotificationsScreen() {
       {notifications.length > 0 ? (
         <View className="gap-3">
           {notifications.map((notification) => (
-            <Card key={notification.id}>
-              <CardHeader>
-                <Text className="font-semibold">{notification.title}</Text>
-                <Text className="text-muted-foreground text-xs">
-                  {new Date(notification.timestamp).toLocaleString()}
-                </Text>
-              </CardHeader>
-              <CardContent>
-                <Text className="text-sm">{notification.body}</Text>
-              </CardContent>
+            <Card key={notification.id} className="p-6 py-4 gap-0">
+              <Text className="font-semibold">{notification.title}</Text>
+              <Text className="text-muted-foreground text-xs">
+                {new Date(notification.timestamp).toLocaleString()}
+              </Text>
+              <Text className="text-sm">{notification.body}</Text>
             </Card>
           ))}
         </View>

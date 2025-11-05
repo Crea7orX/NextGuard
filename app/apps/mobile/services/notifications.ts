@@ -2,6 +2,9 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const PUSH_TOKEN_KEY = 'NG_EXPO_PUSH_TOKEN';
 
 // Configure how notifications behave when app is in foreground
 Notifications.setNotificationHandler({
@@ -41,6 +44,11 @@ export async function registerForPushNotificationsAsync() {
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
     token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
     console.log('Expo push token:', token);
+
+    // Save token globally
+    if (token) {
+      await AsyncStorage.setItem(PUSH_TOKEN_KEY, token);
+    }
   } catch (error) {
     console.error('Error getting push token:', error);
   }
@@ -65,6 +73,23 @@ export async function registerForPushNotificationsAsync() {
   }
 
   return token;
+}
+
+export async function getStoredPushToken(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(PUSH_TOKEN_KEY);
+  } catch (error) {
+    console.error('Error retrieving stored push token:', error);
+    return null;
+  }
+}
+
+export async function clearStoredPushToken(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(PUSH_TOKEN_KEY);
+  } catch (error) {
+    console.error('Error clearing stored push token:', error);
+  }
 }
 
 export async function scheduleLocalNotification(
