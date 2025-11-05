@@ -10,6 +10,10 @@
 #include <storage/StorageManager.h>
 #include <crypto/CryptoManager.h>
 #include <secure/SecureMessage.h>
+#include <utils/Utils.h>
+
+// Forward declaration to avoid circular dependency
+class LoRaManager;
 
 class WebSocketManager {
 private:
@@ -18,6 +22,7 @@ private:
     Logger* logger;
     StorageManager* storage;
     SecureMessage* secureMsg;
+    LoRaManager* loRaManager;
     bool isConnected;
     bool isAuthenticated;
     String serverHost;
@@ -30,6 +35,7 @@ private:
     void handleHelloAck(JsonDocument& doc);
     void handleSessionAck(JsonDocument& doc);
     void handleAdoptAck(JsonDocument& doc);
+    void handleDiscoveryAck(JsonDocument& doc);
     void sendTimestamp();
     void sendHello();
     void sendSession();
@@ -41,7 +47,7 @@ public:
     ~WebSocketManager();
     
     void begin(Logger* loggerInstance, StorageManager* storageInstance,
-               SecureMessage* secureMessage);
+               SecureMessage* secureMessage, LoRaManager* loRaManagerInstance);
     void loop();
     bool connect();
     void disconnect();

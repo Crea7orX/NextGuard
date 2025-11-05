@@ -1,4 +1,5 @@
 #include "WebSocketManager.h"
+#include <lora/LoRaManager.h>
 
 // Static instance pointer for callback
 WebSocketManager* WebSocketManager::instance = nullptr;
@@ -9,6 +10,7 @@ WebSocketManager::WebSocketManager() {
     logger = nullptr;
     storage = nullptr;
     secureMsg = nullptr;
+    loRaManager = nullptr;
     isConnected = false;
     isAuthenticated = false;
     serverHost = "";
@@ -28,10 +30,11 @@ WebSocketManager::~WebSocketManager() {
 }
 
 void WebSocketManager::begin(Logger* loggerInstance, StorageManager* storageInstance,
-                             SecureMessage* secureMessage) {
+                             SecureMessage* secureMessage, LoRaManager* loRaManagerInstance) {
     logger = loggerInstance;
     storage = storageInstance;
     secureMsg = secureMessage;
+    loRaManager = loRaManagerInstance;
     
     if (!WEBSOCKET_ENABLED) {
         if (logger) logger->info("WebSocket is disabled");
@@ -119,6 +122,11 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
             
             if (strcmp(type, "adopt_ack") == 0) {
                 handleAdoptAck(doc);
+                return;
+            }
+
+            if (strcmp(type, "discovery_ack") == 0) {
+                handleDiscoveryAck(doc);
                 return;
             }
             break;
@@ -254,6 +262,35 @@ void WebSocketManager::handleAdoptAck(JsonDocument& doc) {
     } else {
         if (logger) logger->error("ADOPT_ACK verification failed");
     }
+}
+
+void WebSocketManager::handleDiscoveryAck(JsonDocument& doc) {
+    logger->info("Processing DISCOVERY_ACK...");
+    
+    // Verify the message
+    if (!secureMsg->verifyMessage(doc)) {
+        logger->error("DISCOVERY_ACK verification failed");
+        return;
+    }
+    
+    if (!doc["payload"]["serial_id"]) {
+        logger->error("Invalid DISCOVERY_ACK payload");
+        return;
+    }
+    
+    // Convert UUID string to byte array
+    String serialIdStr = doc["payload"]["serial_id"].as<String>();
+    uint8_t nodeUuid[16];
+    
+    if (!Utils::stringToUUID(serialIdStr, nodeUuid)) {
+        logger->error("Invalid UUID format: " + serialIdStr);
+        return;
+    }
+    
+    // Send unencrypted command to the node
+    loRaManager->sendCommand(nodeUuid, "", MSG_DISCOVERY_ACK);
+    
+    logger->info("End device informed successfully!");
 }
 
 void WebSocketManager::sendTimestamp() {
