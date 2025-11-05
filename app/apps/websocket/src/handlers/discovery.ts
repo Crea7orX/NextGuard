@@ -24,11 +24,16 @@ export async function handleDiscovery(
     throw new Error("Invalid response!");
   }
 
+  // TODO: Validate response
+
   const frame = {
     type: "discovery_ack",
     seq: ++session.lastSeqOut,
     ts: nowSec(),
     nonce: generateNonce(),
+    payload: {
+      serial_id: discoveryResponse.data.serialId,
+    },
   };
   ws.send(
     JSON.stringify({ ...frame, mac: generateMac(session.sessionKey, frame) }),
