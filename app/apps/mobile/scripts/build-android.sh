@@ -8,7 +8,7 @@ android_dir="$mobile_root/android"
 
 # Run expo prebuild from the mobile project root
 pushd "$mobile_root" >/dev/null
-npx expo prebuild
+npx expo prebuild --platform android
 popd >/dev/null
 
 # Ensure android directory exists
