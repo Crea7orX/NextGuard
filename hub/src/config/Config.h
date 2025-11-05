@@ -44,7 +44,7 @@
 #define TELEMETRY_INTERVAL 10000  // 10 seconds
 
 // Factory Reset Configuration
-#define BOOT_BUTTON_PIN 2  // GPIO0 (boot button on most ESP32)
+#define BOOT_BUTTON_PIN 0
 #define BUTTON_HOLD_TIME 3000  // 3 seconds
 
 // Ethernet PHY Configuration for WT32-ETH01
@@ -58,6 +58,27 @@
 // Timing Configuration
 #define LOOP_DELAY_MS 10
 #define NETWORK_CHECK_INTERVAL 30000  // 30 seconds
+
+// SPI Configuration
+#define SPI_MOSI_PIN 14
+#define SPI_MISO_PIN 36
+#define SPI_SCK_PIN 12
+
+// RF95 LoRa Configuration
+#define RF95_ENABLED true
+#define RF95_CS_PIN 2
+#define RF95_INT_PIN 35
+#define RF95_RST_PIN 15
+#define RF95_FREQ 868.1    // 868.1 MHz (EU)
+#define RF95_TX_POWER 20   // 20 dBm (max for RFM95)
+#define RF95_SPREADING_FACTOR 7  // SF7 = faster, less range; SF12 = slower, more range
+#define RF95_BANDWIDTH 125000    // 125 kHz
+#define RF95_CODING_RATE 5       // 4/5 coding rate
+
+// ECC Configuration
+#define ECC_PRIVATE_KEY_SIZE 21   // secp160r1 private key (20 bytes + padding)
+#define ECC_PUBLIC_KEY_SIZE 40    // secp160r1 public key (40 bytes)
+#define SHARED_SECRET_SIZE 20     // secp160r1 shared secret
 
 // Debug Configuration
 #define DEBUG_MODE true
