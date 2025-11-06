@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { updateUserSchema, type UpdateUser } from "@repo/validations/auth/user";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { AvatarUpload } from "~/components/common/avatar-upload";
@@ -24,7 +25,6 @@ import {
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 import { convertFromBase64, convertToBase64 } from "~/lib/image";
-import { updateUserSchema, type UpdateUser } from "~/lib/validation/auth/user";
 
 interface Props extends React.ComponentProps<typeof Card> {
   onClose?: () => void;

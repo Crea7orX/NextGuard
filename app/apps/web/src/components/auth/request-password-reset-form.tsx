@@ -1,6 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  resetPasswordRequestSchema,
+  type ResetPasswordRequest,
+} from "@repo/validations/auth/password";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -22,10 +26,6 @@ import { Input } from "~/components/ui/input";
 import { env } from "~/env";
 import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
-import {
-  resetPasswordRequestSchema,
-  type ResetPasswordRequest,
-} from "~/lib/validation/auth/password";
 
 export function RequestPasswordResetForm({
   className,

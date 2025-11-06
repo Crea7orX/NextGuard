@@ -1,6 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  resetPasswordSchema,
+  type ResetPassword,
+} from "@repo/validations/auth/password";
 import { LoaderCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
@@ -22,10 +26,6 @@ import {
 } from "~/components/ui/form";
 import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
-import {
-  resetPasswordSchema,
-  type ResetPassword,
-} from "~/lib/validation/auth/password";
 
 export function PasswordResetForm({
   className,

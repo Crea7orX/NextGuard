@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signUpSchema, type SignUp } from "@repo/validations/auth/sign-up";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
@@ -22,7 +23,6 @@ import {
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
-import { signUpSchema, type SignUp } from "~/lib/validation/auth/sign-up";
 
 export function SignUpForm({
   className,

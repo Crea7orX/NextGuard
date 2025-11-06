@@ -1,4 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  updatePasswordSchema,
+  type UpdatePassword,
+} from "@repo/validations/auth/password";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "~/components/common/loading-button";
@@ -22,10 +26,6 @@ import {
   type FormResponseMessageProps,
 } from "~/components/ui/form";
 import { authClient } from "~/lib/auth-client";
-import {
-  updatePasswordSchema,
-  type UpdatePassword,
-} from "~/lib/validation/auth/password";
 import { PasswordInput } from "../common/password-input";
 
 interface Props extends React.ComponentProps<typeof Card> {
