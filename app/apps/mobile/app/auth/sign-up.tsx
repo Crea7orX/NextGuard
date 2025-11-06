@@ -1,48 +1,66 @@
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ErrorMessage } from '@/components/ui/error-message';
-import { Link } from 'expo-router';
-import { View, Image, type ImageStyle } from 'react-native';
+import { AnotherMethodSeparator } from "@/components/auth/another-method-separator";
+import { ContinueWithGoogleButton } from "@/components/auth/continue-with-google-button";
+import { KeyboardAvoidingScrollView } from "@/components/ui/keyboard-avoiding-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useColorScheme } from 'nativewind';
-import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
-import { ContinueWithGoogle } from '@/components/auth/continue-with-google';
-import { useState } from 'react';
-import { KeyboardAvoidingScrollView } from '@/components/ui/keyboard-avoiding-scroll-view';
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+import { signUpSchema } from "@repo/validations/auth/sign-up";
+import { useForm } from "@tanstack/react-form";
+import React from "react";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
+import { Link } from "expo-router";
 
-const LOGO = {
-  light: require('@/assets/images/react-native-reusables-light.png'),
-  dark: require('@/assets/images/react-native-reusables-dark.png'),
-};
-
-const IMAGE_STYLE: ImageStyle = {
-  height: 80,
-  width: 80,
-};
-
-export default function SignUpScreen() {
-  const { colorScheme } = useColorScheme();
+export default function SignUpForm({
+  className,
+  ...props
+}: React.ComponentProps<typeof View>) {
   const insets = useSafeAreaInsets();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
 
-  const handleSignUp = () => {
-    setError('');
-    
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
-    console.log('Sign up with:', { firstName, lastName, email, password });
-    // TODO: Implement sign-up logic
-  };
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      passwordConfirmation: "",
+      firstName: "",
+      lastName: "",
+    },
+    validators: {
+      onSubmit: signUpSchema,
+    },
+    onSubmit: async ({ value }) => {
+      void authClient.signUp.email(
+        {
+          email: value.email,
+          password: value.password,
+          name: `${value.firstName} ${value.lastName}`,
+          // TODO: Add callbackURL when navigation is implemented
+        },
+        {
+          onRequest: () => {
+            setIsLoading(true);
+            console.log("Signing up with email...");
+          },
+          onError: (ctx) => {
+            setIsLoading(false);
+            console.error("Sign up error:", ctx.error.message);
+          },
+          onSuccess: () => {
+            setIsLoading(false);
+            console.log("Signed up successfully");
+            // TODO: Navigate to dashboard or appropriate screen
+          },
+        }
+      );
+    },
+  });
+
+  const disabled = isLoading || isLoadingProvider;
 
   return (
     <KeyboardAvoidingScrollView
@@ -54,106 +72,149 @@ export default function SignUpScreen() {
         flexGrow: 1,
       }}
     >
-      <View className="flex-1 justify-center gap-8 px-6">
-        {/* Logo Section */}
-        <View className="items-center gap-4">
-          <Image 
-            source={LOGO[colorScheme ?? 'light']} 
-            style={IMAGE_STYLE} 
-            resizeMode="contain" 
-          />
-          <View className="items-center gap-2">
-            <Text className="text-3xl font-bold">Create account</Text>
-            <Text className="text-muted-foreground text-center">
-              Join NextGuard and secure your property
-            </Text>
-          </View>
-        </View>
-
-        {/* Sign Up Form */}
-        <View className="gap-6 w-full max-w-md">
-          <ContinueWithGoogle />
-
-          <AnotherMethodSeparator />
-
+      <View className={cn("grid gap-6", className)} {...props}>
+        <ContinueWithGoogleButton
+        // TODO
+        // disabled={disabled}
+        // setIsLoadingProvider={setIsLoadingProvider}
+        />
+        <AnotherMethodSeparator text="Or continue with" />
+        <View className="grid gap-6">
           <View className="flex-row gap-4">
-            <View className="gap-1 flex-1">
-              <Label nativeID="firstName">First Name</Label>
-              <Input
-                placeholder="John"
-                value={firstName}
-                onChangeText={setFirstName}
-                autoCapitalize="words"
-                autoComplete="given-name"
-              />
-            </View>
-
-            <View className="gap-1 flex-1">
-              <Label nativeID="lastName">Last Name</Label>
-              <Input
-                placeholder="Doe"
-                value={lastName}
-                onChangeText={setLastName}
-                autoCapitalize="words"
-                autoComplete="family-name"
-              />
-            </View>
-          </View>
-
-          <View className="gap-1">
-            <Label nativeID="email">Email</Label>
-            <Input
-              placeholder="email@example.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
+            <form.Field
+              name="firstName"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid} className="flex-1">
+                    <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                      aria-invalid={isInvalid}
+                      placeholder="Enter your first name"
+                      autoComplete="given-name"
+                      autoCapitalize="words"
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="lastName"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid} className="flex-1">
+                    <FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                      aria-invalid={isInvalid}
+                      placeholder="Enter your last name"
+                      autoComplete="family-name"
+                      autoCapitalize="words"
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
             />
           </View>
-
-          <View className="gap-1">
-            <Label nativeID="password">Password</Label>
-            <Input
-              placeholder="Create a password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password-new"
-            />
-            <Text className="text-xs text-muted-foreground">
-              Must be at least 8 characters
-            </Text>
-          </View>
-
-          <View className="gap-1">
-            <Label nativeID="confirmPassword">Confirm Password</Label>
-            <Input
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password-new"
-            />
-          </View>
-
-          {error && <ErrorMessage message={error} />}
-
-          <Button className="w-full" onPress={handleSignUp}>
-            <Text>Create Account</Text>
+          <form.Field
+            name="email"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <Input
+                    id={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                    aria-invalid={isInvalid}
+                    placeholder="Enter your email address"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <form.Field
+            name="password"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <Input
+                    id={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                    aria-invalid={isInvalid}
+                    placeholder="Create a password"
+                    autoComplete="password-new"
+                    secureTextEntry={true}
+                    autoCapitalize="none"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <form.Field
+            name="passwordConfirmation"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+                  <Input
+                    id={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                    aria-invalid={isInvalid}
+                    placeholder="Confirm your password"
+                    autoComplete="password-new"
+                    secureTextEntry={true}
+                    autoCapitalize="none"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <Button
+            className="w-full"
+            onPress={() => form.handleSubmit()}
+            disabled={disabled}
+          >
+            <Text className="text-primary-foreground">Sign Up</Text>
           </Button>
         </View>
-
-        {/* Sign In Link */}
-        <View className="flex-row justify-center gap-1">
-          <Text className="text-sm text-muted-foreground">
-            Already have an account?
+        <View>
+          <Text className="text-center text-sm">
+            Already have an account?{" "}
+            <Link href="/auth/sign-in">
+              <Text className="text-sm font-medium text-primary underline">Sign in</Text>
+            </Link>
           </Text>
-          <Link href="/auth/sign-in">
-            <Text className="text-sm font-medium text-primary">Sign in</Text>
-          </Link>
         </View>
       </View>
     </KeyboardAvoidingScrollView>

@@ -1,36 +1,59 @@
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Link } from 'expo-router';
-import { View, Image, type ImageStyle } from 'react-native';
+import { AnotherMethodSeparator } from "@/components/auth/another-method-separator";
+import { ContinueWithGoogleButton } from "@/components/auth/continue-with-google-button";
+import { KeyboardAvoidingScrollView } from "@/components/ui/keyboard-avoiding-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useColorScheme } from 'nativewind';
-import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
-import { ContinueWithGoogle } from '@/components/auth/continue-with-google';
-import { useState } from 'react';
-import { KeyboardAvoidingScrollView } from '@/components/ui/keyboard-avoiding-scroll-view';
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+import { signInSchema } from "@repo/validations/auth/sign-in";
+import { useForm } from "@tanstack/react-form";
+import React from "react";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-const LOGO = {
-  light: require('@/assets/images/react-native-reusables-light.png'),
-  dark: require('@/assets/images/react-native-reusables-dark.png'),
-};
-
-const IMAGE_STYLE: ImageStyle = {
-  height: 80,
-  width: 80,
-};
-
-export default function SignInScreen() {
-  const { colorScheme } = useColorScheme();
+export default function SignInForm({
+  className,
+  ...props
+}: React.ComponentProps<typeof View>) {
   const insets = useSafeAreaInsets();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
 
-  const handleSignIn = () => {
-    console.log('Sign in with:', { email, password });
-    // TODO: Implement sign-in logic
-  };
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      // TODO
+      // rememberMe: true,
+    },
+    validators: {
+      onSubmit: signInSchema,
+    },
+    onSubmit: async ({ value }) => {
+      void authClient.signIn.email(value, {
+        onRequest: () => {
+          setIsLoading(true);
+          console.log("Signing in with email...");
+        },
+        onError: (ctx) => {
+          if (ctx.error.code === "EMAIL_NOT_VERIFIED") {
+            // TODO: Navigate to verify email screen
+            return;
+          }
+
+          setIsLoading(false);
+        },
+        onSuccess: () => {
+          setIsLoading(false);
+          console.log("Signed in successfully");
+        },
+      });
+    },
+  });
+
+  const disabled = isLoading || isLoadingProvider;
 
   return (
     <KeyboardAvoidingScrollView
@@ -42,74 +65,80 @@ export default function SignInScreen() {
         flexGrow: 1,
       }}
     >
-      <View className="flex-1 justify-center gap-8 px-6">
-        {/* Logo Section */}
-        <View className="items-center gap-4">
-          <Image 
-            source={LOGO[colorScheme ?? 'light']} 
-            style={IMAGE_STYLE} 
-            resizeMode="contain" 
+      <View className={cn("grid gap-6", className)} {...props}>
+        <ContinueWithGoogleButton
+        // TODO
+        // disabled={disabled}
+        // setIsLoadingProvider={setIsLoadingProvider}
+        />
+        <AnotherMethodSeparator text="Or continue with" />
+        <View className="grid gap-6">
+          <form.Field
+            name="email"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <Input
+                    id={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                    aria-invalid={isInvalid}
+                    placeholder="Enter your email address"
+                    autoComplete="email"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
           />
-          <View className="items-center gap-2">
-            <Text className="text-3xl font-bold">Welcome back</Text>
-            <Text className="text-muted-foreground text-center">
-              Sign in to your NextGuard account
-            </Text>
-          </View>
-        </View>
-
-        {/* Sign In Form */}
-        <View className="gap-6 w-full max-w-md">
-          <ContinueWithGoogle />
-
-          <AnotherMethodSeparator />
-
-          <View className="gap-1">
-            <Label nativeID="email">Email</Label>
-            <Input
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-            />
-          </View>
-
-          <View className="gap-1">
-            <View className="flex-row items-center justify-between">
-              <Label nativeID="password">Password</Label>
-                <Link href={{ pathname: '/auth/forgot-password', params: email ? { email } : undefined }} asChild>
-                  <Text className="text-muted-foreground text-sm">
-                    Forgot password?
-                  </Text>
-                </Link>
-            </View>
-            <Input
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password"
-            />
-          </View>
-
-          <Button className="w-full" onPress={handleSignIn}>
-            <Text>Sign In</Text>
+          <form.Field
+            name="password"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <Input
+                    id={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                    aria-invalid={isInvalid}
+                    placeholder="Enter your password"
+                    autoComplete="password"
+                    secureTextEntry={true}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <Button
+            className="w-full"
+            onPress={() => form.handleSubmit()}
+            disabled={disabled}
+          >
+            <Text className="text-primary-foreground">Sign In</Text>
           </Button>
         </View>
-
-        {/* Sign Up Link */}
-        <View className="flex-row justify-center gap-1">
-          <Text className="text-sm text-muted-foreground">
-            Don't have an account?
-          </Text>
-          <Link href="/auth/sign-up">
-            <Text className="text-sm font-medium text-primary">Sign up</Text>
-          </Link>
+        <View>
+        <Text className="text-center text-sm">
+          Don&apos;t have an account? // TODO
+          {/* <Link
+            href={`/auth/sign-up`}
+            className="underline underline-offset-4"
+          >
+            Sign up
+          </Link> */}
+        </Text>
         </View>
       </View>
+      
     </KeyboardAvoidingScrollView>
   );
 }

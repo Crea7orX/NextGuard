@@ -9,7 +9,7 @@ import { sendResetPasswordEmail } from "~/server/email/utils/send-password-reset
 import { sendVerificationEmail } from "~/server/email/utils/send-verification-email";
 
 export const auth = betterAuth({
-  trustedOrigins: ["nextguardmobile://*"],
+  trustedOrigins: ["nextguardmobile://*", "exp://*", "exp://192.168.1.71:8081"],
   database: drizzleAdapter(db, {
     provider: "pg",
   }),

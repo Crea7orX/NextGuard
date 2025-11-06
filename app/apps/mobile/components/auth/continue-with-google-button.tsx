@@ -7,7 +7,7 @@ interface ContinueWithGoogleProps {
   onPress?: () => void;
 }
 
-export function ContinueWithGoogle({ onPress }: ContinueWithGoogleProps) {
+export function ContinueWithGoogleButton({ onPress }: ContinueWithGoogleProps) {
   const handleGoogleSignIn = () => {
     console.log('Sign in with Google');
     // TODO: Implement Google sign-in logic

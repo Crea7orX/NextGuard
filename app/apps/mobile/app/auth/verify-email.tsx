@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mail } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
-import { ContinueWithGoogle } from '@/components/auth/continue-with-google';
+import { ContinueWithGoogleButton } from '@/components/auth/continue-with-google-button';
 
 export default function VerifyEmailScreen() {
   const insets = useSafeAreaInsets();
@@ -63,7 +63,7 @@ export default function VerifyEmailScreen() {
               {/* Alternative Sign In Methods */}
               <View className="gap-6">
                 <AnotherMethodSeparator text='Or use another method' />
-                <ContinueWithGoogle />
+                <ContinueWithGoogleButton />
               </View>
 
               {/* Help Text */}
