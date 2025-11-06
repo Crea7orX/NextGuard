@@ -1,3 +1,4 @@
+import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { lastLoginMethod, organization } from "better-auth/plugins";
@@ -8,6 +9,7 @@ import { sendResetPasswordEmail } from "~/server/email/utils/send-password-reset
 import { sendVerificationEmail } from "~/server/email/utils/send-verification-email";
 
 export const auth = betterAuth({
+  trustedOrigins: ["nextguardmobile://*"],
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
@@ -38,5 +40,6 @@ export const auth = betterAuth({
         owner,
       },
     }),
+    expo(),
   ],
 });
