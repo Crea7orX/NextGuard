@@ -12,12 +12,14 @@ import { useForm } from "@tanstack/react-form";
 import React from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
+import { Link, useRouter } from 'expo-router';
 
 export default function SignInForm({
   className,
   ...props
 }: React.ComponentProps<typeof View>) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
 
@@ -38,8 +40,18 @@ export default function SignInForm({
           console.log("Signing in with email...");
         },
         onError: (ctx) => {
+          // Check if the email is verified
           if (ctx.error.code === "EMAIL_NOT_VERIFIED") {
-            // TODO: Navigate to verify email screen
+            setIsLoading(false);
+            // Navigate to verify email screen with email parameter
+            router.push(`/auth/verify-email?email=${encodeURIComponent(value.email)}`);
+            return;
+          }
+
+          // Check for invalid email or password error
+          if (ctx.error.code === "INVALID_EMAIL_OR_PASSWORD") {
+            console.log("Invalid email or password");
+            setIsLoading(false);
             return;
           }
 
@@ -128,13 +140,13 @@ export default function SignInForm({
         </View>
         <View>
         <Text className="text-center text-sm">
-          Don&apos;t have an account? // TODO
-          {/* <Link
+          Don&apos;t have an account?
+          <Link
             href={`/auth/sign-up`}
             className="underline underline-offset-4"
           >
             Sign up
-          </Link> */}
+          </Link>
         </Text>
         </View>
       </View>

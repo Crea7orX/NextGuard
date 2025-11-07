@@ -12,13 +12,14 @@ import { useForm } from "@tanstack/react-form";
 import React from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 export default function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<typeof View>) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
 
@@ -53,7 +54,8 @@ export default function SignUpForm({
           onSuccess: () => {
             setIsLoading(false);
             console.log("Signed up successfully");
-            // TODO: Navigate to dashboard or appropriate screen
+            // Navigate to verify email screen with email parameter
+            router.push(`/auth/verify-email?email=${encodeURIComponent(value.email)}`);
           },
         }
       );

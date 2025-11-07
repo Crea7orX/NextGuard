@@ -1,20 +1,80 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
-import { Link } from 'expo-router';
-import { View, ScrollView } from 'react-native';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Mail } from 'lucide-react-native';
+import { Mail, Loader2 } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
 import { ContinueWithGoogleButton } from '@/components/auth/continue-with-google-button';
+import { authClient } from '@/lib/auth-client';
+import { env } from '@/env';
+import { useCountdown } from '@/hooks/useCountdown';
+import React from 'react';
 
 export default function VerifyEmailScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { email } = useLocalSearchParams<{ email?: string }>();
+
+  const initialRequest = React.useRef(true);
+  React.useEffect(() => {
+    if (!email) {
+      router.replace('/auth/sign-in');
+      return;
+    }
+    if (!initialRequest.current) return;
+    initialRequest.current = false;
+    requestVerifyEmail();
+  }, []);
+
+  const [isInitialLoading, setIsInitialLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const [message, setMessage] = React.useState<{ text: string; type: 'success' | 'error' }>();
+  const disabled = isInitialLoading || isLoading || isLoadingProvider;
+
+  const [count, { startCountdown, resetCountdown }, isCountdownRunning] =
+    useCountdown({
+      countStart: 30,
+      intervalMs: 1000,
+    });
+
+  function requestVerifyEmail() {
+    if (!email) return;
+
+    void authClient.sendVerificationEmail(
+      {
+        email,
+        callbackURL: `${env.EXPO_PUBLIC_BETTER_AUTH_URL}/verify-email/token`,
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+          setMessage(undefined);
+        },
+        onResponse: () => {
+          setIsInitialLoading(false);
+          setIsLoading(false);
+          resetCountdown();
+          startCountdown();
+        },
+        onSuccess: () => {
+          setMessage({
+            text: `We've sent an email to ${email}. Follow the link to verify your email address.`,
+            type: 'success',
+          });
+        },
+        onError: (ctx) => {
+          setMessage({ text: ctx.error.message, type: 'error' });
+        },
+      },
+    );
+  }
 
   const handleResendEmail = () => {
-    console.log('Resend verification email');
-    // TODO: Implement resend logic
+    requestVerifyEmail();
   };
 
   return (
@@ -48,22 +108,55 @@ export default function VerifyEmailScreen() {
           </CardHeader>
           <CardContent>
             <View className="gap-6">
+              {/* Message Display */}
+              {message && (
+                <View className={`rounded-lg p-4 ${message.type === 'success' ? 'bg-green-500/10' : 'bg-destructive/10'}`}>
+                  <Text className={`text-sm text-center ${message.type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+                    {message.text}
+                  </Text>
+                </View>
+              )}
+
               {/* Email Sent Info */}
               <View className="bg-muted rounded-lg p-4">
                 <Text className="text-sm font-medium text-center">
-                  example@email.com
+                  {email || 'your email'}
                 </Text>
               </View>
 
               {/* Resend Button */}
-              <Button variant="outline" className="w-full" onPress={handleResendEmail}>
-                <Text>Resend Verification Email</Text>
-              </Button>
+              {isInitialLoading ? (
+                <View className="h-10 items-center justify-center">
+                  <ActivityIndicator size="large" />
+                </View>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onPress={handleResendEmail}
+                  disabled={disabled || isCountdownRunning}
+                >
+                  {isLoading ? (
+                    <View className="flex-row items-center gap-2">
+                      <ActivityIndicator size="small" />
+                      <Text>Sending...</Text>
+                    </View>
+                  ) : isCountdownRunning ? (
+                    <Text>Resend after {count}s</Text>
+                  ) : (
+                    <Text>Resend Verification Email</Text>
+                  )}
+                </Button>
+              )}
 
               {/* Alternative Sign In Methods */}
               <View className="gap-6">
                 <AnotherMethodSeparator text='Or use another method' />
-                <ContinueWithGoogleButton />
+                <ContinueWithGoogleButton
+                  // TODO
+                  // disabled={disabled}
+                  // setIsLoadingProvider={setIsLoadingProvider}
+                />
               </View>
 
               {/* Help Text */}
@@ -79,7 +172,7 @@ export default function VerifyEmailScreen() {
                   Wrong email?{' '}
                 </Text>
                 <Link href="/auth/sign-in" asChild>
-                  <Text className="text-sm font-medium">Go back</Text>
+                  <Text className="text-sm font-medium text-primary">Go back</Text>
                 </Link>
               </View>
             </View>
