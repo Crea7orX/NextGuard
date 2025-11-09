@@ -214,7 +214,7 @@ export default function SignUpForm({
           <Text className="text-center text-sm">
             Already have an account?{" "}
             <Link href="/auth/sign-in">
-              <Text className="text-sm font-medium text-primary underline">Sign in</Text>
+              <Text className="text-sm font-semibold text-primary underline">Sign in</Text>
             </Link>
           </Text>
         </View>

@@ -172,7 +172,7 @@ export default function VerifyEmailScreen() {
                   Wrong email?{' '}
                 </Text>
                 <Link href="/auth/sign-in" asChild>
-                  <Text className="text-sm font-medium text-primary">Go back</Text>
+                  <Text className="text-sm font-semibold text-primary">Go back</Text>
                 </Link>
               </View>
             </View>

@@ -140,12 +140,9 @@ export default function SignInForm({
         </View>
         <View>
         <Text className="text-center text-sm">
-          Don&apos;t have an account?
-          <Link
-            href={`/auth/sign-up`}
-            className="underline underline-offset-4"
-          >
-            Sign up
+          Don&apos;t have an account?{" "}
+          <Link href={`/auth/sign-up`}>
+             <Text className="text-sm font-semibold text-primary underline">Sign Up</Text>
           </Link>
         </Text>
         </View>
