@@ -2,17 +2,19 @@ import { Text } from '@/components/ui/text';
 import { View, ScrollView, Pressable } from 'react-native';
 import ThemeSwitch from '@/components/settings/theme-switch';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ProfileCard } from '@/components/account/profile-card';
+import { ProfileCard, SignOutButton } from '@/components/account';
 import DeveloperModeToggle from '@/components/settings/developer-mode-toggle';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useState, useRef } from 'react';
 import Constants from 'expo-constants';
 import { useColorScheme } from 'nativewind';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function MoreScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
   const { enableDeveloperMode } = useDeveloperMode();
+  const { user } = useAuth();
   const [tapCount, setTapCount] = useState(0);
   const tapTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -49,14 +51,13 @@ export default function MoreScreen() {
       contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + 16 }}
     >
       <ProfileCard
-        name="Dimitar"
-        username="mitko8009"
-        email="dgd@pishkisoriz.com"
-        initials="DM"
+        name={user?.name || "Guest"}
+        email={user?.email || "No email"}
+        initials={user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || "G"}
         onAccountDetailsPress={() => console.log('Account details pressed')}
       />
 
-      <View className="w-full px-4">
+      <View className="w-full px-4 gap-4">
         <ThemeSwitch label="Dark mode" />
       </View>
 

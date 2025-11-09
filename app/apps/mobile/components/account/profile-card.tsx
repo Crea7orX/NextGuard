@@ -3,6 +3,8 @@ import { View, Pressable, Animated, Platform, UIManager, Easing, useColorScheme 
 import { UserCircle, ChevronDown } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { useState, useRef, useEffect } from 'react';
+import { SignOutButton } from './sign-out-button';
+import { useAuth } from "@/hooks/useAuth";
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -10,14 +12,14 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 interface ProfileCardProps {
   name: string;
-  username: string;
   email: string;
   initials: string;
   onAccountDetailsPress?: () => void;
 }
 
-export function ProfileCard({ name, username, email, initials, onAccountDetailsPress }: ProfileCardProps) {
+export function ProfileCard({ name, email, initials, onAccountDetailsPress }: ProfileCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { isAuthenticated } = useAuth();
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const heightAnim = useRef(new Animated.Value(0)).current;
 
@@ -58,7 +60,7 @@ export function ProfileCard({ name, username, email, initials, onAccountDetailsP
           <Text className="text-xl font-bold text-primary-foreground">{initials}</Text>
         </View>
         <View className="ml-4 flex-1">
-          <Text className="text-xl font-bold">{name} "{username}"</Text>
+          <Text className="text-xl font-bold">{name}</Text>
           <Text className="text-sm text-muted-foreground">{email}</Text>
         </View>
         <Animated.View style={{ transform: [{ rotate: rotation }] }}>
@@ -66,8 +68,8 @@ export function ProfileCard({ name, username, email, initials, onAccountDetailsP
         </Animated.View>
       </Pressable>
       
-      <Animated.View style={{ maxHeight, overflow: 'hidden' }}>
-        <View className="my-4 h-px bg-border" />
+      <Animated.View style={{ maxHeight, overflow: 'hidden' }} className="gap-3">
+        <View className="mt-4 h-px bg-border" />
         
         <Pressable 
           className="flex-row items-center justify-center gap-1 rounded-md bg-primary px-4 py-3 active:opacity-80"
@@ -78,6 +80,10 @@ export function ProfileCard({ name, username, email, initials, onAccountDetailsP
             Account Details
           </Text>
         </Pressable>
+
+        {isAuthenticated && (
+          <SignOutButton className="w-full" variant='outline' />
+        )}
       </Animated.View>
     </View>
   );

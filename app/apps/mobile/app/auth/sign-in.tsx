@@ -60,6 +60,8 @@ export default function SignInForm({
         onSuccess: () => {
           setIsLoading(false);
           console.log("Signed in successfully");
+          // Navigation to protected routes is handled by AuthProvider
+          router.replace("/(tabs)");
         },
       });
     },
