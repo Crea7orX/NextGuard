@@ -4,7 +4,7 @@ import { Text } from '@/components/ui/text';
 import { useRouter } from 'expo-router';
 import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import DeveloperModeToggle from '../../components/settings/developer-mode-toggle';
+import DeveloperModeToggle from '@/components/settings/developer-mode-toggle';
 
 interface StorageItem {
   key: string;

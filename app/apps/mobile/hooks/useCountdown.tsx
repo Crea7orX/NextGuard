@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 
-import { useBoolean } from "./useBoolean";
-import { useCounter } from "./useCounter";
-import { useInterval } from "./useInterval";
+import { useBoolean } from "@/hooks/useBoolean";
+import { useCounter } from "@/hooks/useCounter";
+import { useInterval } from "@/hooks/useInterval";
 
 type CountdownOptions = {
   countStart: number;

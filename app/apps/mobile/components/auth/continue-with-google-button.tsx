@@ -1,7 +1,9 @@
 import { Text } from '@/components/ui/text';
 import { Pressable, View } from 'react-native';
 import GoogleIcon from '@/assets/icons/google.svg';
-import { Icon } from '../ui/icon';
+import { Icon } from '@/components/ui/icon';
+import { authClient } from '@/lib/auth-client';
+import React from 'react';
 
 interface ContinueWithGoogleProps {
   onPress?: () => void;
