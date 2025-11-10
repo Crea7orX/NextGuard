@@ -50,9 +50,6 @@ export default function MoreScreen() {
       contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + 16 }}
     >
       <ProfileCard
-        name={user?.name || "Guest"}
-        email={user?.email || "No email"}
-        initials={user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || "G"}
         onAccountDetailsPress={() => console.log('Account details pressed')}
       />
 
@@ -71,7 +68,7 @@ export default function MoreScreen() {
       <Pressable
         onPress={handleVersionTap}
         className="items-center py-6"
-        style={{ opacity: tapCount > 0 ? 0.6 : 1 }}
+        style={{ opacity: tapCount > 3 ? 0.6 : 1 }}
       >
         <Text className="text-sm font-semibold" style={{ color: textColor }}>
           {appName}

@@ -1,9 +1,9 @@
 import { Text } from '@/components/ui/text';
-import { View, Pressable, Animated, Platform, UIManager, Easing, useColorScheme } from 'react-native';
+import { View, Pressable, Animated, Platform, UIManager, Easing } from 'react-native';
 import { UserCircle, ChevronDown } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { useState, useRef, useEffect } from 'react';
-import { SignOutButton } from './sign-out-button';
+import { SignOutButton, AccountDetailsButton } from '@/components/account'
 import { useAuth } from "@/hooks/useAuth";
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -11,17 +11,24 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 interface ProfileCardProps {
-  name: string;
-  email: string;
-  initials: string;
+  showSignOutButton?: boolean;
+  showAccountDetailsButton?: boolean;
   onAccountDetailsPress?: () => void;
 }
 
-export function ProfileCard({ name, email, initials, onAccountDetailsPress }: ProfileCardProps) {
+export function ProfileCard({
+  showSignOutButton = true,
+  showAccountDetailsButton = true,
+  onAccountDetailsPress
+}: ProfileCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const heightAnim = useRef(new Animated.Value(0)).current;
+
+  const name = user?.name || "Guest";
+  const email = user?.email || "No email";
+  const initials = user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || "G";
 
   useEffect(() => {
     Animated.parallel([
@@ -71,17 +78,15 @@ export function ProfileCard({ name, email, initials, onAccountDetailsPress }: Pr
       <Animated.View style={{ maxHeight, overflow: 'hidden' }} className="gap-3">
         <View className="mt-4 h-px bg-border" />
         
-        <Pressable 
-          className="flex-row items-center justify-center gap-1 rounded-md bg-primary px-4 py-3 active:opacity-80"
-          onPress={onAccountDetailsPress}
-        >
-          <Icon as={UserCircle} className='text-primary-foreground size-4' />
-          <Text className="text-sm font-semibold text-primary-foreground">
-            Account Details
-          </Text>
-        </Pressable>
+        {showAccountDetailsButton && (
+          <AccountDetailsButton 
+            variant='default'
+            size='default'
+            onPress={() => onAccountDetailsPress?.()}
+          />
+        )}
 
-        {isAuthenticated && (
+        {isAuthenticated && showSignOutButton && (
           <SignOutButton className="w-full" variant='outline' />
         )}
       </Animated.View>
