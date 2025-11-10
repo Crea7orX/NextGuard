@@ -78,16 +78,18 @@ export function ProfileCard({
       <Animated.View style={{ maxHeight, overflow: 'hidden' }} className="gap-3">
         <View className="mt-4 h-px bg-border" />
         
-        {showAccountDetailsButton && (
+        {isAuthenticated && showAccountDetailsButton && (
           <AccountDetailsButton 
-            variant='default'
-            size='default'
+            className='w-full'
             onPress={() => onAccountDetailsPress?.()}
           />
         )}
 
         {isAuthenticated && showSignOutButton && (
-          <SignOutButton className="w-full" variant='outline' />
+          <SignOutButton
+            className="w-full"
+            variant='outline'
+          />
         )}
       </Animated.View>
     </View>

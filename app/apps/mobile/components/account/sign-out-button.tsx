@@ -8,7 +8,7 @@ import { authClient } from '@/lib/auth-client';
 
 interface SignOutButtonProps {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-  size?: 'default' | 'sm' | 'lg' | 'icon';
+  size?: 'default' | 'sm' | 'lg' ;
   className?: string;
   showConfirmation?: boolean;
   confirmationTitle?: string;
@@ -119,10 +119,10 @@ export function SignOutButton({
       {showIcon && (
         <Icon 
           as={LogOut} 
-          className={variant === 'destructive' ? 'text-destructive-foreground' : undefined}
+          className={variant !== 'default' ? 'text-primary' : "text-primary-foreground"}
         />
       )}
-      <Text className={variant === 'destructive' ? 'text-destructive-foreground' : undefined}>
+      <Text className={variant !== 'default' ? 'text-primary' : undefined}>
         {isSigningOut ? loadingText : text}
       </Text>
     </Button>
