@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import BackButton from '@/components/ui/back-button';
 
 interface StorageItem {
 	key: string;
@@ -82,6 +83,11 @@ export default function StorageToolScreen() {
 			}}
 		>
 			<View className="gap-3">
+				<View className='flex-row gap-2 items-center'>
+					<BackButton />
+					<Text className="text-2xl font-bold text-foreground">Storage Inspector</Text>
+				</View>
+
 				<Button onPress={inspectStorage} disabled={isLoading}>
 					<Text>{isLoading ? 'Loading...' : 'Inspect Storage'}</Text>
 				</Button>

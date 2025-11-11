@@ -12,6 +12,7 @@ import React from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Link, useRouter } from "expo-router";
+import BackButton from "@/components/ui/back-button";
 
 export default function SignUpForm({
   className,
@@ -74,6 +75,7 @@ export default function SignUpForm({
       }}
     >
       <View className="w-full max-w-md mx-auto">
+        <BackButton className="absolute left-1 top-1" />
         <BrandSection />
         <View className={cn("grid gap-6", className)} {...props}>
           <ContinueWithGoogleButton

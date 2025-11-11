@@ -13,6 +13,7 @@ import { Bell, BellOff } from "lucide-react-native";
 import { Icon } from "@/components/ui/icon";
 import { CopyButton } from "@/components/ui/copy-button";
 import { useState, useEffect } from "react";
+import BackButton from "@/components/ui/back-button";
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
@@ -60,7 +61,10 @@ export default function NotificationsScreen() {
       }}
     >
       <View className="gap-4">
-        <Text className="text-2xl font-bold">Notifications</Text>
+        <View className='flex-row gap-2 items-center'>
+          <BackButton />
+          <Text className="text-2xl font-bold text-foreground">Notification Manager</Text>
+        </View>
 
         {expoPushToken && (
           <Card className="p-6 pt-4 gap-0">
