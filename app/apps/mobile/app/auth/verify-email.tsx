@@ -154,8 +154,8 @@ export default function VerifyEmailScreen() {
                 <AnotherMethodSeparator text='Or use another method' />
                 <ContinueWithGoogleButton
                   // TODO
-                  // disabled={disabled}
-                  // setIsLoadingProvider={setIsLoadingProvider}
+                  disabled={disabled}
+                  setIsLoadingProvider={setIsLoadingProvider}
                 />
               </View>
 

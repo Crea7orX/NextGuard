@@ -70,8 +70,8 @@ export default function SignInForm({
 
   return (
     <KeyboardAvoidingScrollView
-      className="flex-1 bg-background"
-      contentContainerStyle={{ 
+      className="bg-background flex-1"
+      contentContainerStyle={{
         paddingTop: insets.top + 20,
         paddingBottom: insets.bottom + 20,
         paddingHorizontal: 16,
@@ -82,9 +82,9 @@ export default function SignInForm({
         <BrandSection />
         <View className={cn("grid gap-6", className)} {...props}>
           <ContinueWithGoogleButton
-          // TODO
-          // disabled={disabled}
-          // setIsLoadingProvider={setIsLoadingProvider}
+            // TODO
+            disabled={disabled}
+            setIsLoadingProvider={setIsLoadingProvider}
           />
           <AnotherMethodSeparator text="Or continue with" />
           <View className="grid gap-6">
