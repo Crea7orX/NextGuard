@@ -1,5 +1,4 @@
-import { AnotherMethodSeparator } from "@/components/auth/another-method-separator";
-import { ContinueWithGoogleButton } from "@/components/auth/continue-with-google-button";
+import { ContinueWithGoogleButton, AnotherMethodSeparator, BrandSection } from "@/components/auth";
 import { KeyboardAvoidingScrollView } from "@/components/ui/keyboard-avoiding-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from "@/components/ui/button";
@@ -79,77 +78,79 @@ export default function SignInForm({
         flexGrow: 1,
       }}
     >
-      <View className={cn("grid gap-6", className)} {...props}>
-        <ContinueWithGoogleButton
-        // TODO
-        // disabled={disabled}
-        // setIsLoadingProvider={setIsLoadingProvider}
-        />
-        <AnotherMethodSeparator text="Or continue with" />
-        <View className="grid gap-6">
-          <form.Field
-            name="email"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                  <Input
-                    id={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.nativeEvent.text)}
-                    aria-invalid={isInvalid}
-                    placeholder="Enter your email address"
-                    autoComplete="email"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
+      <View className="w-full max-w-md mx-auto">
+        <BrandSection />
+        <View className={cn("grid gap-6", className)} {...props}>
+          <ContinueWithGoogleButton
+          // TODO
+          // disabled={disabled}
+          // setIsLoadingProvider={setIsLoadingProvider}
           />
-          <form.Field
-            name="password"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                  <Input
-                    id={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.nativeEvent.text)}
-                    aria-invalid={isInvalid}
-                    placeholder="Enter your password"
-                    autoComplete="password"
-                    secureTextEntry={true}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-          <Button
-            className="w-full"
-            onPress={() => form.handleSubmit()}
-            disabled={disabled}
-          >
-            <Text className="text-primary-foreground">Sign In</Text>
-          </Button>
-        </View>
-        <View>
-        <Text className="text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href={`/auth/sign-up`}>
-             <Text className="text-sm font-semibold text-primary underline">Sign Up</Text>
-          </Link>
-        </Text>
+          <AnotherMethodSeparator text="Or continue with" />
+          <View className="grid gap-6">
+            <form.Field
+              name="email"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                      aria-invalid={isInvalid}
+                      placeholder="Enter your email address"
+                      autoComplete="email"
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="password"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                      aria-invalid={isInvalid}
+                      placeholder="Enter your password"
+                      autoComplete="password"
+                      secureTextEntry={true}
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            />
+            <Button
+              className="w-full"
+              onPress={() => form.handleSubmit()}
+              disabled={disabled}
+            >
+              <Text className="text-primary-foreground">Sign In</Text>
+            </Button>
+          </View>
+          <View>
+          <Text className="text-center text-sm">
+            Don&apos;t have an account?{" "}
+            <Link href={`/auth/sign-up`}>
+              <Text className="text-sm font-semibold text-primary underline">Sign Up</Text>
+            </Link>
+          </Text>
+          </View>
         </View>
       </View>
-      
     </KeyboardAvoidingScrollView>
   );
 }

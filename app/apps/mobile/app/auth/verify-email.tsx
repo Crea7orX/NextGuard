@@ -4,7 +4,7 @@ import { Text } from '@/components/ui/text';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Mail, Loader2 } from 'lucide-react-native';
+import { Mail } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { AnotherMethodSeparator } from '@/components/auth/another-method-separator';
 import { ContinueWithGoogleButton } from '@/components/auth/continue-with-google-button';
