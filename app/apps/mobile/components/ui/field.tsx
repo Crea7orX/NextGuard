@@ -188,7 +188,7 @@ function FieldError({
         {uniqueErrors.map(
           (error, index) =>
             error?.message && (
-              <Text key={index} className="text-sm">
+              <Text key={index} className="text-destructive text-sm">
                 • {error.message}
               </Text>
             )
