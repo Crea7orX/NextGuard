@@ -10,9 +10,11 @@ type ThemeOption = 'light' | 'dark' | 'system';
 
 type Props = {
   label?: string;
+  variant?: 'default' | 'compact';
+  className?: string;
 };
 
-export default function ThemeSwitch({ label = 'Appearance' }: Props) {
+export default function ThemeSwitch({ label = 'Appearance', variant = 'default', className }: Props) {
   const { colorScheme, setColorScheme } = useColorScheme() as {
     colorScheme?: 'light' | 'dark';
     setColorScheme?: (s: 'light' | 'dark' | 'system') => void;
@@ -50,12 +52,40 @@ export default function ThemeSwitch({ label = 'Appearance' }: Props) {
     }
   };
 
-  const iconSize = 20;
+  const cycleTheme = () => {
+    const themeOrder: ThemeOption[] = ['light', 'dark', 'system'];
+    const currentIndex = themeOrder.indexOf(selectedTheme);
+    const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
+    handleThemeChange(nextTheme);
+  };
+
+  const iconSize = variant === 'compact' ? 20 : 20;
   const currentScheme = colorScheme ?? 'light';
   const iconColor = currentScheme === 'dark' ? '#fafafa' : '#18181b';
 
+  if (variant === 'compact') {
+    const CompactIcon = 
+      selectedTheme === 'light' ? Sun : 
+      selectedTheme === 'dark' ? Moon : 
+      Monitor;
+
+    return (
+      <Pressable
+        style={[
+          styles.compactButton,
+          { backgroundColor: currentScheme === 'dark' ? '#27272a' : '#f4f4f5' }
+        ]}
+        className={className}
+        onPress={cycleTheme}
+      >
+        <CompactIcon size={iconSize} color={iconColor} />
+      </Pressable>
+    );
+  }
+
+  // Default variant - full options
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className={className}>
       <Text style={[styles.label, { color: iconColor }]}>{label}</Text>
       <View style={styles.optionsRow}>
         <Pressable
@@ -168,5 +198,12 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 13,
     fontWeight: '500',
+  },
+  compactButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

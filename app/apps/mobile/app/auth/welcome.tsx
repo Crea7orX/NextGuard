@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { Check } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
+import ThemeSwitch from '@/components/settings/theme-switch';
 
 const LOGO = {
   light: require('@/assets/images/react-native-reusables-light.png'),
@@ -32,6 +33,7 @@ export default function WelcomeScreen() {
       }}
     >
       <View className="flex-1 items-center justify-center gap-12 px-6">
+      <ThemeSwitch variant="compact" className="absolute top-4 right-4" />
         {/* Logo Section */}
         <View className="items-center gap-6">
           <Image 
