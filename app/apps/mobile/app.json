@@ -18,7 +18,10 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "net.nextguard"
+      "bundleIdentifier": "net.nextguard",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "NextGuard uses Face ID to securely unlock the app and authenticate your identity."
+      }
     },
     "android": {
       "edgeToEdgeEnabled": true,
@@ -32,7 +35,9 @@
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.INTERNET",
         "android.permission.RECEIVE_BOOT_COMPLETED",
-        "android.permission.VIBRATE"
+        "android.permission.VIBRATE",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
       ]
     },
     "web": {
@@ -47,6 +52,12 @@
         "expo-secure-store",
         {
           "configureAndroidBackup": true
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "NextGuard uses Face ID to securely unlock the app and authenticate your identity."
         }
       ]
     ],

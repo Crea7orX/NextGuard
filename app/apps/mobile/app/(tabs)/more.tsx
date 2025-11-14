@@ -1,6 +1,7 @@
 import { Text } from '@/components/ui/text';
 import { View, ScrollView, Pressable } from 'react-native';
 import ThemeSwitch from '@/components/settings/theme-switch';
+import BiometricSwitch from '@/components/settings/biometric-switch';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ProfileCard } from '@/components/account';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
@@ -54,7 +55,12 @@ export default function MoreScreen() {
       />
 
       <View className="w-full px-4 gap-4">
-        <ThemeSwitch label="Dark mode" />
+        <View className="bg-card rounded-lg border border-border">
+          <BiometricSwitch />
+        </View>
+        <View className="bg-card rounded-lg border border-border">
+          <ThemeSwitch label="Appearance" />
+        </View>
       </View>
 
       <View className="flex-1 items-center justify-center p-4">

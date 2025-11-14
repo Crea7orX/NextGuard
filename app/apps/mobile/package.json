@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "npx expo start --android --dev-client",
+    "dev": "npx expo start",
     "android": "npx expo start --android",
     "ios": "npx expo start --ios",
     "web": "npx expo start --web",
@@ -51,6 +51,7 @@
     "expo-constants": "^18.0.10",
     "expo-device": "~8.0.9",
     "expo-linking": "~8.0.8",
+    "expo-local-authentication": "^17.0.7",
     "expo-notifications": "~0.32.12",
     "expo-router": "~6.0.10",
     "expo-secure-store": "~15.0.7",
