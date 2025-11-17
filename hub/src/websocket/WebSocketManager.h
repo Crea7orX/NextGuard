@@ -39,6 +39,7 @@ private:
     void handleAdoptAck(JsonDocument& doc);
     void handleDiscoveryAck(JsonDocument& doc);
     void handleWsEnableNodeAdoption(JsonDocument& doc);
+    void handleWsSendMessageToNode(JsonDocument& doc);
     void sendTimestamp();
     void sendHello();
     void sendSession();

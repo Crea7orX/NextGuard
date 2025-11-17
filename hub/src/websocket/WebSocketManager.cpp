@@ -137,6 +137,11 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
                 handleWsEnableNodeAdoption(doc);
                 return;
             }
+
+            if (strcmp(type, "ws_send_message_to_node") == 0) {
+                handleWsSendMessageToNode(doc);
+                return;
+            }
             break;
         }
             
@@ -370,6 +375,40 @@ void WebSocketManager::handleWsEnableNodeAdoption(JsonDocument& doc) {
 
     // Enable adoption for the node
     loRaManager->enableAdoptionMode(nodeUuid);
+}
+
+void WebSocketManager::handleWsSendMessageToNode(JsonDocument& doc) {
+    logger->info("Processing WS_SEND_MESSAGE_TO_NODE...");
+
+    // Verify the message
+    if (!secureMsg->verifyMessage(doc)) {
+        logger->error("WS_SEND_MESSAGE_TO_NODE verification failed");
+        return;
+    }
+
+    if (!doc["payload"]["serial_id"] || !doc["payload"]["message"]) {
+        logger->error("Invalid WS_SEND_MESSAGE_TO_NODE payload");
+        return;
+    }
+
+    // Convert UUID string to byte array
+    String serialIdStr = doc["payload"]["serial_id"].as<String>();
+    String message = doc["payload"]["message"].as<String>();
+    uint8_t nodeUuid[16];
+
+    if (!Utils::stringToUUID(serialIdStr, nodeUuid)) {
+        logger->error("Invalid UUID format: " + serialIdStr);
+        return;
+    }
+
+    // Send message to the node
+    if (loRaManager) {
+        if (loRaManager->sendCommandByUUID(nodeUuid, message.c_str())) {
+            logger->info("message sent to node: " + serialIdStr);
+        } else {
+            logger->error("Failed to send message to node: " + serialIdStr);
+        }
+    }
 }
 
 void WebSocketManager::sendTimestamp() {
