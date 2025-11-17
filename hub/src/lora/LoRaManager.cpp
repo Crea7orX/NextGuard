@@ -1,12 +1,13 @@
 #include "LoRaManager.h"
 #include <websocket/WebSocketManager.h>
 
-LoRaManager::LoRaManager() : adoptionMode(false), adoptionStartTime(0) {
+LoRaManager::LoRaManager() : adoptionStartTime(0), hasPendingNode(false) {
     logger = nullptr;
     nodeManager = nullptr;
     wsManager = nullptr;
     memset(hubPrivKey, 0, sizeof(hubPrivKey));
     memset(hubPubKey, 0, sizeof(hubPubKey));
+    memset(pendingAdoptionNodeId, 0, sizeof(pendingAdoptionNodeId));
 }
 
 void LoRaManager::begin(Logger* loggerInstance, NodeManager* nodeManagerInstance, WebSocketManager* wsManagerInstance, long frequency) {
@@ -35,7 +36,7 @@ void LoRaManager::begin(Logger* loggerInstance, NodeManager* nodeManagerInstance
 
 void LoRaManager::process() {
     // Check for adoption timeout
-    if (adoptionMode && (millis() - adoptionStartTime > ADOPTION_TIMEOUT)) {
+    if (hasPendingNode && (millis() - adoptionStartTime > ADOPTION_TIMEOUT)) {
         disableAdoptionMode();
     }
     
@@ -109,8 +110,14 @@ void LoRaManager::handleAdoptionRequest(const uint8_t* payload, size_t len) {
     
     logger->info("Adoption request from node UUID: " + Utils::uuidToString(nodeId));
     
-    if (!adoptionMode) {
+    if (!hasPendingNode) {
         logger->warning("Not in adoption mode - ignoring");
+        return;
+    }
+    
+    // Check if this node is the one we're expecting to adopt
+    if (memcmp(nodeId, pendingAdoptionNodeId, UUID_SIZE) != 0) {
+        logger->warning("Adoption request from unexpected node - ignoring. Expected: " + Utils::uuidToString(pendingAdoptionNodeId));
         return;
     }
     
@@ -140,6 +147,21 @@ void LoRaManager::handleAdoptionRequest(const uint8_t* payload, size_t len) {
     
     if (RadioManager::sendPacket(response, sizeof(response))) {
         logger->info("Adoption response sent");
+
+        // Clear pending adoption
+        hasPendingNode = false;
+        memset(pendingAdoptionNodeId, 0, sizeof(pendingAdoptionNodeId));
+
+        // Disable adoption mode after successful adoption
+        disableAdoptionMode();
+        
+        // Send info to server
+        DynamicJsonDocument discoveryDoc(1024);
+
+        discoveryDoc["serialId"] = Utils::uuidToString(nodeId);
+        discoveryDoc["sharedSecret"] = Utils::toHexString(sharedSecret, SHARED_SECRET_SIZE);
+
+        wsManager->sendMessage("hub_node_adoption", discoveryDoc);
     } else {
         logger->error("Failed to send adoption response");
     }
@@ -243,26 +265,31 @@ void LoRaManager::handleEncryptedData(const uint8_t* payload, size_t len) {
     
     logger->info("Decrypted message from node UUID: " + Utils::uuidToString(nodeId) + ", counter: " + String(counter));
     
-    logger->info("Data: " + Utils::toHexString(plaintext, plaintextLen));
-    // Serial.print("[LORA_MGR] Data: ");
-    // for (size_t i = 0; i < plaintextLen; i++) {
-    //     Serial.write(plaintext[i]);
-    // }
-    // Serial.println();
+    // logger->info("Data: " + Utils::toHexString(plaintext, plaintextLen));
+    Serial.print("[LORA_MGR] Data: ");
+    for (size_t i = 0; i < plaintextLen; i++) {
+        Serial.write(plaintext[i]);
+    }
+    Serial.println();
 }
 
 // TODO: Implement down functions
 
-void LoRaManager::enableAdoptionMode(unsigned long duration) {
-    adoptionMode = true;
+void LoRaManager::enableAdoptionMode(const uint8_t* nodeId, unsigned long duration) {
     adoptionStartTime = millis();
+    hasPendingNode = true;
+    memcpy(pendingAdoptionNodeId, nodeId, UUID_SIZE);
+    
     Serial.print("[LORA_MGR] *** ADOPTION MODE ACTIVE FOR ");
     Serial.print(duration / 1000);
-    Serial.println(" SECONDS ***");
+    Serial.print(" SECONDS FOR NODE: ");
+    ProtocolUtils::printUUID(nodeId);
+    Serial.println(" ***");
 }
 
 void LoRaManager::disableAdoptionMode() {
-    adoptionMode = false;
+    hasPendingNode = false;
+    memset(pendingAdoptionNodeId, 0, sizeof(pendingAdoptionNodeId));
     Serial.println("[LORA_MGR] Adoption mode ended");
 }
 
@@ -366,5 +393,11 @@ void LoRaManager::printStatus() {
     }
     
     Serial.print("Adoption mode: ");
-    Serial.println(adoptionMode ? "ENABLED" : "disabled");
+    Serial.println(hasPendingNode ? "ENABLED" : "disabled");
+    
+    if (hasPendingNode) {
+        Serial.print("Pending node: ");
+        ProtocolUtils::printUUID(pendingAdoptionNodeId);
+        Serial.println();
+    }
 }

@@ -27,8 +27,9 @@ private:
     uint8_t hubPubKey[ECC_PUBLIC_KEY_SIZE];
     
     // Adoption state
-    bool adoptionMode;
     unsigned long adoptionStartTime;
+    uint8_t pendingAdoptionNodeId[UUID_SIZE];
+    bool hasPendingNode;
     
     // Message handlers
     void handleDiscovery(const uint8_t* payload, size_t len, int rssi, float snr);
@@ -46,9 +47,9 @@ public:
     void process();
     
     // Adoption management
-    void enableAdoptionMode(unsigned long duration = ADOPTION_TIMEOUT);
+    void enableAdoptionMode(const uint8_t* nodeId, unsigned long duration = ADOPTION_TIMEOUT);
     void disableAdoptionMode();
-    bool isAdoptionMode() { return adoptionMode; }
+    bool isAdoptionMode() { return hasPendingNode; }
     
     // Send command to node
     bool sendCommand(const uint8_t* nodeId, const char* command, uint8_t msgType = MSG_COMMAND);
