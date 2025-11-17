@@ -48,6 +48,7 @@ public:
     // Node list operations
     void printActiveNodes();
     void printDiscoveredNodes();
+    void clearNodes();
 };
 
 #endif // NODE_MANAGER_H

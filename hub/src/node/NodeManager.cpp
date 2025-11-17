@@ -253,3 +253,18 @@ void NodeManager::printDiscoveredNodes() {
         logger->info("  (none)");
     }
 }
+
+void NodeManager::clearNodes() {
+    // Clear all active nodes
+    for (int i = 0; i < maxNodes; i++) {
+        nodes[i].active = false;
+        memset(nodes[i].nodeId, 0, UUID_SIZE);
+        memset(nodes[i].sessionKey, 0, SESSION_KEY_SIZE);
+        nodes[i].lastSeen = 0;
+        nodes[i].txCounter = 0;
+        nodes[i].rxCounter = 0;
+        nodes[i].lastRxCounter = 0xFFFFFFFF;
+    }
+    
+    logger->info("All nodes cleared, ready for restoration");
+}
