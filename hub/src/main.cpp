@@ -110,7 +110,7 @@ void setup() {
     
     // Initialize WebSocket
     logger.info("Initializing WebSocket...");
-    wsManager.begin(&logger, &storage, &secureMsg, &loraManager);
+    wsManager.begin(&logger, &storage, &secureMsg, &loraManager, &nodeManager);
     wsManager.setServer(SERVER_HOST, SERVER_PORT, WEBSOCKET_PATH, SERVER_USE_TLS);
     wsManager.connect();
     
@@ -147,7 +147,7 @@ void loop() {
     if (Serial.available()) {
         char cmd = Serial.read();
         if (cmd == 'a' || cmd == 'A') {
-            loraManager.enableAdoptionMode();
+            Serial.println("[HUB] Adoption mode must be enabled via server with specific node ID");
         } else if (cmd == 's' || cmd == 'S') {
             // Send command to node
             Serial.println("[HUB] Enter command (format: nodeIndex,command):");

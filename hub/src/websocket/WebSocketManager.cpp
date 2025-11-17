@@ -11,6 +11,7 @@ WebSocketManager::WebSocketManager() {
     storage = nullptr;
     secureMsg = nullptr;
     loRaManager = nullptr;
+    nodeManager = nullptr;
     isConnected = false;
     isAuthenticated = false;
     serverHost = "";
@@ -30,11 +31,13 @@ WebSocketManager::~WebSocketManager() {
 }
 
 void WebSocketManager::begin(Logger* loggerInstance, StorageManager* storageInstance,
-                             SecureMessage* secureMessage, LoRaManager* loRaManagerInstance) {
+                             SecureMessage* secureMessage, LoRaManager* loRaManagerInstance,
+                             NodeManager* nodeManagerInstance) {
     logger = loggerInstance;
     storage = storageInstance;
     secureMsg = secureMessage;
     loRaManager = loRaManagerInstance;
+    nodeManager = nodeManagerInstance;
     
     if (!WEBSOCKET_ENABLED) {
         if (logger) logger->info("WebSocket is disabled");
@@ -129,6 +132,11 @@ void WebSocketManager::onWebSocketEvent(WStype_t type, uint8_t* payload, size_t 
                 handleDiscoveryAck(doc);
                 return;
             }
+
+            if (strcmp(type, "ws_enable_node_adoption") == 0) {
+                handleWsEnableNodeAdoption(doc);
+                return;
+            }
             break;
         }
             
@@ -200,7 +208,7 @@ void WebSocketManager::handleHelloAck(JsonDocument& doc) {
 }
 
 void WebSocketManager::handleSessionAck(JsonDocument& doc) {
-    if (logger) logger->info("Processing SESSION_ACK...");
+    logger->info("Processing SESSION_ACK...");
     
     if (!secureMsg->verifyServerSignature(doc)) {
         return;
@@ -222,7 +230,7 @@ void WebSocketManager::handleSessionAck(JsonDocument& doc) {
     size_t infoLen = strlen(info);
     if (!CryptoManager::hkdfSha256(ikm, 32, salt, 16, 
                                    (const uint8_t*)info, infoLen, sessionKey)) {
-        if (logger) logger->error("HKDF failed");
+        logger->error("HKDF failed");
         return;
     }
     
@@ -233,15 +241,59 @@ void WebSocketManager::handleSessionAck(JsonDocument& doc) {
         secureMsg->setSeqOut(doc["seq0"].as<uint32_t>());
     }
     
-    if (logger) logger->info("Session key derived successfully");
+    logger->info("Session key derived successfully");
     
     // Send session_ack (protocol response)
     sendSessionAck();
     
     // For already adopted devices, directly set authenticated
-    if (storage && storage->isAdopted()) {
+    if (storage->isAdopted()) {
         isAuthenticated = true;
-        if (logger) logger->info("Session restored - device already adopted");
+        logger->info("Session restored - device already adopted");
+        
+        // Restore nodes from server response
+        if (doc.containsKey("payload") && doc["payload"].containsKey("nodes")) {
+            JsonArray nodesArray = doc["payload"]["nodes"].as<JsonArray>();
+            
+            // Clear all existing nodes first
+            nodeManager->clearNodes();
+            
+            logger->info("Restoring " + String(nodesArray.size()) + " nodes from server...");
+            
+            // Restore each node
+            for (JsonObject nodeObj : nodesArray) {
+                String serialIdStr = nodeObj["serialId"].as<String>();
+                String sharedSecretStr = nodeObj["sharedSecret"].as<String>();
+                
+                uint8_t nodeId[UUID_SIZE];
+                uint8_t sharedSecret[SHARED_SECRET_SIZE];
+                
+                // Convert serialId from string to bytes
+                if (!Utils::stringToUUID(serialIdStr, nodeId)) {
+                    logger->error("Invalid node UUID: " + serialIdStr);
+                    continue;
+                }
+                
+                // Convert sharedSecret from hex string to bytes
+                if (sharedSecretStr.length() != SHARED_SECRET_SIZE * 2) {
+                    logger->error("Invalid shared secret length for node: " + serialIdStr);
+                    continue;
+                }
+                
+                for (size_t i = 0; i < SHARED_SECRET_SIZE; i++) {
+                    String byteStr = sharedSecretStr.substring(i * 2, i * 2 + 2);
+                    sharedSecret[i] = (uint8_t)strtol(byteStr.c_str(), NULL, 16);
+                }
+                
+                // Derive session key from shared secret
+                uint8_t sessionKey[SESSION_KEY_SIZE];
+                SecurityUtils::deriveSessionKey(sharedSecret, sessionKey);
+                nodeManager->addNode(nodeId, sessionKey);
+                logger->info("Restored node: " + serialIdStr);
+            }
+            
+            logger->info("Node restoration complete");
+        }
     }
 }
 
@@ -291,6 +343,33 @@ void WebSocketManager::handleDiscoveryAck(JsonDocument& doc) {
     loRaManager->sendCommand(nodeUuid, "", MSG_DISCOVERY_ACK);
     
     logger->info("End device informed successfully!");
+}
+
+void WebSocketManager::handleWsEnableNodeAdoption(JsonDocument& doc) {
+    logger->info("Processing WS_ENABLE_NODE_ADOPTION...");
+
+    // Verify the message
+    if (!secureMsg->verifyMessage(doc)) {
+        logger->error("WS_ENABLE_NODE_ADOPTION verification failed");
+        return;
+    }
+
+    if (!doc["payload"]["serial_id"]) {
+        logger->error("Invalid WS_ENABLE_NODE_ADOPTION payload");
+        return;
+    }
+
+    // Convert UUID string to byte array
+    String serialIdStr = doc["payload"]["serial_id"].as<String>();
+    uint8_t nodeUuid[16];
+
+    if (!Utils::stringToUUID(serialIdStr, nodeUuid)) {
+        logger->error("Invalid UUID format: " + serialIdStr);
+        return;
+    }
+
+    // Enable adoption for the node
+    loRaManager->enableAdoptionMode(nodeUuid);
 }
 
 void WebSocketManager::sendTimestamp() {

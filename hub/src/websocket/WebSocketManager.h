@@ -10,6 +10,7 @@
 #include <storage/StorageManager.h>
 #include <crypto/CryptoManager.h>
 #include <secure/SecureMessage.h>
+#include <node/NodeManager.h>
 #include <utils/Utils.h>
 
 // Forward declaration to avoid circular dependency
@@ -23,6 +24,7 @@ private:
     StorageManager* storage;
     SecureMessage* secureMsg;
     LoRaManager* loRaManager;
+    NodeManager* nodeManager;
     bool isConnected;
     bool isAuthenticated;
     String serverHost;
@@ -36,6 +38,7 @@ private:
     void handleSessionAck(JsonDocument& doc);
     void handleAdoptAck(JsonDocument& doc);
     void handleDiscoveryAck(JsonDocument& doc);
+    void handleWsEnableNodeAdoption(JsonDocument& doc);
     void sendTimestamp();
     void sendHello();
     void sendSession();
@@ -47,7 +50,8 @@ public:
     ~WebSocketManager();
     
     void begin(Logger* loggerInstance, StorageManager* storageInstance,
-               SecureMessage* secureMessage, LoRaManager* loRaManagerInstance);
+               SecureMessage* secureMessage, LoRaManager* loRaManagerInstance,
+               NodeManager* nodeManagerInstance);
     void loop();
     bool connect();
     void disconnect();
