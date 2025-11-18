@@ -9,7 +9,7 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.url(),
     SERVER_SECRET_KEY: z.string(),
-    WEBSOCKET_SERVER: z.url().default("http://localhost:3000"),
+    WEBSOCKET_SERVER_URL: z.url(),
     WEBSOCKET_SECRET_KEY: z.string(),
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_URL: z.url().default("http://localhost:3000"),
@@ -43,7 +43,7 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     SERVER_SECRET_KEY: process.env.SERVER_SECRET_KEY,
-    WEBSOCKET_SERVER: process.env.WEBSOCKET_SERVER,
+    WEBSOCKET_SERVER_URL: process.env.WEBSOCKET_SERVER_URL,
     WEBSOCKET_SECRET_KEY: process.env.WEBSOCKET_SECRET_KEY,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
