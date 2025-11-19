@@ -34,6 +34,10 @@ export function createSession(
   return session;
 }
 
+export function getSession(deviceId: string) {
+  return sessions.get(deviceId);
+}
+
 export function updateSession(
   session: Session,
   sequence: number,
