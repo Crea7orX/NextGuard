@@ -1,5 +1,16 @@
 import type { DeviceTelemetrySchema } from "@repo/validations/websockets/devices";
-import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { deviceTypes } from "@repo/validations/websockets/devices";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  not,
+  sql,
+} from "drizzle-orm";
 import { NotFoundError } from "~/lib/errors";
 import type {
   DeviceSearchParams,
@@ -88,6 +99,26 @@ export async function getDeviceById({ id, ownerId }: getDeviceByIdProps) {
   return device;
 }
 
+interface getDevicesByTypeProps {
+  type: (typeof deviceTypes)[number];
+  ownerId: string;
+}
+
+export async function getDevicesByType({
+  type,
+  ownerId,
+}: getDevicesByTypeProps) {
+  return db
+    .select()
+    .from(devices)
+    .where(
+      and(
+        eq(devices.type, type),
+        eq(devices.ownerId, ownerId), // ownership
+      ),
+    );
+}
+
 interface updateDeviceByIdProps {
   id: string;
   ownerId: string;
@@ -138,6 +169,19 @@ export async function getDeviceBySerialId__unprotected({
     .limit(1);
 
   return device;
+}
+
+interface getDevicesNotByType__unprotectedProps {
+  notType: (typeof deviceTypes)[number];
+}
+
+export async function getDevicesNotByType__unprotected({
+  notType,
+}: getDevicesNotByType__unprotectedProps) {
+  return db
+    .select()
+    .from(devices)
+    .where(not(eq(devices.type, notType)));
 }
 
 interface setDeviceTelemetryBySerialId__unprotectedProps {
