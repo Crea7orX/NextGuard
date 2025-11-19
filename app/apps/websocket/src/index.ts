@@ -7,7 +7,9 @@ import {
   createWebSocketServer,
   setupWebSocketUpgrade,
 } from "~/http-server";
+import { adoptionRouter } from "~/routes/adoption";
 import { bootstrapRouter } from "~/routes/bootstrap";
+import { sendMessageToNodeRouter } from "~/routes/send_message_to_node";
 import { destorySession, type Session } from "~/sessions";
 
 const PORT = env.PORT;
@@ -16,6 +18,8 @@ export const SERVER_PUBLIC_KEY_PEM = env.SERVER_PUBLIC_KEY_PEM;
 
 const app = createApp();
 app.use(bootstrapRouter);
+app.use(adoptionRouter);
+app.use(sendMessageToNodeRouter);
 
 const httpServer = createHttpsServer(app);
 const wss = createWebSocketServer();
