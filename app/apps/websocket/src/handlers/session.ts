@@ -1,4 +1,4 @@
-import { deviceResponseSchema } from "@repo/validations/websockets/devices";
+import { deviceSessionResponseSchema } from "@repo/validations/websockets/devices";
 import type { WebSocket as WSWebSocket } from "ws";
 import { sendRequest } from "~/lib/requests";
 import { generateNonce, nowSec, signP256, verifyP256 } from "~/lib/utils";
@@ -31,7 +31,7 @@ export async function handleSession(ws: WSWebSocket, data: any) {
     throw new Error("Invalid response!");
   }
 
-  const device = deviceResponseSchema.safeParse(deviceResponse.data);
+  const device = deviceSessionResponseSchema.safeParse(deviceResponse.data);
   if (!device.success) {
     console.log("Invalid response!", device.error);
     throw new Error("Invalid response!");
@@ -69,6 +69,9 @@ export async function handleSession(ws: WSWebSocket, data: any) {
       salt: salt.toString("base64"),
     },
     ikm: ikm.toString("base64"),
+    payload: {
+      nodes: device.data.nodes,
+    },
   };
 
   const digest = Buffer.concat([
