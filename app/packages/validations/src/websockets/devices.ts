@@ -11,6 +11,17 @@ export const deviceResponseSchema = z.object({
 
 export type DeviceResponseSchema = z.infer<typeof deviceResponseSchema>;
 
+export const deviceSessionResponseSchema = deviceResponseSchema.extend({
+  nodes: z
+    .object({
+      serialId: z.string(),
+      sharedSecret: z.string(),
+    })
+    .array(),
+});
+
+export type DeviceSessionResponse = z.infer<typeof deviceSessionResponseSchema>;
+
 export const deviceTelemetrySchema = z.object({
   system: z.object({
     firmware: z.string(),
