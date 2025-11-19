@@ -1,9 +1,12 @@
-import { deviceResponseSchema } from "@repo/validations/websockets/devices";
+import { deviceSessionResponseSchema } from "@repo/validations/websockets/devices";
 import type { NextRequest } from "next/server";
 import { authenticateWSServer } from "~/lib/auth-utils";
 import { BadRequestError, handleError, NotFoundError } from "~/lib/errors";
 import { createSuccessResponse } from "~/lib/responses";
-import { getDeviceBySerialId__unprotected } from "~/server/db/queries/devices";
+import {
+  getDeviceBySerialId__unprotected,
+  getDevicesNotByType__unprotected,
+} from "~/server/db/queries/devices";
 
 interface Props {
   params: Promise<{
@@ -24,7 +27,20 @@ export async function GET(request: NextRequest, { params }: Props) {
     });
     if (!device) throw new NotFoundError();
 
-    return createSuccessResponse(deviceResponseSchema.parse(device));
+    const nodeDevices = await getDevicesNotByType__unprotected({
+      notType: "hub",
+    });
+    const nodes = [];
+    for (const node of nodeDevices) {
+      nodes.push({
+        serialId: node.serialId,
+        sharedSecret: node.publicKeyPem,
+      });
+    }
+
+    return createSuccessResponse(
+      deviceSessionResponseSchema.parse({ ...device, nodes }),
+    );
   } catch (error) {
     return handleError(error);
   }
