@@ -271,6 +271,19 @@ void LoRaManager::handleEncryptedData(const uint8_t* payload, size_t len) {
         Serial.write(plaintext[i]);
     }
     Serial.println();
+    
+    // Send message to server via WebSocket
+    DynamicJsonDocument msgDoc(512);
+    msgDoc["serialId"] = Utils::uuidToString(nodeId);
+    
+    // Convert plaintext to string
+    String message = "";
+    for (size_t i = 0; i < plaintextLen; i++) {
+        message += (char)plaintext[i];
+    }
+    msgDoc["message"] = message;
+    
+    wsManager->sendMessage("hub_message_from_node", msgDoc);
 }
 
 // TODO: Implement down functions
