@@ -1,3 +1,4 @@
+import type { NodeAdoption } from "@repo/validations/websockets/adoptions";
 import type { PendingDeviceDiscoverySchema } from "@repo/validations/websockets/pending-devices";
 import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { getDeviceTypeFromSerialId } from "~/lib/device-utils";
@@ -333,4 +334,30 @@ export async function discoverPendingDeviceBySerialId__unprotected({
   }
 
   return pendingDevice;
+}
+
+interface adoptNodeBySerialId__unprotected {
+  serialId: string;
+  adoption: NodeAdoption;
+}
+
+export async function adoptNodeBySerialId__unprotected({
+  serialId,
+  adoption,
+}: adoptNodeBySerialId__unprotected) {
+  const pendingDevice = await getPendingDeviceBySerialId__unprotected({
+    serialId,
+  });
+  if (pendingDevice?.state !== "pending_introduce") throw new ConflictError();
+
+  const [device] = await db
+    .update(pendingDevices)
+    .set({
+      state: "waiting_user_confirmation",
+      publicKeyPem: adoption.sharedSecret,
+    })
+    .where(eq(pendingDevices.serialId, serialId))
+    .returning();
+
+  return device;
 }
