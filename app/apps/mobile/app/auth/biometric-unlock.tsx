@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { Fingerprint, Scan, Lock } from 'lucide-react-native';
 import { useBiometrics } from '@/hooks/useBiometrics';
+import { useBiometricLock } from '@/providers/biometric-lock-provider';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/button';
 
@@ -37,6 +38,7 @@ import { Button } from '@/components/ui/button';
 export default function BiometricUnlockScreen() {
   const { colorScheme } = useColorScheme();
   const { isEnabled, capabilities, authenticate } = useBiometrics();
+  const { handleBiometricSuccess } = useBiometricLock();
   const router = useRouter();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -48,6 +50,10 @@ export default function BiometricUnlockScreen() {
     // Auto-trigger biometric authentication when the screen loads
     if (isEnabled && capabilities?.isAvailable) {
       handleBiometricAuth();
+    } else {
+      // If biometrics are disabled or not available, unlock immediately
+      handleBiometricSuccess();
+      router.replace('/(tabs)');
     }
   }, []);
 
@@ -57,6 +63,8 @@ export default function BiometricUnlockScreen() {
       const success = await authenticate('Authenticate to access NextGuard');
       
       if (success) {
+        // Notify the provider that authentication was successful
+        handleBiometricSuccess();
         // Navigate to the main app
         router.replace('/(tabs)');
       } else {
@@ -109,15 +117,6 @@ export default function BiometricUnlockScreen() {
             {isAuthenticating ? 'Authenticating...' : `Unlock with ${biometricLabel}`}
           </Text>
         </Button>
-
-        <Pressable
-          onPress={() => router.replace('/auth/sign-in')}
-          style={styles.alternativeButton}
-        >
-          <Text style={[styles.alternativeText, { color: mutedColor }]}>
-            Sign in with password
-          </Text>
-        </Pressable>
       </View>
     </View>
   );
@@ -156,13 +155,5 @@ const styles = StyleSheet.create({
   },
   biometricIcon: {
     marginVertical: 32,
-  },
-  alternativeButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-  },
-  alternativeText: {
-    fontSize: 14,
-    textAlign: 'center',
   },
 });

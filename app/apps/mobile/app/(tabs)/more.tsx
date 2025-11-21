@@ -55,7 +55,7 @@ export default function MoreScreen() {
       />
 
       <View className="w-full px-4 gap-4">
-        <View className="bg-card rounded-lg border border-border">
+        <View className="bg-card rounded-lg border border-border mt-4">
           <BiometricSwitch />
         </View>
         <View className="bg-card rounded-lg border border-border">

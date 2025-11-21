@@ -11,6 +11,7 @@ import { sendVerificationEmail } from "~/server/email/utils/send-verification-em
 export const auth = betterAuth({
   trustedOrigins: [
     "nextguardmobile://",
+    "exp://192.168.1.71:8081",
     "exp://10.190.237.83:8081"
   ],
   database: drizzleAdapter(db, {

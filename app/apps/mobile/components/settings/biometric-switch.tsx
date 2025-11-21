@@ -36,7 +36,7 @@ export default function BiometricSwitch({ label = 'Biometric Unlock', className 
       case 'face':
         return 'Face ID';
       case 'fingerprint':
-        return 'Fingerprint';
+      return 'Fingerprint';
       case 'iris':
         return 'Iris Recognition';
       default:
