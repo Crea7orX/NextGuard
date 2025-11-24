@@ -43,8 +43,8 @@ const uint8_t SERIAL_ID[16] = {
 #define MSG_COMMAND 0x20
 #define MSG_DISCOVERY 0x03 // Discovery packet for non-adopted nodes
 #define MSG_DISCOVERY_ACK 0x04 // Discovery ACK from hub
-#define MSG_CHALLENGE 0x05 // Challenge from node to hub on boot
-#define MSG_CHALLENGE_RSP 0x06 // Challenge response from hub
+#define MSG_CHALLENGE 0x05 // Challenge for counter sync
+#define MSG_CHALLENGE_RSP 0x06 // Challenge response
 
 #define FREQ 868E6
 
@@ -74,34 +74,27 @@ bool btnDown = false;
 
 AES128 aes;
 
-// Debug prints
+// Debug prints - using macros for better optimization
 #if DEBUG
   #define DEBUG_PRINT(x) Serial.print(x)
   #define DEBUG_PRINTLN(x) Serial.println(x)
   #define DEBUG_PRINTF(x, y) Serial.print(x, y)
+  #define DEBUG_PRINT_HEX(label, data, len) \
+    do { \
+      Serial.print(label); \
+      for (int i = 0; i < (len) && i < 8; i++) { \
+        if ((data)[i] < 16) Serial.print('0'); \
+        Serial.print((data)[i], HEX); \
+      } \
+      if ((len) > 8) Serial.print(F("...")); \
+      Serial.println(); \
+    } while(0)
 #else
   #define DEBUG_PRINT(x)
   #define DEBUG_PRINTLN(x)
   #define DEBUG_PRINTF(x, y)
+  #define DEBUG_PRINT_HEX(label, data, len)
 #endif
-
-void prn(const __FlashStringHelper* s) {
-#if DEBUG
-  Serial.println(s);
-#endif
-}
-
-void prnHex(const __FlashStringHelper* l, uint8_t* d, int n) {
-#if DEBUG
-  Serial.print(l);
-  for (int i = 0; i < n && i < 8; i++) {
-    if (d[i] < 16) Serial.print('0');
-    Serial.print(d[i], HEX);
-  }
-  if (n > 8) Serial.print(F("..."));
-  Serial.println();
-#endif
-}
 
 void blink(int n, int d = 100) {
   for (int i = 0; i < n; i++) {
@@ -216,7 +209,7 @@ bool verifyHMAC(uint8_t* key, size_t keyLen, uint8_t* data, size_t dataLen, uint
 }
 
 void saveKeys() {
-  prn(F("[N] Saving..."));
+  DEBUG_PRINTLN(F("[N] Saving..."));
   EEPROM.put(EE_MAGIC_ADDR, (uint16_t)EE_MAGIC);
   
   for (int i = 0; i < 21; i++) 
@@ -231,7 +224,7 @@ bool load() {
   EEPROM.get(EE_MAGIC_ADDR, m);
   
   if (m != EE_MAGIC) {
-    prn(F("[N] No save"));
+    DEBUG_PRINTLN(F("[N] No save"));
     return false;
   }
   
@@ -248,13 +241,13 @@ bool load() {
     if (i == 3 || i == 5 || i == 7 || i == 9) DEBUG_PRINT('-');
   }
   DEBUG_PRINTLN();
-  prnHex(F("[N] Key:"), sessionKey, 16);
+  DEBUG_PRINT_HEX(F("[N] Key:"), sessionKey, 16);
   
   return true;
 }
 
 void clear() {
-  prn(F("[N] CLEAR!"));
+  DEBUG_PRINTLN(F("[N] CLEAR!"));
   EEPROM.put(EE_MAGIC_ADDR, (uint16_t)0);
   adopted = false;
   blink(5, 50);
@@ -262,7 +255,7 @@ void clear() {
 
 void sendData(const char* msg) {
   if (!adopted) {
-    prn(F("[N] Not adopted!"));
+    DEBUG_PRINTLN(F("[N] Not adopted!"));
     return;
   }
   
@@ -342,9 +335,9 @@ void sendData(const char* msg) {
   LoRa.beginPacket();
   LoRa.write(pkt, hmacDataLen + 32);  // Include HMAC in transmission
   if (LoRa.endPacket()) {
-    prn(F("[N] Encrypted sent"));
+    DEBUG_PRINTLN(F("[N] Encrypted sent"));
   } else {
-    prn(F("[N] Send FAIL!"));
+    DEBUG_PRINTLN(F("[N] Send FAIL!"));
   }
   
   LoRa.receive();
@@ -419,20 +412,20 @@ void sendChallenge() {
 }
 
 void sendAdopt() {
-  prn(F("[N] Adopt req..."));
+  DEBUG_PRINTLN(F("[N] Adopt req..."));
   
   // Generate fresh keys for each adoption attempt
-  prn(F("[N] Gen fresh keys..."));
+  DEBUG_PRINTLN(F("[N] Gen fresh keys..."));
   uECC_set_rng(&getRng);
   
   uint8_t pubKey[40];
   if (!uECC_make_key(pubKey, privKey, uECC_secp160r1())) {
-    prn(F("[N] Key gen FAIL!"));
+    DEBUG_PRINTLN(F("[N] Key gen FAIL!"));
     return;
   }
   
-  prnHex(F("[N] NewPriv:"), privKey, 20);
-  prnHex(F("[N] NewPub:"), pubKey, 40);
+  DEBUG_PRINT_HEX(F("[N] NewPriv:"), privKey, 20);
+  DEBUG_PRINT_HEX(F("[N] NewPub:"), pubKey, 40);
   
   // Send FULL public key: type + SERIAL_ID + pubKey(40 bytes)
   uint8_t pkt[57];  // 1 + 16 + 40
@@ -446,9 +439,9 @@ void sendAdopt() {
   LoRa.beginPacket();
   LoRa.write(pkt, 57);
   if (LoRa.endPacket()) {
-    prn(F("[N] Sent OK"));
+    DEBUG_PRINTLN(F("[N] Sent OK"));
   } else {
-    prn(F("[N] Send FAIL!"));
+    DEBUG_PRINTLN(F("[N] Send FAIL!"));
   }
   
   // Go back to receive mode
@@ -459,43 +452,43 @@ void sendAdopt() {
 
 void handleAdopt(uint8_t* p, int len) {
   if (len < 58) {  // 1 + 16 + 1 + 40
-    prn(F("[N] Bad rsp"));
+    DEBUG_PRINTLN(F("[N] Bad rsp"));
     return;
   }
   
   // Compare 16-byte UUID
   if (memcmp(p + 1, SERIAL_ID, 16) != 0) {
-    prn(F("[N] Wrong UUID"));
+    DEBUG_PRINTLN(F("[N] Wrong UUID"));
     return;
   }
   
   if (p[17] != 1) {
-    prn(F("[N] Rejected"));
+    DEBUG_PRINTLN(F("[N] Rejected"));
     return;
   }
   
-  prn(F("[N] ADOPTED!"));
+  DEBUG_PRINTLN(F("[N] ADOPTED!"));
   
   uint8_t hubPub[40];
   memcpy(hubPub, p + 18, 40);  // Full public key
   
-  prnHex(F("[N] HubPub:"), hubPub, 20);
+  DEBUG_PRINT_HEX(F("[N] HubPub:"), hubPub, 20);
   
   // ECDH shared secret
   uint8_t secret[20];
   if (!uECC_shared_secret(hubPub, privKey, secret, uECC_secp160r1())) {
-    prn(F("[N] ECDH FAIL!"));
+    DEBUG_PRINTLN(F("[N] ECDH FAIL!"));
     return;
   }
   
-  prnHex(F("[N] Secret:"), secret, 20);
+  DEBUG_PRINT_HEX(F("[N] Secret:"), secret, 20);
   
   // KDF: XOR fold to 16 bytes
   for (int i = 0; i < 16; i++) {
     sessionKey[i] = secret[i] ^ secret[(i + 4) % 20];
   }
   
-  prnHex(F("[N] Session:"), sessionKey, 16);
+  DEBUG_PRINT_HEX(F("[N] Session:"), sessionKey, 16);
   
   adopted = true;
   saveKeys();
@@ -504,13 +497,13 @@ void handleAdopt(uint8_t* p, int len) {
 
 void handleCommand(uint8_t* p, int len) {
   if (len < 63) {  // 1 + 16 + 4 + 8 + 1 + 16(min) + 32(hmac)
-    prn(F("[N] Bad cmd size"));
+    DEBUG_PRINTLN(F("[N] Bad cmd size"));
     return;
   }
   
   // Compare 16-byte UUID
   if (memcmp(p + 1, SERIAL_ID, 16) != 0) {
-    prn(F("[N] Cmd wrong UUID"));
+    DEBUG_PRINTLN(F("[N] Cmd wrong UUID"));
     return;
   }
   
@@ -519,11 +512,11 @@ void handleCommand(uint8_t* p, int len) {
   uint8_t* receivedHmac = p + hmacDataLen;
   
   if (!verifyHMAC(sessionKey, 16, p, hmacDataLen, receivedHmac)) {
-    prn(F("[N] HMAC FAIL!"));
+    DEBUG_PRINTLN(F("[N] HMAC FAIL!"));
     return;
   }
   
-  prn(F("[N] HMAC OK"));
+  DEBUG_PRINTLN(F("[N] HMAC OK"));
   
   // Read 32-bit counter
   uint32_t counter;
@@ -547,7 +540,7 @@ void handleCommand(uint8_t* p, int len) {
   }
   
   if (counter == lastRxCounter) {
-    prn(F("[N] Duplicate!"));
+    DEBUG_PRINTLN(F("[N] Duplicate!"));
     return;
   }
   
@@ -598,38 +591,38 @@ void handleCommand(uint8_t* p, int len) {
   
   // Execute command
   if (strcmp((char*)plaintext, "BLINK") == 0) {
-    prn(F("[N] Executing BLINK"));
+    DEBUG_PRINTLN(F("[N] Executing BLINK"));
     blink(5, 100);
   } else if (strcmp((char*)plaintext, "FAST_BLINK") == 0) {
-    prn(F("[N] Executing FAST_BLINK"));
+    DEBUG_PRINTLN(F("[N] Executing FAST_BLINK"));
     blink(10, 50);
   } else if (strcmp((char*)plaintext, "LED_ON") == 0) {
-    prn(F("[N] LED ON"));
+    DEBUG_PRINTLN(F("[N] LED ON"));
     digitalWrite(LED_PIN, HIGH);
   } else if (strcmp((char*)plaintext, "LED_OFF") == 0) {
-    prn(F("[N] LED OFF"));
+    DEBUG_PRINTLN(F("[N] LED OFF"));
     digitalWrite(LED_PIN, LOW);
   } else if (strcmp((char*)plaintext, "PING") == 0) {
-    prn(F("[N] PING received"));
+    DEBUG_PRINTLN(F("[N] PING received"));
     sendData("PONG");
   } else if (strncmp((char*)plaintext, "ECHO:", 5) == 0) {
     DEBUG_PRINT(F("[N] ECHO: "));
     DEBUG_PRINTLN((char*)plaintext + 5);
     sendData((char*)plaintext + 5);
   } else {
-    prn(F("[N] Unknown command"));
+    DEBUG_PRINTLN(F("[N] Unknown command"));
   }
 }
 
 void handleDiscoveryAck(uint8_t* p, int len) {
   if (len < 17) { // 1 + 16
-    prn(F("[N] Bad discovery ack"));
+    DEBUG_PRINTLN(F("[N] Bad discovery ack"));
     return;
   }
   
   // Verify it's for our node
   if (memcmp(p + 1, SERIAL_ID, 16) != 0) {
-    prn(F("[N] Wrong UUID in discovery ack"));
+    DEBUG_PRINTLN(F("[N] Wrong UUID in discovery ack"));
     return;
   }
   
@@ -640,13 +633,13 @@ void handleDiscoveryAck(uint8_t* p, int len) {
 
 void handleChallengeResponse(uint8_t* p, int len) {
   if (len < 61) { // 1 + 16 + 4 + 4 + 4 + 32(HMAC)
-    prn(F("[N] Bad challenge rsp"));
+    DEBUG_PRINTLN(F("[N] Bad challenge rsp"));
     return;
   }
   
   // Verify it's for our node
   if (memcmp(p + 1, SERIAL_ID, 16) != 0) {
-    prn(F("[N] Wrong UUID in rsp"));
+    DEBUG_PRINTLN(F("[N] Wrong UUID in rsp"));
     return;
   }
   
@@ -655,11 +648,11 @@ void handleChallengeResponse(uint8_t* p, int len) {
   uint8_t* receivedHmac = p + hmacDataLen;
   
   if (!verifyHMAC(sessionKey, 16, p, hmacDataLen, receivedHmac)) {
-    prn(F("[N] Challenge HMAC FAIL!"));
+    DEBUG_PRINTLN(F("[N] Challenge HMAC FAIL!"));
     return;
   }
   
-  prn(F("[N] Challenge HMAC OK"));
+  DEBUG_PRINTLN(F("[N] Challenge HMAC OK"));
   
   // Extract hub's counters
   uint32_t hubTxCounter, hubRxCounter;
@@ -668,7 +661,7 @@ void handleChallengeResponse(uint8_t* p, int len) {
   
   // Verify nonce matches what we sent
   if (memcmp(p + 25, challengeNonce, 8) != 0) {
-    prn(F("[N] Nonce mismatch!"));
+    DEBUG_PRINTLN(F("[N] Nonce mismatch!"));
     return;
   }
   
@@ -728,7 +721,7 @@ void setup() {
   delay(1000);
 #endif
   
-  prn(F("\n[N] Start"));
+  DEBUG_PRINTLN(F("\n[N] Start"));
   DEBUG_PRINT(F("[N] RAM:"));
   DEBUG_PRINTLN(freeRam());
   
@@ -750,7 +743,7 @@ void setup() {
   LoRa.setPins(RFM95_CS, RFM95_RST, RFM95_DIO0);
   
   if (!LoRa.begin(FREQ)) {
-    prn(F("[N] LoRa FAIL!"));
+    DEBUG_PRINTLN(F("[N] LoRa FAIL!"));
     while (1) blink(1, 500);
   }
   
@@ -758,14 +751,14 @@ void setup() {
   LoRa.setSignalBandwidth(125E3);
   LoRa.setSyncWord(0x34);
   
-  prn(F("[N] LoRa OK"));
+  DEBUG_PRINTLN(F("[N] LoRa OK"));
   DEBUG_PRINT(F("[N] Freq: "));
   DEBUG_PRINT(FREQ / 1E6);
   DEBUG_PRINTLN(F(" MHz"));
   
   if (load()) {
     adopted = true;
-    prn(F("[N] Loaded"));
+    DEBUG_PRINTLN(F("[N] Loaded"));
     blink(5);
   } else {
     // Add delay and print before key gen
@@ -777,14 +770,14 @@ void setup() {
   LoRa.onReceive(onRx);
   LoRa.receive();
   
-  prn(F("[N] Ready"));
+  DEBUG_PRINTLN(F("[N] Ready"));
   DEBUG_PRINT(F("[N] RAM:"));
   DEBUG_PRINTLN(freeRam());
   
   // Send challenge if adopted to sync counters
   if (adopted) {
     delay(500);  // Wait for things to settle
-    prn(F("[N] Sending boot challenge..."));
+    DEBUG_PRINTLN(F("[N] Sending boot challenge..."));
     sendChallenge();
   }
   
@@ -830,7 +823,7 @@ void loop() {
       unsigned long t = millis();
       while (digitalRead(BTN_PIN) == LOW) {
         if (millis() - t > 3000) {
-          prn(F("[N] RESET..."));
+          DEBUG_PRINTLN(F("[N] RESET..."));
           clear();
           while (digitalRead(BTN_PIN) == LOW);
           delay(1000);
@@ -859,7 +852,7 @@ void loop() {
   static unsigned long lastChallenge = 0;
   if (adopted && !countersSynced && (millis() - lastChallenge > 5000)) {
     lastChallenge = millis();
-    prn(F("[N] Resending challenge..."));
+    DEBUG_PRINTLN(F("[N] Resending challenge..."));
     sendChallenge();
   }
   
