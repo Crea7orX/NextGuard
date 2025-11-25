@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/text';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Radio, Bell, Waves, DoorClosed, Battery, Plug, Signal, Lock } from 'lucide-react-native';
+import BackButton from '@/components/ui/back-button';
 
 type DeviceType = 'Hub' | 'Siren' | 'Motion' | 'Entry';
 
@@ -123,23 +124,31 @@ export default function DeviceDetailsScreen() {
     <>
       <Stack.Screen 
         options={{ 
-          title: device.name,
-          headerBackTitle: 'Back',
+          headerShown: false,
         }} 
       />
-      <ScrollView 
-        className="flex-1 bg-background"
-        contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + 20 }}
-      >
-        <View className="flex-1 p-4">
-          {/* Basic Information */}
+      <View className="flex-1 bg-background">
+        {/* Sticky Header */}
+        <View 
+          className="bg-background border-b border-border"
+          style={{ paddingTop: insets.top }}
+        >
+          <View className="flex-row items-center gap-3 px-4 py-3">
+            <BackButton navigateTo="/(tabs)/dashboard" />
+            <View className="flex-row items-center gap-2 flex-1">
+              <Icon as={DeviceIcon} size={24} className="text-foreground" />
+              <Text className="text-xl font-semibold">{device.name}</Text>
+            </View>
+          </View>
+        </View>
+
+        <ScrollView 
+          className="flex-1"
+          contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+        >
+          <View className="flex-1 p-4">
+            {/* Basic Information */}
           <Card className="mb-4">
-            <CardHeader>
-              <View className="flex-row items-center gap-2 mb-2">
-                <Icon as={DeviceIcon} size={24} className="text-foreground" />
-                <CardTitle>Basic Information</CardTitle>
-              </View>
-            </CardHeader>
             <CardContent className="gap-3">
               <View>
                 <Text className="text-xs text-muted-foreground mb-1">Name</Text>
@@ -289,6 +298,7 @@ export default function DeviceDetailsScreen() {
           )}
         </View>
       </ScrollView>
+    </View>
     </>
   );
 }

@@ -62,7 +62,7 @@ export function DeviceCard({ id, type, name, description, addedAt, battery, isPl
             </View>
           )}
         </View>
-        <View className="mt-4">
+        <View className="mt-2">
           <Button
             variant="outline"
             size="sm"
