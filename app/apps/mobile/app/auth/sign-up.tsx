@@ -3,16 +3,18 @@ import { KeyboardAvoidingScrollView } from "@/components/ui/keyboard-avoiding-sc
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { signUpSchema } from "@repo/validations/auth/sign-up";
 import { useForm } from "@tanstack/react-form";
 import React from "react";
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Link, useRouter } from "expo-router";
 import BackButton from "@/components/ui/back-button";
+import { Eye, EyeOff } from 'lucide-react-native';
 
 export default function SignUpForm({
   className,
@@ -22,6 +24,8 @@ export default function SignUpForm({
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = React.useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -167,17 +171,30 @@ export default function SignUpForm({
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                    <Input
-                      id={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.nativeEvent.text)}
-                      aria-invalid={isInvalid}
-                      placeholder="Create a password"
-                      autoComplete="password-new"
-                      secureTextEntry={true}
-                      autoCapitalize="none"
-                    />
+                    <View className="relative">
+                      <Input
+                        id={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                        aria-invalid={isInvalid}
+                        placeholder="Create a password"
+                        autoComplete="password-new"
+                        secureTextEntry={!showPassword}
+                        autoCapitalize="none"
+                        className="pr-12"
+                      />
+                      <TouchableOpacity
+                        onPress={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-0 h-10 justify-center"
+                      >
+                        {showPassword ? (
+                          <Icon as={EyeOff} size={20} className="text-muted-foreground" />
+                        ) : (
+                          <Icon as={Eye} size={20} className="text-muted-foreground" />
+                        )}
+                      </TouchableOpacity>
+                    </View>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
@@ -193,17 +210,30 @@ export default function SignUpForm({
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
-                    <Input
-                      id={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.nativeEvent.text)}
-                      aria-invalid={isInvalid}
-                      placeholder="Confirm your password"
-                      autoComplete="password-new"
-                      secureTextEntry={true}
-                      autoCapitalize="none"
-                    />
+                    <View className="relative">
+                      <Input
+                        id={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.nativeEvent.text)}
+                        aria-invalid={isInvalid}
+                        placeholder="Confirm your password"
+                        autoComplete="password-new"
+                        secureTextEntry={!showPasswordConfirmation}
+                        autoCapitalize="none"
+                        className="pr-12"
+                      />
+                      <TouchableOpacity
+                        onPress={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                        className="absolute right-3 top-0 h-10 justify-center"
+                      >
+                        {showPasswordConfirmation ? (
+                          <Icon as={EyeOff} size={20} className="text-muted-foreground" />
+                        ) : (
+                          <Icon as={Eye} size={20} className="text-muted-foreground" />
+                        )}
+                      </TouchableOpacity>
+                    </View>
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 );
