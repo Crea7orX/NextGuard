@@ -13,8 +13,8 @@ import { useState, useEffect } from 'react';
 import { KeyboardAvoidingScrollView } from '@/components/ui/keyboard-avoiding-scroll-view';
 
 const LOGO = {
-  light: require('@/assets/images/react-native-reusables-light.png'),
-  dark: require('@/assets/images/react-native-reusables-dark.png'),
+  light: require('@/assets/images/logo-black.png'),
+  dark: require('@/assets/images/logo-white.png'),
 };
 
 const IMAGE_STYLE: ImageStyle = {

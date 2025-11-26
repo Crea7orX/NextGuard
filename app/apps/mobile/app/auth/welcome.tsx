@@ -9,8 +9,8 @@ import { Icon } from '@/components/ui/icon';
 import ThemeSwitch from '@/components/settings/theme-switch';
 
 const LOGO = {
-  light: require('@/assets/images/react-native-reusables-light.png'),
-  dark: require('@/assets/images/react-native-reusables-dark.png'),
+  light: require('@/assets/images/logo-black.png'),
+  dark: require('@/assets/images/logo-white.png'),
 };
 
 const IMAGE_STYLE: ImageStyle = {
