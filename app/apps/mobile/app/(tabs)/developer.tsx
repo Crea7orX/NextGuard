@@ -6,11 +6,6 @@ import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DeveloperModeToggle from '@/components/settings/developer-mode-toggle';
 
-interface StorageItem {
-  key: string;
-  value: string;
-}
-
 export default function DeveloperScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();

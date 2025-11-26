@@ -1,6 +1,6 @@
 import { Text } from '@/components/ui/text';
 import { View, Pressable, Animated, Platform, UIManager, Easing } from 'react-native';
-import { UserCircle, ChevronDown } from 'lucide-react-native';
+import { ChevronDown } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { useState, useRef, useEffect } from 'react';
 import { SignOutButton, AccountDetailsButton } from '@/components/account'

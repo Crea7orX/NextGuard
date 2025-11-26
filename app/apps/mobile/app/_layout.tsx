@@ -14,7 +14,6 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { BiometricLockProvider } from "@/providers/biometric-lock-provider";
 import { LogBox } from 'react-native';
 
-// Suppress warnings
 LogBox.ignoreLogs([
   '[Reanimated] Writing to `value` during component render',
 ]);

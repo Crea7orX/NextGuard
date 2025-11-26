@@ -3,20 +3,16 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Link } from 'expo-router';
 import { Shield, ShieldCheck, ShieldAlert, Activity, Home, Bell, User } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/hooks/useAuth';
-import { authClient } from '@/lib/auth-client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DeviceCard } from '@/components/devices/device-card';
 
 export default function HomeScreen() {
-  const { colorScheme } = useColorScheme();
   const insets = useSafeAreaInsets();
-  const { isAuthenticated, user } = useAuth();
-  const { data: session } = authClient.useSession();
+  const { user } = useAuth();
   const [systemStatus] = React.useState<'armed' | 'disarmed' | 'alert'>('disarmed');
 
   // Mock devices data

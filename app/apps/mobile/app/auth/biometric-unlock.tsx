@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { Fingerprint, Scan, Lock } from 'lucide-react-native';
 import { useBiometrics } from '@/hooks/useBiometrics';
@@ -7,34 +7,6 @@ import { useBiometricLock } from '@/providers/biometric-lock-provider';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/button';
 
-/**
- * BiometricUnlockScreen component
- * 
- * This is an example component that demonstrates how to implement
- * a biometric unlock screen when the app is launched.
- * 
- * Usage:
- * You can add this screen to your auth flow or app startup to require
- * biometric authentication before accessing the app.
- * 
- * To use this in your app:
- * 1. Add this screen to your router
- * 2. Check if biometrics are enabled in your AuthProvider or _layout.tsx
- * 3. Navigate to this screen if biometrics are enabled
- * 
- * @example
- * ```tsx
- * // In your AuthProvider or app layout:
- * const { isEnabled, authenticate } = useBiometrics();
- * 
- * useEffect(() => {
- *   if (isEnabled) {
- *     // Navigate to biometric unlock screen
- *     router.push('/auth/biometric-unlock');
- *   }
- * }, [isEnabled]);
- * ```
- */
 export default function BiometricUnlockScreen() {
   const { colorScheme } = useColorScheme();
   const { isEnabled, capabilities, authenticate } = useBiometrics();
@@ -47,11 +19,9 @@ export default function BiometricUnlockScreen() {
   const mutedColor = currentScheme === 'dark' ? '#a1a1aa' : '#71717a';
 
   useEffect(() => {
-    // Auto-trigger biometric authentication when the screen loads
     if (isEnabled && capabilities?.isAvailable) {
       handleBiometricAuth();
     } else {
-      // If biometrics are disabled or not available, unlock immediately
       handleBiometricSuccess();
       router.replace('/(tabs)');
     }
@@ -63,9 +33,7 @@ export default function BiometricUnlockScreen() {
       const success = await authenticate('Authenticate to access NextGuard');
       
       if (success) {
-        // Notify the provider that authentication was successful
         handleBiometricSuccess();
-        // Navigate to the main app
         router.replace('/(tabs)');
       } else {
         Alert.alert(

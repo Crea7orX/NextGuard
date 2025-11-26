@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   LucideMenu,
   Code2,
-  Bell,
 } from "lucide-react-native";
 import { Icon } from "@/components/ui/icon";
 import { useColorScheme } from "nativewind";

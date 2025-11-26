@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';

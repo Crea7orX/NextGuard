@@ -21,33 +21,6 @@ interface SignOutButtonProps {
   onSignOutError?: (error: unknown) => void;
 }
 
-/**
- * Sign Out Button Component
- * 
- * A reusable button component that handles user sign-out with optional confirmation dialog.
- * 
- * @example
- * ```tsx
- * // Basic usage
- * <SignOutButton />
- * 
- * // Custom styling
- * <SignOutButton variant="outline" className="w-full" />
- * 
- * // Without confirmation
- * <SignOutButton showConfirmation={false} />
- * 
- * // Custom text
- * <SignOutButton text="Logout" loadingText="Logging out..." />
- * 
- * // With callbacks
- * <SignOutButton
- *   onSignOutStart={() => console.log('Starting...')}
- *   onSignOutSuccess={() => console.log('Success!')}
- *   onSignOutError={(error) => console.error(error)}
- * />
- * ```
- */
 export function SignOutButton({
   variant = 'destructive',
   size = 'default',

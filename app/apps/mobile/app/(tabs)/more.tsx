@@ -14,7 +14,6 @@ export default function MoreScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
   const { enableDeveloperMode } = useDeveloperMode();
-  const { user } = useAuth();
   const [tapCount, setTapCount] = useState(0);
   const tapTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -22,7 +21,6 @@ export default function MoreScreen() {
   const appVersion = Constants.expoConfig?.version || '1.0.0';
 
   const handleVersionTap = () => {
-    // Clear previous timeout
     if (tapTimeout.current) {
       clearTimeout(tapTimeout.current);
     }
@@ -31,12 +29,10 @@ export default function MoreScreen() {
     setTapCount(newCount);
 
     if (newCount >= 10) {
-      // Enable developer mode
       enableDeveloperMode();
       setTapCount(0);
       console.log('Developer mode enabled!');
     } else {
-      // Reset counter after 2 seconds of no taps
       tapTimeout.current = setTimeout(() => {
         setTapCount(0);
       }, 2000);
