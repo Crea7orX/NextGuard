@@ -62,6 +62,9 @@ void LoRaManager::process() {
             case MSG_CHALLENGE:
                 handleChallenge(packet->data, packet->length);
                 break;
+            case MSG_CHALLENGE_RSP:
+                handleChallengeResponse(packet->data, packet->length);
+                break;
             case MSG_DATA:
                 handleEncryptedData(packet->data, packet->length);
                 break;
@@ -154,6 +157,10 @@ void LoRaManager::handleAdoptionRequest(const uint8_t* payload, size_t len) {
 
         // Disable adoption mode after successful adoption
         disableAdoptionMode();
+        
+        // Send challenge for counter sync
+        delay(100); // Small delay to ensure node is ready
+        sendChallengeToNode(nodeId);
         
         // Send info to server
         DynamicJsonDocument discoveryDoc(1024);
@@ -286,7 +293,82 @@ void LoRaManager::handleEncryptedData(const uint8_t* payload, size_t len) {
     wsManager->sendMessage("hub_message_from_node", msgDoc);
 }
 
-// TODO: Implement down functions
+void LoRaManager::handleChallengeResponse(const uint8_t* payload, size_t len) {
+    if (len < 65) { // 1 + 16 + 4 + 4 + 8 + 32(HMAC)
+        logger->warning("Invalid hub challenge response size");
+        return;
+    }
+    
+    const uint8_t* nodeId = payload + 1;
+    
+    int idx = nodeManager->findNode(nodeId);
+    if (idx == -1) {
+        logger->warning("Hub challenge response from unknown node UUID: " + Utils::uuidToString(nodeId));
+        return;
+    }
+    
+    NodeInfo* node = nodeManager->getNode(idx);
+    
+    // Verify HMAC
+    size_t hmacDataLen = 33; // 1 + 16 + 4 + 4 + 8
+    const uint8_t* receivedHmac = payload + hmacDataLen;
+    
+    if (!SecurityUtils::verifyHMAC(node->sessionKey, SESSION_KEY_SIZE, payload, hmacDataLen, receivedHmac)) {
+        logger->error("Hub challenge response HMAC verification FAILED!");
+        return;
+    }
+    
+    // Extract counters from response
+    uint32_t nodeTxCounter, nodeRxCounter;
+    memcpy(&nodeTxCounter, payload + 17, COUNTER_SIZE);
+    memcpy(&nodeRxCounter, payload + 21, COUNTER_SIZE);
+    
+    logger->info("Hub challenge response from node - Node TX: " + String(nodeTxCounter) + ", Node RX: " + String(nodeRxCounter));
+    
+    // Sync counters
+    nodeManager->syncCounters(idx, nodeTxCounter, nodeRxCounter);
+    
+    logger->info("Counter sync complete via hub challenge");
+}
+
+bool LoRaManager::sendChallengeToNode(const uint8_t* nodeId) {
+    int idx = nodeManager->findNode(nodeId);
+    if (idx == -1) {
+        logger->error("Cannot send challenge - unknown node UUID: " + Utils::uuidToString(nodeId));
+        return false;
+    }
+    
+    NodeInfo* node = nodeManager->getNode(idx);
+    
+    // Generate random nonce
+    uint8_t nonce[NONCE_SIZE];
+    for (int i = 0; i < NONCE_SIZE; i++) {
+        nonce[i] = esp_random() & 0xFF;
+    }
+    
+    // Build challenge packet
+    uint8_t packet[ProtocolUtils::getChallengePacketSize()];
+    packet[0] = MSG_CHALLENGE;
+    memcpy(packet + 1, nodeId, UUID_SIZE);
+    memcpy(packet + 17, &node->txCounter, COUNTER_SIZE);
+    memcpy(packet + 21, &node->rxCounter, COUNTER_SIZE);
+    memcpy(packet + 25, nonce, NONCE_SIZE);
+    
+    // Compute HMAC
+    uint8_t hmac[HMAC_SIZE];
+    SecurityUtils::computeHMAC(node->sessionKey, SESSION_KEY_SIZE, packet, 33, hmac);
+    memcpy(packet + 33, hmac, HMAC_SIZE);
+    
+    logger->info("Sending challenge to node: " + Utils::uuidToString(nodeId));
+    
+    if (RadioManager::sendPacket(packet, sizeof(packet))) {
+        logger->info("Challenge sent - Hub TX: " + String(node->txCounter) + ", Hub RX: " + String(node->rxCounter));
+        return true;
+    } else {
+        logger->error("Failed to send challenge");
+        return false;
+    }
+}
 
 void LoRaManager::enableAdoptionMode(const uint8_t* nodeId, unsigned long duration) {
     adoptionStartTime = millis();

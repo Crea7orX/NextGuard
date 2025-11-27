@@ -10,8 +10,8 @@
 #define MSG_COMMAND 0x20        // Encrypted command from hub
 #define MSG_DISCOVERY 0x03      // Discovery packet from non-adopted nodes
 #define MSG_DISCOVERY_ACK 0x04  // Acknowledgement of discovery packet
-#define MSG_CHALLENGE 0x05      // Challenge from node to hub on boot
-#define MSG_CHALLENGE_RSP 0x06  // Challenge response from hub
+#define MSG_CHALLENGE 0x05      // Challenge for counter sync (bidirectional)
+#define MSG_CHALLENGE_RSP 0x06  // Challenge response (bidirectional)
 
 // Configuration Constants
 #define MAX_NODES 10

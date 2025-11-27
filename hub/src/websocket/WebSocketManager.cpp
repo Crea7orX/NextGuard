@@ -295,6 +295,11 @@ void WebSocketManager::handleSessionAck(JsonDocument& doc) {
                 SecurityUtils::deriveSessionKey(sharedSecret, sessionKey);
                 nodeManager->addNode(nodeId, sessionKey);
                 logger->info("Restored node: " + serialIdStr);
+                
+                // Send challenge to sync counters
+                if (loRaManager) {
+                    loRaManager->sendChallengeToNode(nodeId);
+                }
             }
             
             logger->info("Node restoration complete");

@@ -35,6 +35,7 @@ private:
     void handleDiscovery(const uint8_t* payload, size_t len, int rssi, float snr);
     void handleAdoptionRequest(const uint8_t* payload, size_t len);
     void handleChallenge(const uint8_t* payload, size_t len);
+    void handleChallengeResponse(const uint8_t* payload, size_t len);
     void handleEncryptedData(const uint8_t* payload, size_t len);
     
 public:
@@ -55,6 +56,9 @@ public:
     bool sendCommand(const uint8_t* nodeId, const char* command, uint8_t msgType = MSG_COMMAND);
     bool sendCommandOld(int nodeIndex, const char* command);
     bool sendCommandByUUID(const uint8_t* nodeId, const char* command);
+    
+    // Counter synchronization
+    bool sendChallengeToNode(const uint8_t* nodeId);
     
     // Node information
     void listActiveNodes();
