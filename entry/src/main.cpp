@@ -8,14 +8,14 @@
 #include <SHA256.h>
 
 // Debug mode - set to 0 for production (no serial output)
-#define DEBUG 1
+#define DEBUG 0
 
 // Node Serial ID
 const uint8_t SERIAL_ID[16] = {
-  0x55, 0x0e, 0x84, 0x00,
-  0xe2, 0x9b, 0x41, 0x24,
-  0xa7, 0x16, 0x44, 0x66,
-  0x55, 0x44, 0x00, 0x01
+  0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x40, 0x24,
+  0xa0, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00
 };
 
 // LoRa pins for Pro Mini
@@ -68,6 +68,9 @@ bool countersSynced = false; // Flag to track if counters are synced after boot
 bool discoveryAcked = false; // Flag to track if hub acknowledged discovery
 bool reedState = false; // Current reed switch state
 bool lastReedState = false; // Previous reed switch state
+bool transmitting = false; // Lock to prevent simultaneous transmissions
+bool pendingResponse = false; // Flag for deferred response
+char pendingMsg[16]; // Buffer for deferred response
 
 unsigned long lastSend = 0;
 bool btnDown = false;
@@ -259,6 +262,15 @@ void sendData(const char* msg) {
     return;
   }
   
+  // Check if already transmitting to prevent re-entrancy
+  if (transmitting) {
+    DEBUG_PRINTLN(F("[N] TX busy, dropped"));
+    return;
+  }
+  
+  transmitting = true; // Set lock
+  LoRa.idle(); // Ensure LoRa is not in RX mode
+  
   int len = strlen(msg);
   DEBUG_PRINT(F("[N] Send:"));
   DEBUG_PRINTLN(msg);
@@ -281,13 +293,6 @@ void sendData(const char* msg) {
     nonce[i] = random(256);
     iv[i + 8] = nonce[i];
   }
-  
-  DEBUG_PRINT(F("[N] Nonce: "));
-  for (int i = 0; i < 8; i++) {
-    if (nonce[i] < 0x10) DEBUG_PRINT('0');
-    DEBUG_PRINTF(nonce[i], HEX);
-  }
-  DEBUG_PRINTLN();
   
   // Set key
   aes.setKey(sessionKey, 16);
@@ -323,25 +328,34 @@ void sendData(const char* msg) {
   computeHMAC(sessionKey, 16, pkt, hmacDataLen, hmac);
   memcpy(pkt + hmacDataLen, hmac, 32);
   
-  DEBUG_PRINT(F("[N] HMAC: "));
-  for (int i = 0; i < 8; i++) {  // Print first 8 bytes
-    if (hmac[i] < 0x10) DEBUG_PRINT('0');
-    DEBUG_PRINTF(hmac[i], HEX);
-  }
-  DEBUG_PRINTLN(F("..."));
-  
   txCounter++;  // Increment counter
+  
+  // Reset watchdog before transmission
+  wdt_reset();
   
   LoRa.beginPacket();
   LoRa.write(pkt, hmacDataLen + 32);  // Include HMAC in transmission
-  if (LoRa.endPacket()) {
-    DEBUG_PRINTLN(F("[N] Encrypted sent"));
-  } else {
-    DEBUG_PRINTLN(F("[N] Send FAIL!"));
+  
+  // Use non-blocking endPacket with timeout
+  bool sent = LoRa.endPacket(false);  // Non-blocking mode
+  unsigned long txStart = millis();
+  while (!sent && (millis() - txStart < 2000)) {  // 2 second timeout
+    wdt_reset();
+    delay(10);
   }
   
+  if (sent || (millis() - txStart >= 2000)) {
+    if (sent) {
+      DEBUG_PRINTLN(F("[N] Encrypted sent"));
+    } else {
+      DEBUG_PRINTLN(F("[N] TX timeout!"));
+    }
+  }
+  
+  transmitting = false; // Release lock
   LoRa.receive();
   blink(1);
+  wdt_reset();
 }
 
 void sendDiscovery() {
@@ -349,6 +363,8 @@ void sendDiscovery() {
   uint8_t pkt[17];  // 1 + 16
   pkt[0] = MSG_DISCOVERY;
   memcpy(pkt + 1, SERIAL_ID, 16);
+  
+  wdt_reset();  // Reset watchdog before transmission
   
   LoRa.beginPacket();
   LoRa.write(pkt, 17);
@@ -393,6 +409,8 @@ void sendChallenge() {
   }
   DEBUG_PRINTLN(F("..."));
   
+  wdt_reset();  // Reset watchdog before transmission
+  
   LoRa.beginPacket();
   LoRa.write(pkt, 65);  // Send with HMAC
   if (LoRa.endPacket()) {
@@ -418,11 +436,16 @@ void sendAdopt() {
   DEBUG_PRINTLN(F("[N] Gen fresh keys..."));
   uECC_set_rng(&getRng);
   
+  // Reset watchdog before key generation (can take time)
+  wdt_reset();
+  
   uint8_t pubKey[40];
   if (!uECC_make_key(pubKey, privKey, uECC_secp160r1())) {
     DEBUG_PRINTLN(F("[N] Key gen FAIL!"));
     return;
   }
+  
+  wdt_reset();  // Reset after key generation
   
   DEBUG_PRINT_HEX(F("[N] NewPriv:"), privKey, 20);
   DEBUG_PRINT_HEX(F("[N] NewPub:"), pubKey, 40);
@@ -473,6 +496,9 @@ void handleAdopt(uint8_t* p, int len) {
   memcpy(hubPub, p + 18, 40);  // Full public key
   
   DEBUG_PRINT_HEX(F("[N] HubPub:"), hubPub, 20);
+  
+  // Reset watchdog before ECDH
+  wdt_reset();
   
   // ECDH shared secret
   uint8_t secret[20];
@@ -532,10 +558,7 @@ void handleCommand(uint8_t* p, int len) {
   
   // Counter validation (prevent replay attacks)
   if (counter < rxCounter) {
-    DEBUG_PRINT(F("[N] Replay! Counter "));
-    DEBUG_PRINT(counter);
-    DEBUG_PRINT(F(" < expected "));
-    DEBUG_PRINTLN(rxCounter);
+    DEBUG_PRINTLN(F("[N] Replay!"));
     return;
   }
   
@@ -544,7 +567,7 @@ void handleCommand(uint8_t* p, int len) {
     return;
   }
   
-  DEBUG_PRINT(F("[N] Command counter: "));
+  DEBUG_PRINT(F("[N] Counter:"));
   DEBUG_PRINTLN(counter);
   
   // Prepare IV (SERIAL_ID + counter32 + nonce from packet)
@@ -554,12 +577,8 @@ void handleCommand(uint8_t* p, int len) {
   memcpy(iv + 4, &counter, 4);  // 32-bit counter
   memcpy(iv + 8, nonce, 8);     // 8-byte nonce from packet
   
-  DEBUG_PRINT(F("[N] Nonce: "));
-  for (int i = 0; i < 8; i++) {
-    if (nonce[i] < 0x10) DEBUG_PRINT('0');
-    DEBUG_PRINTF(nonce[i], HEX);
-  }
-  DEBUG_PRINTLN();
+  // Reset watchdog before decryption
+  wdt_reset();
   
   // Set key
   aes.setKey(sessionKey, 16);
@@ -590,28 +609,7 @@ void handleCommand(uint8_t* p, int len) {
   DEBUG_PRINTLN((char*)plaintext);
   
   // Execute command
-  if (strcmp((char*)plaintext, "BLINK") == 0) {
-    DEBUG_PRINTLN(F("[N] Executing BLINK"));
-    blink(5, 100);
-  } else if (strcmp((char*)plaintext, "FAST_BLINK") == 0) {
-    DEBUG_PRINTLN(F("[N] Executing FAST_BLINK"));
-    blink(10, 50);
-  } else if (strcmp((char*)plaintext, "LED_ON") == 0) {
-    DEBUG_PRINTLN(F("[N] LED ON"));
-    digitalWrite(LED_PIN, HIGH);
-  } else if (strcmp((char*)plaintext, "LED_OFF") == 0) {
-    DEBUG_PRINTLN(F("[N] LED OFF"));
-    digitalWrite(LED_PIN, LOW);
-  } else if (strcmp((char*)plaintext, "PING") == 0) {
-    DEBUG_PRINTLN(F("[N] PING received"));
-    sendData("PONG");
-  } else if (strncmp((char*)plaintext, "ECHO:", 5) == 0) {
-    DEBUG_PRINT(F("[N] ECHO: "));
-    DEBUG_PRINTLN((char*)plaintext + 5);
-    sendData((char*)plaintext + 5);
-  } else {
-    DEBUG_PRINTLN(F("[N] Unknown command"));
-  }
+  DEBUG_PRINTLN(F("[N] Unknown command"));
 }
 
 void handleDiscoveryAck(uint8_t* p, int len) {
@@ -629,6 +627,84 @@ void handleDiscoveryAck(uint8_t* p, int len) {
   DEBUG_PRINTLN(F("[N] Discovery ACK received - stopping discovery"));
   discoveryAcked = true; // Stop sending discovery packets
   blink(2);
+}
+
+void handleHubChallenge(uint8_t* p, int len) {
+  if (len < 61) { // 1 + 16 + 4 + 4 + 8 + 32(HMAC)
+    DEBUG_PRINTLN(F("[N] Bad hub challenge"));
+    return;
+  }
+  
+  // Verify it's for our node
+  if (memcmp(p + 1, SERIAL_ID, 16) != 0) {
+    DEBUG_PRINTLN(F("[N] Wrong UUID in hub challenge"));
+    return;
+  }
+  
+  // Verify HMAC (last 32 bytes)
+  size_t hmacDataLen = len - 32;
+  uint8_t* receivedHmac = p + hmacDataLen;
+  
+  if (!verifyHMAC(sessionKey, 16, p, hmacDataLen, receivedHmac)) {
+    DEBUG_PRINTLN(F("[N] Hub challenge HMAC FAIL!"));
+    return;
+  }
+  
+  DEBUG_PRINTLN(F("[N] Hub challenge HMAC OK"));
+  
+  // Extract hub's counters
+  uint32_t hubTxCounter, hubRxCounter;
+  memcpy(&hubTxCounter, p + 17, 4);
+  memcpy(&hubRxCounter, p + 21, 4);
+  
+  // Extract hub's nonce
+  uint8_t hubNonce[8];
+  memcpy(hubNonce, p + 25, 8);
+  
+  DEBUG_PRINT(F("[N] Hub challenge - Hub TX: "));
+  DEBUG_PRINT(hubTxCounter);
+  DEBUG_PRINT(F(", Hub RX: "));
+  DEBUG_PRINTLN(hubRxCounter);
+  
+  // Sync our TX counter with what hub expects
+  if (hubRxCounter != txCounter) {
+    DEBUG_PRINT(F("[N] Adjusting TX counter: "));
+    DEBUG_PRINT(txCounter);
+    DEBUG_PRINT(F(" -> "));
+    DEBUG_PRINTLN(hubRxCounter);
+    txCounter = hubRxCounter;
+  }
+  
+  // Sync our RX counter with hub's TX
+  rxCounter = hubTxCounter;
+  lastRxCounter = 0xFFFFFFFF;
+  
+  // Send response using same MSG_CHALLENGE_RSP message type
+  uint8_t pkt[65];  // 1 + 16 + 4 + 4 + 8 + 32(HMAC)
+  pkt[0] = MSG_CHALLENGE_RSP;
+  memcpy(pkt + 1, SERIAL_ID, 16);
+  memcpy(pkt + 17, &txCounter, 4);
+  memcpy(pkt + 21, &rxCounter, 4);
+  memcpy(pkt + 25, hubNonce, 8);  // Echo back the hub's nonce
+  
+  // Compute HMAC
+  size_t responseHmacDataLen = 33;  // 1 + 16 + 4 + 4 + 8
+  uint8_t responseHmac[32];
+  computeHMAC(sessionKey, 16, pkt, responseHmacDataLen, responseHmac);
+  memcpy(pkt + responseHmacDataLen, responseHmac, 32);
+  
+  // Send response
+  LoRa.beginPacket();
+  LoRa.write(pkt, 65);
+  if (LoRa.endPacket()) {
+    DEBUG_PRINTLN(F("[N] Hub challenge response sent"));
+    countersSynced = true;
+    blink(2, 100);
+  } else {
+    DEBUG_PRINTLN(F("[N] Hub challenge response FAIL!"));
+  }
+  
+  LoRa.receive();
 }
 
 void handleChallengeResponse(uint8_t* p, int len) {
@@ -701,6 +777,8 @@ void onRx(int ps) {
     handleCommand(buf, idx);
   } else if (buf[0] == MSG_DISCOVERY_ACK) {
     handleDiscoveryAck(buf, idx);
+  } else if (buf[0] == MSG_CHALLENGE) {
+    handleHubChallenge(buf, idx);
   } else if (buf[0] == MSG_CHALLENGE_RSP) {
     handleChallengeResponse(buf, idx);
   }
@@ -713,7 +791,7 @@ int freeRam() {
 }
 
 void setup() {
-  // Disable watchdog that might be causing resets
+  // Disable watchdog initially
   wdt_disable();
   
 #if DEBUG
@@ -786,9 +864,23 @@ void setup() {
   lastReedState = reedState;
   DEBUG_PRINT(F("[N] Reed initial state: "));
   DEBUG_PRINTLN(reedState ? F("OPEN") : F("CLOSED"));
+  
+  // Enable watchdog timer (8 second timeout)
+  wdt_enable(WDTO_8S);
+  DEBUG_PRINTLN(F("[N] Watchdog enabled"));
 }
 
 void loop() {
+  // Reset watchdog at start of each loop iteration
+  wdt_reset();
+  
+  // Handle deferred response
+  if (pendingResponse && !transmitting) {
+    pendingResponse = false;
+    delay(50); // Small delay to avoid collision
+    sendData(pendingMsg);
+  }
+  
   // Check reed switch state change
   reedState = digitalRead(REED_PIN);
   if (reedState != lastReedState) {
@@ -815,6 +907,7 @@ void loop() {
     }
   }
   
+  // Button handling
   if (digitalRead(BTN_PIN) == LOW) {
     if (!btnDown) {
       btnDown = true;
