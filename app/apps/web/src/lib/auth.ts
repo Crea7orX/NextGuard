@@ -1,0 +1,49 @@
+import { expo } from "@better-auth/expo";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { lastLoginMethod, organization } from "better-auth/plugins";
+import { env } from "~/env";
+import { ac, owner } from "~/lib/permissions";
+import { db } from "~/server/db";
+import { sendResetPasswordEmail } from "~/server/email/utils/send-password-reset-email";
+import { sendVerificationEmail } from "~/server/email/utils/send-verification-email";
+
+export const auth = betterAuth({
+  trustedOrigins: [
+    "nextguardmobile://",
+    "exp://192.168.1.71:8081",
+    "exp://10.190.237.83:8081"
+  ],
+  database: drizzleAdapter(db, {
+    provider: "pg",
+  }),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: sendResetPasswordEmail,
+    resetPasswordTokenExpiresIn: env.BETTER_AUTH_RESET_PASSWORD_EXPIRES_IN,
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: sendVerificationEmail,
+    expiresIn: env.BETTER_AUTH_EMAIL_VERIFICATION_EXPIRES_IN,
+  },
+  socialProviders: {
+    google: {
+      clientId: env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
+  },
+  plugins: [
+    lastLoginMethod(),
+    organization({
+      organizationLimit: env.BETTER_AUTH_ORGANIZATION_LIMIT,
+      ac,
+      roles: {
+        owner,
+      },
+    }),
+    expo(),
+  ],
+});

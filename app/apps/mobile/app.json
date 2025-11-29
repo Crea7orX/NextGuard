@@ -1,0 +1,76 @@
+{
+  "expo": {
+    "name": "NextGuard",
+    "slug": "nextguard",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "nextguardmobile",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#131314"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "net.nextguard",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "NextGuard uses Face ID to securely unlock the app and authenticate your identity."
+      }
+    },
+    "android": {
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#131314"
+      },
+      "package": "net.nextguard",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.INTERNET",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-notifications",
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "NextGuard uses Face ID to securely unlock the app and authenticate your identity."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "82df21f5-86cc-4585-ad01-86249e7a8bca"
+      },
+      "typedRoutes": true
+    },
+    "owner": "nextguard"
+  }
+}
