@@ -26,6 +26,7 @@ export default function DevicesPage({ searchParams }: Props) {
   const search = React.use(searchParams);
   const { data, isLoading, isPlaceholderData } = useGetAllDevicesQuery({
     searchParams: search,
+    refetchInterval: 1000,
   });
 
   // TODO: add skeletons

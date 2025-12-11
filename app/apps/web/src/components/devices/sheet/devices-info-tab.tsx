@@ -1,4 +1,15 @@
 import {
+  Battery,
+  DoorClosed,
+  DoorOpen,
+  Heart,
+  Lock,
+  Megaphone,
+  MegaphoneOff,
+  Plug,
+  Signal,
+} from "lucide-react";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -14,6 +25,10 @@ interface Props extends React.ComponentProps<"div"> {
 
 export function DevicesInfoTab({ className, device, ...props }: Props) {
   const telemetry = device.metadata.telemetry;
+  const batteryPercentage = device.metadata.batteryPercentage;
+  const batteryVoltage = device.metadata.batteryVoltage;
+  const state = device.metadata.state;
+  const lastHeartbeatAt = device.metadata.lastHeartbeatAt;
 
   function formatUptime(uptimeSeconds: number): string {
     if (uptimeSeconds === 0) return "0s";
@@ -53,26 +68,90 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
         </CardHeader>
       </Card>
 
+      {device.type === "entry" && (
+        <Card className="!py-4">
+          <CardContent className="grid gap-2 !px-4">
+            <div className="flex justify-between gap-2">
+              <span className="text-foreground text-nowrap text-sm">State</span>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 text-end text-sm text-green-600",
+                  !state && "text-destructive",
+                )}
+              >
+                {state ? (
+                  <>
+                    <DoorClosed className="size-4" /> Closed
+                  </>
+                ) : (
+                  <>
+                    <DoorOpen className="size-4" /> Opened
+                  </>
+                )}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {device.type === "siren" && (
+        <Card className="!py-4">
+          <CardContent className="grid gap-2 !px-4">
+            <div className="flex justify-between gap-2">
+              <span className="text-foreground text-nowrap text-sm">State</span>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 text-end text-sm text-green-600",
+                  state && "text-destructive",
+                )}
+              >
+                {state ? (
+                  <>
+                    <Megaphone className="size-4" /> ON
+                  </>
+                ) : (
+                  <>
+                    <MegaphoneOff className="size-4" /> OFF
+                  </>
+                )}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="!py-4">
         <CardContent className="grid gap-2 !px-4">
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">
+            <span className="text-foreground text-nowrap text-sm">
               Signal strength
             </span>
-            <span className="text-muted-foreground text-end text-sm">
-              -70 dBm
+            <span className="inline-flex items-center gap-1 text-end text-sm text-orange-500">
+              <Signal className="size-4" /> -
+              {Math.round((Math.random() + 0.05) * 100)} dBm
             </span>
           </div>
 
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">Battery</span>
-            <span className="text-muted-foreground text-end text-sm">100%</span>
+            <span className="text-foreground text-nowrap text-sm">Battery</span>
+            {batteryPercentage ? (
+              <span className="inline-flex items-center gap-1 text-end text-sm text-orange-300">
+                <Battery className="size-4" /> {batteryPercentage}%
+                {batteryVoltage && (
+                  <> / {(batteryVoltage / 1000).toFixed(2)}V</>
+                )}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-end text-sm text-green-600">
+                <Plug className="size-4" /> Plugged in
+              </span>
+            )}
           </div>
 
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">Lid</span>
-            <span className="text-muted-foreground text-end text-sm">
-              Closed
+            <span className="text-foreground text-nowrap text-sm">Lid</span>
+            <span className="text-muted-foreground inline-flex items-center gap-1 text-end text-sm">
+              <Lock className="size-4" /> Closed
             </span>
           </div>
         </CardContent>
@@ -81,14 +160,14 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
       <Card className="!py-4">
         <CardContent className="grid gap-2 !px-4">
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">Type</span>
+            <span className="text-foreground text-nowrap text-sm">Type</span>
             <span className="text-muted-foreground text-end text-sm">
               {device.type}
             </span>
           </div>
 
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">
+            <span className="text-foreground text-nowrap text-sm">
               Serial ID
             </span>
             <span className="text-muted-foreground text-end text-sm">
@@ -97,7 +176,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
           </div>
 
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">
+            <span className="text-foreground text-nowrap text-sm">
               Device version
             </span>
             <span className="text-muted-foreground text-end text-sm">
@@ -106,18 +185,28 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
           </div>
 
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">Uptime</span>
+            <span className="text-foreground text-nowrap text-sm">Uptime</span>
             <span className="text-muted-foreground text-end text-sm">
-              {formatUptime(telemetry?.system.uptime ?? 0)}
+              {formatUptime(telemetry?.system.uptime ?? Math.random() * 100)}
             </span>
           </div>
 
           <div className="flex justify-between gap-2">
-            <span className="text-foreground text-sm text-nowrap">
+            <span className="text-foreground text-nowrap text-sm">
               Last heartbeat
             </span>
-            <span className="text-muted-foreground text-end text-sm">
-              3s ago
+            <span className="text-destructive inline-flex items-center gap-1 text-end text-sm">
+              <Heart className="size-4" />{" "}
+              {lastHeartbeatAt ? (
+                <>
+                  {Math.round(
+                    new Date().getTime() / 1000 - lastHeartbeatAt / 1000,
+                  )}
+                  s ago
+                </>
+              ) : (
+                <>Never</>
+              )}
             </span>
           </div>
         </CardContent>
@@ -128,7 +217,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
           <Card className="!py-4">
             <CardContent className="grid gap-2 !px-4">
               <div className="flex justify-between gap-2">
-                <span className="text-foreground text-sm text-nowrap">
+                <span className="text-foreground text-nowrap text-sm">
                   Netowrk mode
                 </span>
                 <span className="text-muted-foreground text-end text-sm">
@@ -137,7 +226,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
               </div>
 
               <div className="flex justify-between gap-2">
-                <span className="text-foreground text-sm text-nowrap">
+                <span className="text-foreground text-nowrap text-sm">
                   Local IP Address
                 </span>
                 <span className="text-muted-foreground text-end text-sm">
@@ -146,7 +235,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
               </div>
 
               <div className="flex justify-between gap-2">
-                <span className="text-foreground text-sm text-nowrap">
+                <span className="text-foreground text-nowrap text-sm">
                   MAC Address
                 </span>
                 <span className="text-muted-foreground text-end text-sm">
@@ -156,7 +245,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
 
               {telemetry.network.wifiSsid && (
                 <div className="flex justify-between gap-2">
-                  <span className="text-foreground text-sm text-nowrap">
+                  <span className="text-foreground text-nowrap text-sm">
                     WiFi SSID
                   </span>
                   <span className="text-muted-foreground text-end text-sm">
@@ -167,7 +256,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
 
               {telemetry.network.wifiRssi && (
                 <div className="flex justify-between gap-2">
-                  <span className="text-foreground text-sm text-nowrap">
+                  <span className="text-foreground text-nowrap text-sm">
                     WiFi Signal strength
                   </span>
                   <span className="text-muted-foreground text-end text-sm">
@@ -179,7 +268,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
 
               {telemetry.network.ethSpeedMbps && (
                 <div className="flex justify-between gap-2">
-                  <span className="text-foreground text-sm text-nowrap">
+                  <span className="text-foreground text-nowrap text-sm">
                     Ethernet Speed
                   </span>
                   <span className="text-muted-foreground text-end text-sm">
@@ -190,7 +279,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
 
               {telemetry.network.ethFullDuplex && (
                 <div className="flex justify-between gap-2">
-                  <span className="text-foreground text-sm text-nowrap">
+                  <span className="text-foreground text-nowrap text-sm">
                     Ethernet Duplex
                   </span>
                   <span className="text-muted-foreground text-end text-sm">
@@ -204,7 +293,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
           <Card className="!py-4">
             <CardContent className="grid gap-2 !px-4">
               <div className="flex justify-between gap-2">
-                <span className="text-foreground text-sm text-nowrap">
+                <span className="text-foreground text-nowrap text-sm">
                   CPU Temp
                 </span>
                 <span className="text-muted-foreground text-end text-sm">
@@ -213,7 +302,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
               </div>
 
               <div className="flex justify-between gap-2">
-                <span className="text-foreground text-sm text-nowrap">
+                <span className="text-foreground text-nowrap text-sm">
                   CPU Frequency
                 </span>
                 <span className="text-muted-foreground text-end text-sm">
@@ -222,7 +311,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
               </div>
 
               <div className="flex justify-between gap-2">
-                <span className="text-foreground text-sm text-nowrap">
+                <span className="text-foreground text-nowrap text-sm">
                   CPU Cores
                 </span>
                 <span className="text-muted-foreground text-end text-sm">
@@ -231,7 +320,7 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
               </div>
 
               <div className="flex justify-between gap-2">
-                <span className="text-foreground text-sm text-nowrap">
+                <span className="text-foreground text-nowrap text-sm">
                   Used dynamic memory
                 </span>
                 <span className="text-muted-foreground text-end text-sm">
@@ -243,6 +332,51 @@ export function DevicesInfoTab({ className, device, ...props }: Props) {
               </div>
             </CardContent>
           </Card>
+
+          {device.type === "siren" && (
+            <Card className="!py-4">
+              <CardContent className="grid gap-2 !px-4">
+                <div className="flex justify-between gap-2">
+                  <span className="text-foreground text-nowrap text-sm">
+                    CPU Temp
+                  </span>
+                  <span className="text-muted-foreground text-end text-sm">
+                    {telemetry.cpu.tempC.toFixed(2)}°C
+                  </span>
+                </div>
+
+                <div className="flex justify-between gap-2">
+                  <span className="text-foreground text-nowrap text-sm">
+                    CPU Frequency
+                  </span>
+                  <span className="text-muted-foreground text-end text-sm">
+                    {telemetry.cpu.freqMhz.toFixed(2)}MHz
+                  </span>
+                </div>
+
+                <div className="flex justify-between gap-2">
+                  <span className="text-foreground text-nowrap text-sm">
+                    CPU Cores
+                  </span>
+                  <span className="text-muted-foreground text-end text-sm">
+                    {telemetry.cpu.cores}
+                  </span>
+                </div>
+
+                <div className="flex justify-between gap-2">
+                  <span className="text-foreground text-nowrap text-sm">
+                    Used dynamic memory
+                  </span>
+                  <span className="text-muted-foreground text-end text-sm">
+                    {formatBytes(
+                      telemetry.memory.heapTotal - telemetry.memory.heapFree,
+                    )}{" "}
+                    / {formatBytes(telemetry.memory.heapTotal)}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
     </div>

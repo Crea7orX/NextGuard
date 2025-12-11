@@ -10,7 +10,7 @@ interface Props {
 export function DevicesSheetBody({ id }: Props) {
   const { data, isLoading } = useGetDeviceByIdQuery({
     id,
-    refetchInterval: 2000,
+    refetchInterval: 1000,
   });
 
   // TODO: add skeletons

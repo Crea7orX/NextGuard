@@ -6,7 +6,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint .",

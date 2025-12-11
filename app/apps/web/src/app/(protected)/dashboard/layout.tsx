@@ -9,6 +9,7 @@ import {
 } from "~/components/spaces/no-space-selected";
 import { TypeToConfirmAlertDialog } from "~/components/type-to-confirm-alert-dialog";
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
+import { Toaster } from "~/components/ui/sonner";
 
 interface Props {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ export default function DashboardLayout({ children }: Props) {
       </SidebarProvider>
       <TypeToConfirmAlertDialog />
       <GlobalSheet />
+      <Toaster position="top-center" />
     </>
   );
 }

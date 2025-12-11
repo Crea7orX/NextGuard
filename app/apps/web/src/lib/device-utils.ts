@@ -3,8 +3,9 @@ import type { deviceTypeEnum } from "~/server/db/schemas/pending-devices";
 type DeviceTypeValue = (typeof deviceTypeEnum.enumValues)[number];
 
 enum DeviceTypeMapping {
-  "0x54" = "hub",
   "0x24" = "entry",
+  "0x54" = "hub",
+  "0x75" = "siren",
 }
 
 export function getDeviceTypeFromSerialId(serialId: string) {

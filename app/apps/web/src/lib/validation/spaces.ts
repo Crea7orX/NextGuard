@@ -11,6 +11,17 @@ export const spaceCreateSchema = z.object({
 
 export type SpaceCreate = z.infer<typeof spaceCreateSchema>;
 
+export const spaceResponseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  logo: z.string().nullish(),
+  armed: z.boolean(),
+  // createdAt: z.number(),
+  // updatedAt: z.number().nullish(),
+});
+
+export type SpaceResponse = z.infer<typeof spaceResponseSchema>;
+
 export function generateRandomSlug() {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";

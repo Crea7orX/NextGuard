@@ -2,6 +2,7 @@ import type { RawData, WebSocket as WSWebSocket } from "ws";
 import { handleDiscovery } from "~/handlers/discovery";
 import { handleHello } from "~/handlers/hello";
 import { handleHelloAck } from "~/handlers/hello-ack";
+import { handleHubMessageFromNode } from "~/handlers/hub_message_from_node";
 import { handleHubNodeAdoption } from "~/handlers/hub_node_adoption";
 import { handleSession } from "~/handlers/session";
 import { handleTelemtry } from "~/handlers/telemetry";
@@ -69,6 +70,11 @@ export async function handleMessage(
 
   if (data.type === "hub_node_adoption") {
     await handleHubNodeAdoption(socket, parsedMessage.data, session);
+    return;
+  }
+
+  if (data.type === "hub_message_from_node") {
+    await handleHubMessageFromNode(socket, parsedMessage.data, session);
     return;
   }
 }

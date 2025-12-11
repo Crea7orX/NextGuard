@@ -86,6 +86,10 @@ export const deviceResponseSchema = z.object({
   description: z.string().nullish(),
   metadata: z.object({
     telemetry: z.object(deviceTelemetrySchema.shape).optional(),
+    batteryPercentage: z.number().optional(),
+    batteryVoltage: z.number().optional(),
+    state: z.boolean().optional(),
+    lastHeartbeatAt: z.number().optional(),
   }),
   ownerId: z.string(),
   createdAt: z.number(),

@@ -17,6 +17,7 @@ export function PendingDevicesDataTable({
 }: React.ComponentProps<"div">) {
   const { data } = useGetAllPendingDevicesQuery({
     searchParams: {},
+    refetchInterval: 1000,
   });
 
   const [adoptDevice, setAdoptDevice] = React.useState<PendingDeviceResponse>();

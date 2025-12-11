@@ -20,9 +20,9 @@ export async function handleDiscovery(
     path: `/pending_devices/${session.deviceId}/discovery`,
     body: payload.data,
   });
-  if (!discoveryResponse.success) {
-    throw new Error("Invalid response!");
-  }
+  // if (!discoveryResponse.success) {
+  //   throw new Error("Invalid response!");
+  // }
 
   // TODO: Validate response
 
@@ -32,7 +32,7 @@ export async function handleDiscovery(
     ts: nowSec(),
     nonce: generateNonce(),
     payload: {
-      serial_id: discoveryResponse.data.serialId,
+      serial_id: payload.data.serialId,
     },
   };
   ws.send(

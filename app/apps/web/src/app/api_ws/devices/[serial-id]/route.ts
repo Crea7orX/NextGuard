@@ -42,6 +42,7 @@ export async function GET(request: NextRequest, { params }: Props) {
       deviceSessionResponseSchema.parse({ ...device, nodes }),
     );
   } catch (error) {
+    console.log(error);
     return handleError(error);
   }
 }
