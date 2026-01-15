@@ -3,7 +3,8 @@ import { View, Pressable, Animated, Platform, UIManager, Easing } from 'react-na
 import { ChevronDown } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { useState, useRef, useEffect } from 'react';
-import { SignOutButton, AccountDetailsButton } from '@/components/account'
+import { SignOutButton } from '@/components/account/sign-out-button';
+import { AccountDetailsButton } from '@/components/account/account-details-button';
 import { useAuth } from "@/hooks/useAuth";
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -28,7 +29,20 @@ export function ProfileCard({
 
   const name = user?.name || "Guest";
   const email = user?.email || "No email";
-  const initials = user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || "G";
+  const initials = (() => {
+    const nameStr = user?.name?.trim() || '';
+    if (!nameStr) return 'G';
+
+    const parts = nameStr.split(/\s+/);
+    const chars = parts.map(part => {
+      for (const ch of part) {
+        if (/\p{L}|\p{N}/u.test(ch)) return ch;
+      }
+      return '';
+    }).filter(Boolean).join('').toUpperCase();
+
+    return chars || 'G';
+  })();
 
   useEffect(() => {
     Animated.parallel([
